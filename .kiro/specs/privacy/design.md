@@ -51,11 +51,25 @@ RetentionPolicy(id, data_type, duration_days, description, active)
 
 ## Correctness Properties
 
-- Every write to a personal-data field in any bounded context produces exactly one corresponding `AuditLog` entry in the same transaction.
-- `DELETE /users/me` always results in: digital files purged from storage, AuditLog entries anonymized beyond minimum legal retention, and no residual DataConsent/DataProcessingRecord rows referencing a resolvable identity.
-- No cross-user data read (reviews, reading history, etc.) is served unless the data owner's visibility setting explicitly permits it for that requester.
-- `RetentionPolicy.duration_days` is read from configuration/database at runtime — never from a compile-time constant.
-- Users are always notified before automated deletion triggered by retention expiry.
+### Property 1: Audit log on every write
+Every write to a personal-data field in any bounded context produces exactly one corresponding `AuditLog` entry in the same transaction.
+**Validates: Requirements 1.5**
+
+### Property 2: Account cancellation completeness
+`DELETE /users/me` always results in: digital files purged from storage, AuditLog entries anonymized beyond minimum legal retention, and no residual DataConsent/DataProcessingRecord rows referencing a resolvable identity.
+**Validates: Requirements 1.2**
+
+### Property 3: Visibility enforcement
+No cross-user data read (reviews, reading history, etc.) is served unless the data owner's visibility setting explicitly permits it for that requester.
+**Validates: Requirements 1.8**
+
+### Property 4: Runtime retention configuration
+`RetentionPolicy.duration_days` is read from configuration/database at runtime — never from a compile-time constant.
+**Validates: Requirements 1.7**
+
+### Property 5: Pre-deletion notification
+Users are always notified before automated deletion triggered by retention expiry.
+**Validates: Requirements 1.7**
 
 ## Error Handling
 

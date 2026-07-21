@@ -65,12 +65,29 @@ Note(id, user_id, copy_id, position, text, created_at, updated_at)
 
 ## Correctness Properties
 
-- A `Book` can exist without any associated Copies.
-- `Copy.file_ref` is only ever resolved when `request.user_id == Copy.user_id`; every other request path returns no file reference.
-- `Copy.type == physical` implies `file_ref IS NULL`, always.
-- `ReadingProgress`, `Bookmark`, and `Note` can only exist for digital copies whose `usuario_id` matches the record's `user_id`.
-- Search results from the group library never expose `file_ref` of any copy.
-- `MetadataProvider` is accessed via an interface — the implementation is replaceable without domain changes.
+### Property 1: Book exists without copies
+A `Book` can exist without any associated Copies.
+**Validates: Requirements 1.1**
+
+### Property 2: File isolation
+`Copy.file_ref` is only ever resolved when `request.user_id == Copy.user_id`; every other request path returns no file reference.
+**Validates: Requirements 1.3**
+
+### Property 3: Physical copy has no file
+`Copy.type == physical` implies `file_ref IS NULL`, always.
+**Validates: Requirements 1.4**
+
+### Property 4: Reader data ownership
+`ReadingProgress`, `Bookmark`, and `Note` can only exist for digital copies whose `usuario_id` matches the record's `user_id`.
+**Validates: Requirements 4.2**
+
+### Property 5: Group search isolation
+Search results from the group library never expose `file_ref` of any copy.
+**Validates: Requirements 3.3**
+
+### Property 6: Metadata provider abstraction
+`MetadataProvider` is accessed via an interface — the implementation is replaceable without domain changes.
+**Validates: Requirements 2.2**
 
 ## Error Handling
 

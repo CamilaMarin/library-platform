@@ -41,11 +41,25 @@ Review(id, user_id, book_id, rating[integer 1-5], text, visibility[private|share
 
 ## Correctness Properties
 
-- `Review.visibility == 'private'` implies `shared_with_type IS NULL AND shared_with_id IS NULL`.
-- `Review.visibility == 'shared'` implies `shared_with_type IS NOT NULL AND shared_with_id IS NOT NULL`.
-- A `shared` review is only served to users who are members of the specified group or club at query time.
-- A `private` review is only served to its `user_id` (the author).
-- No review is ever served without an explicit access check against the requester's memberships.
+### Property 1: Private visibility nulls shared_with
+`Review.visibility == 'private'` implies `shared_with_type IS NULL AND shared_with_id IS NULL`.
+**Validates: Requirements 1.2**
+
+### Property 2: Shared visibility requires explicit target
+`Review.visibility == 'shared'` implies `shared_with_type IS NOT NULL AND shared_with_id IS NOT NULL`.
+**Validates: Requirements 1.3**
+
+### Property 3: Shared review access control
+A `shared` review is only served to users who are members of the specified group or club at query time.
+**Validates: Requirements 2.1**
+
+### Property 4: Private review access control
+A `private` review is only served to its `user_id` (the author).
+**Validates: Requirements 2.2**
+
+### Property 5: Mandatory access check
+No review is ever served without an explicit access check against the requester's memberships.
+**Validates: Requirements 2.3**
 
 ## Error Handling
 

@@ -57,11 +57,25 @@ GroupMembership(group_id, user_id, status[invited|accepted])
 
 ## Correctness Properties
 
-- A `User` row is never created without a corresponding `DataConsent` row in the same transaction.
-- A `GroupMembership.status` can only transition `invited → accepted` via an explicit action by the invited `user_id`; no other path exists.
-- A valid Access Token contains `user_id` and `exp`; validation never requires a database lookup.
-- Refresh Token rotation always invalidates the previous token in the same transaction as issuing the new one (prevents replay).
-- A revoked Refresh Token can never be used to obtain a new Access Token.
+### Property 1: Consent-gating
+A `User` row is never created without a corresponding `DataConsent` row in the same transaction.
+**Validates: Requirements 1.1**
+
+### Property 2: Invitation state machine
+A `GroupMembership.status` can only transition `invited → accepted` via an explicit action by the invited `user_id`; no other path exists.
+**Validates: Requirements 3.2**
+
+### Property 3: Stateless token validation
+A valid Access Token contains `user_id` and `exp`; validation never requires a database lookup.
+**Validates: Requirements 2.2**
+
+### Property 4: Refresh token rotation atomicity
+Refresh Token rotation always invalidates the previous token in the same transaction as issuing the new one (prevents replay).
+**Validates: Requirements 2.3**
+
+### Property 5: Revocation enforcement
+A revoked Refresh Token can never be used to obtain a new Access Token.
+**Validates: Requirements 2.4**
 
 ## Error Handling
 

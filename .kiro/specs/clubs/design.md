@@ -47,9 +47,17 @@ Comment(id, turn_id, user_id, text, is_spoiler, created_at)
 
 ## Correctness Properties
 
-- `ActivateReadingTurn` for a `(user_id, book_id)` pair succeeds only if that user owns a `Copy` of that book (checked via Library context's ownership query — never by copying or caching `file_ref`).
-- A `Club.group_id` always references an existing `FamilyGroup`.
-- `Comment.is_spoiler` defaults to `false`; users must explicitly mark spoiler content.
+### Property 1: Copy ownership validation
+`ActivateReadingTurn` for a `(user_id, book_id)` pair succeeds only if that user owns a `Copy` of that book (checked via Library context's ownership query — never by copying or caching `file_ref`).
+**Validates: Requirements 2.2**
+
+### Property 2: Group reference integrity
+A `Club.group_id` always references an existing `FamilyGroup`.
+**Validates: Requirements 1.1**
+
+### Property 3: Spoiler default
+`Comment.is_spoiler` defaults to `false`; users must explicitly mark spoiler content.
+**Validates: Requirements 1.3**
 
 ## Error Handling
 

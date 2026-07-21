@@ -38,10 +38,21 @@ Loan(id, copy_id, borrower_user_id, loan_date, estimated_return_date, status[act
 
 ## Correctness Properties
 
-- `Loan.copy_id` always references a `Copy` with `type == physical`; enforced at the application layer before persistence.
-- A `Copy` cannot have two simultaneous `active` loans.
-- Loan creation always flips the referenced `Copy.status` to `on_loan` in the same transaction.
-- Loan return always flips the referenced `Copy.status` back to `available` in the same transaction.
+### Property 1: Physical-only constraint
+`Loan.copy_id` always references a `Copy` with `type == physical`; enforced at the application layer before persistence.
+**Validates: Requirements 1.1**
+
+### Property 2: No concurrent loans
+A `Copy` cannot have two simultaneous `active` loans.
+**Validates: Requirements 1.2**
+
+### Property 3: Loan creation status transition
+Loan creation always flips the referenced `Copy.status` to `on_loan` in the same transaction.
+**Validates: Requirements 1.2**
+
+### Property 4: Return status transition
+Loan return always flips the referenced `Copy.status` back to `available` in the same transaction.
+**Validates: Requirements 1.2**
 
 ## Error Handling
 
