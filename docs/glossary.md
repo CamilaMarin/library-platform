@@ -1,0 +1,24 @@
+# Glossary — EntreLíneas
+
+- **Usuario**: persona con cuenta en la plataforma, siempre dueña de sus propios datos y archivos.
+- **GrupoFamiliar**: conjunto de usuarios que se han invitado y aceptado mutuamente; unidad social base de la app. Jerarquía MVP: Usuario → Grupo → Biblioteca compartida.
+- **Libro (Book)**: metadatos de una obra intelectual (título, autor, género, descripción), independiente de quién lo posea. Puede existir sin copias asociadas.
+- **Ejemplar (Book Copy)**: instancia de un Libro que pertenece a un Usuario; puede ser físico (solo metadatos + estado) o digital (archivo cifrado, aislado por cuenta). Cada copia tiene exactamente un propietario.
+- **Club**: espacio de coordinación de lectura dentro de un grupo familiar (en el MVP), con libro activo y fecha de discusión.
+- **TurnoLectura**: mecanismo para coordinar quién lee/comenta un libro digital dentro de un club, sin transferir el archivo.
+- **Préstamo**: registro de que un Ejemplar físico está en posesión temporal de otra persona. No aplica a ejemplares digitales.
+- **Reseña**: calificación + opinión de un usuario sobre un libro, con visibilidad `private` o `shared` (con destino explícito: grupo o club específico).
+- **ConsentimientoDatos**: registro del consentimiento explícito de un usuario para el tratamiento de sus datos personales, con timestamp y versión de política aceptada.
+- **Sorteo (Reading Selection)**: mecanismo de selección conjunta de lectura con filtros (género, páginas, disponibilidad). Valida que cada participante tenga acceso autorizado al libro.
+- **ProgresoLectura**: posición actual del usuario en un ejemplar digital, gestionada por el lector integrado.
+- **Marcador (Bookmark)**: punto guardado en un ejemplar digital por el usuario propietario.
+- **Nota**: anotación del usuario asociada a una posición en un ejemplar digital.
+- **Access Token**: JWT de corta duración emitido al login, usado para autenticar requests.
+- **Refresh Token**: token de larga duración para obtener nuevos Access Tokens sin re-login.
+- **ARCO**: derechos de Acceso, Rectificación, Cancelación y Oposición sobre datos personales (más portabilidad), garantizados por la Ley 21.719.
+- **APDP**: Agencia de Protección de Datos Personales de Chile, entidad fiscalizadora bajo la Ley 21.719.
+- **Ley 21.719**: ley chilena de protección de datos personales, en plena vigencia desde el 1 de diciembre de 2026, alineada con el estándar GDPR.
+- **Bounded Context**: en DDD, un límite explícito dentro del cual un modelo de dominio es coherente y consistente (ver `domain/entities.md`).
+- **ADR (Architecture Decision Record)**: documento corto que registra una decisión arquitectónica, su contexto y sus consecuencias.
+- **Steering Rules**: reglas permanentes que guían a un agente de IA (Kiro, Claude, etc.) en todas las tareas de implementación, sin importar el módulo.
+- **PROJECT_CONTEXT.md**: documento de entrada de nivel 1 que resume todo el proyecto para una persona o agente nuevo.
