@@ -1,19 +1,19 @@
 # Implementation Status — EntreLíneas
 
-Last updated: 2025-01-01
+Last updated: 2025-07-21
 
 ## Overall Progress
 
-- Current milestone: **M-1 (Architecture Validation)**
-- Milestones completed: **0/11**
+- Current milestone: **M0 (Privacy Foundation)**
+- Milestones completed: **1/11**
 - Architecture frozen: **Yes**
-- Implementation started: **No**
+- Implementation started: **Yes**
 
 ## Milestones
 
 | # | Milestone | Status | Tasks | Completed |
 |---|-----------|--------|-------|-----------|
-| M-1 | Architecture Validation | Not started | 7 | 0/7 |
+| M-1 | Architecture Validation | ✅ Complete | 7 | 7/7 |
 | M0 | Privacy Foundation | Not started | 3 | 0/3 |
 | M1 | Authentication | Not started | 7 | 0/7 |
 | M2 | Users & Groups | Not started | 4 | 0/4 |
@@ -120,8 +120,8 @@ Last updated: 2025-01-01
 
 ## Next Milestone
 
-**M-1: Architecture Validation**
+**M0: Privacy Foundation**
 
-Goal: Validate the complete technical stack before implementing business features.
+Goal: Implement minimal privacy infrastructure (DataConsent, DataProcessingRecord, AuditLog service, RetentionPolicy entity).
 
-Prerequisites: Sprint 0 scaffolding complete (folder structure, docker-compose, skeletons, CI).
+Prerequisites: M-1 complete ✅
