@@ -1,11 +1,18 @@
+"""Alembic environment configuration. Reads DATABASE_URL from app.config."""
+
 from logging.config import fileConfig
 
-from alembic import context
 from sqlalchemy import engine_from_config, pool
 
+from alembic import context
+from app.config import settings
 from app.database import Base
 
 config = context.config
+
+# Override sqlalchemy.url from app settings (which reads from .env)
+config.set_main_option("sqlalchemy.url", settings.database_url)
+
 if config.config_file_name is not None:
     fileConfig(config.config_file_name)
 
