@@ -6,7 +6,7 @@ This module covers personal library management: books (metadata of the intellect
 
 Reading selection (sorteo/draw) has its own dedicated spec: `.kiro/specs/reading-selection/`.
 
-Source: `docs/specs/library.md`, `docs/domain/business-rules.md` (rules 1, 9, 11).
+Source: `docs/domain/business-rules.md` (rules 1, 9, 11).
 
 ### Referenced ADRs
 - `adr/0001-no-shared-file-storage.md` — No file sharing between accounts

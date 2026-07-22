@@ -1,19 +1,19 @@
-# ADR-0003: Cumplimiento de la Ley 21.719 desde el diseño
+# ADR-0003: Ley 21.719 (Chile's Data Protection Law) Compliance from Design
 
-## Estado
-Aceptado
+## Status
+Accepted
 
-## Contexto
-La Ley 21.719 (Chile) entra en plena vigencia el 1 de diciembre de 2026, alineada con el estándar GDPR: crea la Agencia de Protección de Datos Personales (APDP), exige derechos ARCO + portabilidad, notificación de brechas en 72 horas, y multas de hasta 20.000 UTM o 4% de ingresos anuales en reincidencia. Aplica a cualquier organización que trate datos de personas en Chile, sin excepción de tamaño.
+## Context
+Ley 21.719 (Chile's Data Protection Law) enters full effect on December 1, 2026, aligned with GDPR standards: it creates the Data Protection Agency (APDP), mandates ARCO rights + portability, requires breach notification within 72 hours, and fines up to 20,000 UTM or 4% of annual revenue for repeat offenses. It applies to any organization processing data of individuals in Chile, regardless of size.
 
-## Decisión
-- Privacy by Design desde el primer sprint, no como ajuste posterior al MVP.
-- Cada entidad que almacene datos personales queda vinculada a un registro de tratamiento (`RegistroTratamientoDatos`) y a logs de auditoría.
-- El panel de privacidad del usuario (`/privacy`) implementa los 4 derechos ARCO + portabilidad como autoservicio, sin pasar por soporte.
-- Existe un playbook documentado de notificación de brechas dentro de 72 horas.
-- Minimización de datos: ningún campo se agrega al modelo sin justificar su necesidad funcional explícita (ej. no se pide RUT).
+## Decision
+- Privacy by Design from the first sprint, not as a post-MVP adjustment.
+- Every entity storing personal data is linked to a processing record (`DataProcessingRecord`) and to audit logs.
+- The user's privacy panel (`/privacy`) implements all 4 ARCO rights + portability as self-service, without going through support.
+- A documented breach notification playbook within 72 hours exists.
+- Data minimization: no field is added to the model without justifying its explicit functional necessity (e.g., national ID is never requested).
 
-## Consecuencias
-- Overhead de diseño y desarrollo mayor al de un MVP típico, pero evita rediseñar el modelo de datos bajo presión antes de diciembre de 2026.
-- Sirve como diferenciador de portafolio: pocos proyectos personales documentan cumplimiento normativo real desde el ADR.
-- Requiere revisión legal externa antes de cualquier lanzamiento con datos reales (fuera del alcance de este documento, que es orientación general y no asesoría legal).
+## Consequences
+- Higher design and development overhead than a typical MVP, but avoids redesigning the data model under pressure before December 2026.
+- Serves as a portfolio differentiator: few personal projects document real regulatory compliance from the ADR level.
+- Requires external legal review before any launch with real data (outside the scope of this document, which is general guidance and not legal advice).

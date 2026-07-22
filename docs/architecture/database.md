@@ -1,66 +1,67 @@
 # Database — EntreLíneas
 
-PostgreSQL. Ver también `domain/entities.md` para la versión DDD del mismo modelo.
+PostgreSQL. See also `domain/entities.md` for the DDD view of the same model.
 
-## Tablas MVP
+## MVP Tables
 
-### Identidad & Privacidad
-- **usuarios**(id, nombre, email, password_hash, fecha_nacimiento[opcional], config_privacidad, creado_en)
-- **consentimientos_datos**(id, usuario_id, timestamp, version_politica, finalidad)
-- **refresh_tokens**(id, usuario_id, token_hash, expira_en, revocado, creado_en)
-- **grupos_familiares**(id, nombre, creado_en)
-- **miembros_grupo**(grupo_id, usuario_id, estado[invitado|aceptado])
+### Identity & Privacy
+- **users**(id, name, email, password_hash, date_of_birth[optional], privacy_settings, created_at)
+- **data_consents**(id, user_id, timestamp, policy_version, purpose)
+- **refresh_tokens**(id, user_id, token_hash, expires_at, revoked, created_at)
+- **family_groups**(id, name, created_at)
+- **group_memberships**(group_id, user_id, status[invited|accepted])
 
-### Biblioteca
-- **libros**(id, titulo, autor, generos[], descripcion, paginas, isbn)
-- **ejemplares**(id, usuario_id, libro_id, tipo[fisico|digital], archivo_ref, estado[disponible|prestado])
-- **progreso_lectura**(id, usuario_id, ejemplar_id, posicion, porcentaje, ultima_lectura)
-- **marcadores**(id, usuario_id, ejemplar_id, posicion, etiqueta, creado_en)
-- **notas**(id, usuario_id, ejemplar_id, posicion, texto, creado_en, actualizado_en)
+### Library
+- **books**(id, title, author, genres[], description, pages, isbn)
+- **copies**(id, user_id, book_id, type[physical|digital], file_ref, status[available|on_loan])
+- **reading_progress**(id, user_id, copy_id, position, percentage, last_read_at)
+- **bookmarks**(id, user_id, copy_id, position, label, created_at)
+- **notes**(id, user_id, copy_id, position, text, created_at, updated_at)
 
-### Comunidad
-- **clubes**(id, grupo_id, nombre, libro_activo_id, fecha_discusion)
-- **turnos_lectura**(id, club_id, libro_id, usuario_id_actual)
-- **comentarios_turno**(id, turno_id, usuario_id, texto, es_spoiler)
+### Community
+- **clubs**(id, group_id, name, active_book_id, discussion_date)
+- **reading_turns**(id, club_id, book_id, current_user_id)
+- **turn_comments**(id, turn_id, user_id, text, is_spoiler)
 
-### Circulación
-- **prestamos**(id, ejemplar_id, prestado_a_usuario_id, fecha_prestamo, fecha_devolucion_estimada, estado)
+### Circulation
+- **loans**(id, copy_id, borrower_user_id, loan_date, estimated_return_date, status)
 
-### Reseñas
-- **resenas**(id, usuario_id, libro_id, calificacion, texto, visibility[private|shared], shared_with_type[group|club|null], shared_with_id[nullable])
+### Reviews
+- **reviews**(id, user_id, book_id, rating, text, visibility[private|shared], shared_with_type[group|club|null], shared_with_id[nullable])
 
-### Privacidad & Auditoría
-- **registro_tratamiento_datos**(id, usuario_id, tipo_dato, finalidad, base_legal, fecha_recoleccion, fecha_expiracion_retencion)
-- **logs_auditoria**(id, usuario_id_actor, accion, entidad_afectada, timestamp)
-- **politicas_retencion**(id, tipo_dato, duracion_dias, descripcion, activa)
+### Privacy & Audit
+- **data_processing_records**(id, user_id, data_type, purpose, legal_basis, collected_at, retention_expires_at)
+- **audit_logs**(id, actor_user_id, action, affected_entity, timestamp)
+- **retention_policies**(id, data_type, duration_days, description, active)
 
-### Selección de Lectura
-- **sorteos**(id, grupo_id, filtros_json, resultado_libro_id, resultado_ejemplar_origen_usuario_id, timestamp)
+### Reading Selection
+- **draws**(id, group_id, filters_json, result_book_id, result_source_user_id, timestamp)
 
-## Constraints relevantes a nivel de aplicación (no solo DB)
+## Application-Level Constraints (not DB-only)
 
-- `ejemplares.archivo_ref` solo se resuelve para requests donde `request.usuario_id == ejemplares.usuario_id`.
-- `prestamos.ejemplar_id` debe referenciar un ejemplar con `tipo = 'fisico'` (validado en el caso de uso, reforzado con constraint check si el motor lo permite).
-- `resenas.shared_with_id` solo puede ser NOT NULL cuando `visibility = 'shared'`.
-- `progreso_lectura`, `marcadores` y `notas` solo pueden existir para ejemplares digitales cuyo `usuario_id` coincida con el del registro.
+- `copies.file_ref` is only resolved for requests where `request.user_id == copies.user_id`.
+- `loans.copy_id` must reference a copy with `type = 'physical'` (validated in the use case, reinforced with a check constraint if the engine supports it).
+- `reviews.shared_with_id` can only be NOT NULL when `visibility = 'shared'`.
+- `reading_progress`, `bookmarks`, and `notes` can only exist for digital copies whose `user_id` matches the record's user_id.
 
-## Cambios respecto al diseño anterior
+## Changes from Previous Design
 
-- Se eliminó `rol[adulto|menor]` de `miembros_grupo` — cuentas de menores diferidas a v2 (ver `adr/0005`).
-- Se agregó `refresh_tokens` — JWT custom con rotación (ver `adr/0004`).
-- Se cambió `resenas.visibilidad` por el modelo `visibility` + `shared_with_type` + `shared_with_id` (ver `adr/0007`).
-- Se agregaron tablas del lector integrado: `progreso_lectura`, `marcadores`, `notas` (ver `adr/0014`).
-- Se agregó `politicas_retencion` — periodos configurables, no hardcodeados (ver `adr/0016`).
-- Se agregó `sorteos` — selección de lectura como feature dedicada (ver `adr/0013`).
+- Removed `role[adult|minor]` from `group_memberships` — minor accounts deferred to v2 (see `adr/0005`).
+- Added `refresh_tokens` — custom JWT with rotation (see `adr/0004`).
+- Changed review visibility to `visibility` + `shared_with_type` + `shared_with_id` model (see `adr/0007`).
+- Added reader tables: `reading_progress`, `bookmarks`, `notes` (see `adr/0014`).
+- Added `retention_policies` — configurable periods, not hardcoded (see `adr/0016`).
+- Added `draws` — reading selection as a dedicated feature (see `adr/0013`).
+- All table names now use English snake_case.
 
-## Tablas v2 (catálogo enriquecido, no MVP)
+## v2 Tables (enriched catalog, not MVP)
 
-- **autores**, **series**, **editoriales**, **colecciones** — normalización de metadatos hoy embebidos como texto libre en `libros`.
-- Campos/tablas para gestión de cuentas de menores (ver `adr/0005`).
+- **authors**, **series**, **publishers**, **collections** — normalization of metadata currently embedded as free text in `books`.
+- Fields/tables for minor account management (see `adr/0005`).
 
-## Índices sugeridos
+## Suggested Indexes
 
-- `ejemplares(usuario_id)`, `ejemplares(libro_id)` — consultas de biblioteca personal y de sorteo.
-- `logs_auditoria(usuario_id_actor, timestamp)` — consultas de auditoría por rango de fecha.
-- `refresh_tokens(token_hash)` — validación rápida de refresh tokens.
-- `progreso_lectura(usuario_id, ejemplar_id)` — consulta de progreso al abrir lector.
+- `copies(user_id)`, `copies(book_id)` — personal library and draw queries.
+- `audit_logs(actor_user_id, timestamp)` — audit queries by date range.
+- `refresh_tokens(token_hash)` — fast refresh token validation.
+- `reading_progress(user_id, copy_id)` — progress lookup when opening the reader.

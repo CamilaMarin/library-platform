@@ -4,7 +4,7 @@
 
 This module coordinates book clubs within a family group: active book, discussion date, spoiler-safe comments, and digital reading turns that never move a file between accounts.
 
-Source: `docs/specs/clubs.md`, `docs/domain/business-rules.md` (rule 3).
+Source: `docs/domain/business-rules.md` (rule 3).
 
 ### Referenced ADRs
 - `adr/0001-no-shared-file-storage.md` — No file sharing between accounts

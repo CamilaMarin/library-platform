@@ -1,16 +1,15 @@
 # ADR-0013: Reading Selection as Dedicated Specification
 
-## Estado
-Aceptado
+## Status
+Accepted
 
-## Contexto
-La selección de lectura (sorteo aleatorio filtrable, modo de elección por turno) es una funcionalidad core del MVP que diferencia a EntreLíneas de sus competidores. Estaba brevemente descrita dentro de `specs/library.md` pero merece un tratamiento independiente dada su complejidad (filtros, validación de disponibilidad, múltiples modos de selección).
+## Context
+Reading selection (filterable random draw, pick-by-turn mode) is a core MVP feature that differentiates EntreLíneas from competitors. It was briefly described within the library spec but deserves independent treatment given its complexity (filters, availability validation, multiple selection modes).
 
-## Decisión
-- Crear una especificación dedicada para Reading Selection: `specs/reading-selection.md`.
-- Se creará un spec completo en `.kiro/specs/reading-selection/` con requirements, design y tasks.
+## Decision
+- Create a dedicated specification for Reading Selection: `.kiro/specs/reading-selection/` with requirements, design, and tasks.
 
-## Consecuencias
-- Los acceptance criteria de selección de lectura se mueven de `specs/library.md` a `specs/reading-selection.md`.
-- `specs/library.md` se enfoca exclusivamente en gestión de biblioteca (CRUD de libros y ejemplares, búsqueda, import).
-- El bounded context sigue siendo Biblioteca (la selección usa entidades de Library), pero tiene su propia especificación funcional.
+## Consequences
+- Reading selection acceptance criteria move out of the library spec into their own spec.
+- The library spec focuses exclusively on library management (CRUD for books and copies, search, import, reader).
+- The bounded context remains Library at implementation level (reading selection uses Book/Copy entities), but it has its own functional specification.

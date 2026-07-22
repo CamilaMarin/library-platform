@@ -1,16 +1,16 @@
 # ADR-0010: Search is Part of the Library Module
 
-## Estado
-Aceptado
+## Status
+Accepted
 
-## Contexto
-El roadmap lista "Búsqueda básica" como feature MVP. Se evaluó si debía ser un módulo independiente o parte de un bounded context existente.
+## Context
+The roadmap lists "basic search" as an MVP feature. It was evaluated whether it should be an independent module or part of an existing bounded context.
 
-## Decisión
-- La búsqueda es parte del módulo **Library** (bounded context Biblioteca).
-- No es un módulo independiente ni un bounded context separado.
+## Decision
+- Search is part of the **Library** module (bounded context Library).
+- It is not an independent module or bounded context.
 
-## Consecuencias
-- Los casos de uso de búsqueda (`BuscarLibro`, `BuscarEjemplar`) viven en `library/application/`.
-- No se crea un directorio `search/` separado en la estructura de carpetas.
-- Si en el futuro la búsqueda crece en complejidad (full-text, Elasticsearch), se puede extraer a infraestructura propia manteniendo la interfaz en el módulo Library.
+## Consequences
+- Search use cases (`SearchBooks`) live in `library/application/`.
+- No separate `search/` directory is created in the folder structure.
+- If in the future search grows in complexity (full-text, Elasticsearch), it can be extracted to its own infrastructure while maintaining the interface in the Library module.

@@ -4,7 +4,7 @@
 
 This module implements the cross-cutting privacy infrastructure required by Chile's Ley 21.719: consent tracking, a processing record, audit logging, self-service ARCO rights, configurable retention, and breach notification. Every other bounded context depends on the services defined here.
 
-Source: `docs/specs/privacy.md`.
+Source: `docs/domain/business-rules.md` (rules 4, 7, 10, 11), `adr/0003-ley-21719-compliance.md`.
 
 ### Referenced ADRs
 - `adr/0003-ley-21719-compliance.md` — Ley 21.719 compliance from design

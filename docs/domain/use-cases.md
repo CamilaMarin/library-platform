@@ -1,42 +1,42 @@
 # Use Cases — EntreLíneas (Application Layer)
 
-## Identidad & Privacidad
-- `RegistrarUsuario` (requiere `AceptarConsentimientoDatos` previo o en el mismo flujo)
-- `LoginUsuario` (emite Access Token + Refresh Token; ver `adr/0004`)
-- `RefrescarToken` (rota Refresh Token, emite nuevo Access Token)
-- `RevocarToken` (invalida Refresh Token)
-- `CrearGrupoFamiliar`
-- `InvitarMiembroGrupo` / `AceptarInvitacionGrupo`
-- `EjercerDerechoARCO` (acceso / rectificación / cancelación / oposición / portabilidad)
-- `NotificarBrechaDeSeguridad` (uso interno, dispara playbook de 72h)
+## Identity & Privacy
+- `RegisterUser` (requires `AcceptDataConsent` prior or in the same flow)
+- `LoginUser` (issues Access Token + Refresh Token; see `adr/0004`)
+- `RefreshToken` (rotates Refresh Token, issues new Access Token)
+- `RevokeToken` (invalidates Refresh Token)
+- `CreateFamilyGroup`
+- `InviteGroupMember` / `AcceptGroupInvitation`
+- `ExerciseARCORight` (access / rectification / cancellation / opposition / portability)
+- `NotifySecurityBreach` (internal, triggers 72h playbook)
 
-## Biblioteca
-- `AgregarLibro` (metadatos de la obra intelectual)
-- `AgregarEjemplarFisico`
-- `AgregarEjemplarDigital` (incluye cifrado y aislamiento de archivo)
-- `EditarLibro` / `EliminarLibro`
-- `EditarEjemplar` / `EliminarEjemplar`
-- `BuscarLibro` (búsqueda dentro de biblioteca propia y del grupo — solo metadatos)
-- `ImportarMetadatosLibro` (autocompletado vía fuente pública: Open Library, Google Books)
-- `AbrirLector` (valida propiedad, sirve archivo cifrado al propietario autenticado)
-- `GuardarProgresoLectura`
-- `CrearMarcador` / `EliminarMarcador`
-- `CrearNota` / `EditarNota` / `EliminarNota`
+## Library
+- `CreateBook` (intellectual work metadata)
+- `CreatePhysicalCopy`
+- `CreateDigitalCopy` (includes encryption and file isolation)
+- `EditBook` / `DeleteBook`
+- `EditCopy` / `DeleteCopy`
+- `SearchBooks` (search within personal and group library — metadata only)
+- `ImportBookMetadata` (autocomplete via public source: Open Library, Google Books)
+- `OpenReader` (validate ownership, serve encrypted file to authenticated owner)
+- `SaveReadingProgress`
+- `CreateBookmark` / `DeleteBookmark`
+- `CreateNote` / `EditNote` / `DeleteNote`
 
-## Selección de Lectura
-- `EjecutarSorteoLectura` (valida disponibilidad para todos los participantes; ver `adr/0008`)
-- `SeleccionPorTurno` (modo alternativo de elección rotativa entre miembros)
+## Reading Selection
+- `RunReadingDraw` (validates availability for all participants; see `adr/0008`)
+- `PickByTurn` (alternative rotational selection mode among members)
 
-## Comunidad
-- `CrearClub` (solo dentro de un grupo familiar en el MVP; ver `adr/0006`)
-- `AsignarLibroActivoClub`
-- `ActivarTurnoLectura` (valida posesión de ejemplar propio)
-- `ComentarEnClub`
+## Community
+- `CreateClub` (only within a family group in MVP; see `adr/0006`)
+- `SetActiveBook`
+- `ActivateReadingTurn` (validates own copy ownership)
+- `PostComment`
 
-## Circulación
-- `RegistrarPrestamo` (solo ejemplar físico)
-- `RegistrarDevolucionPrestamo`
+## Circulation
+- `RegisterLoan` (physical copy only)
+- `RegisterReturn`
 
-## Reseñas
-- `CrearResena` (con `visibility`: private | shared, y `shared_with` explícito; ver `adr/0007`)
-- `EditarResena` / `EliminarResena`
+## Reviews
+- `CreateReview` (with `visibility`: private | shared, and explicit `shared_with`; see `adr/0007`)
+- `EditReview` / `DeleteReview`

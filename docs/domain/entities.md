@@ -2,46 +2,46 @@
 
 ## Bounded Contexts
 
-### 1. Identidad & Privacidad
-- **Usuario** (aggregate root): id, nombre, email, password_hash, configuración_privacidad.
-- **ConsentimientoDatos** (value object/entidad interna): timestamp, versión de política, finalidad.
-- **RefreshToken** (entidad): token, usuario_id, expiración, revocado.
+### 1. Identity & Privacy
+- **User** (aggregate root): id, name, email, password_hash, privacy_settings.
+- **DataConsent** (value object / internal entity): timestamp, policy_version, purpose.
+- **RefreshToken** (entity): token, user_id, expires_at, revoked.
 
-> Nota: `fecha_nacimiento` es opcional en el MVP. Cuentas de menores diferidas a v2 (ver `adr/0005-minor-accounts-deferred.md`).
+> Note: `date_of_birth` is optional in the MVP. Minor accounts deferred to v2 (see `adr/0005-minor-accounts-deferred.md`).
 
-### 2. Biblioteca
-- **Libro** (entidad de catálogo): título, autor, géneros, descripción, páginas, ISBN. Representa la obra intelectual. Puede existir sin que nadie posea una copia.
-- **Ejemplar** (aggregate root, pertenece a un Usuario): tipo (físico/digital), archivo_ref (solo digital, nunca expuesto fuera del dueño), estado. Cada copia tiene exactamente un propietario.
-- **ProgresoLectura** (entidad dentro del aggregate Ejemplar digital): usuario_id, ejemplar_id, posición, porcentaje, última_lectura.
-- **Marcador** (entidad): usuario_id, ejemplar_id, posición, etiqueta.
-- **Nota** (entidad): usuario_id, ejemplar_id, posición, texto.
+### 2. Library
+- **Book** (catalog entity): title, author, genres, description, pages, ISBN. Represents the intellectual work. Can exist without anyone owning a copy.
+- **Copy** (aggregate root, belongs to a User): type (physical/digital), file_ref (digital only, never exposed outside owner), status. Each copy has exactly one owner.
+- **ReadingProgress** (entity within Copy aggregate): user_id, copy_id, position, percentage, last_read_at.
+- **Bookmark** (entity): user_id, copy_id, position, label.
+- **Note** (entity): user_id, copy_id, position, text.
 
-### 3. Comunidad
-- **GrupoFamiliar** (aggregate root): lista de miembros con estado (invitado/aceptado).
-- **Club** (aggregate root): grupo asociado (solo un grupo en MVP), libro activo, fecha de discusión.
-- **TurnoLectura** (entidad dentro del aggregate Club): usuario con el turno actual, comentarios.
+### 3. Community
+- **FamilyGroup** (aggregate root): members with status (invited/accepted).
+- **Club** (aggregate root): associated group (single group in MVP), active_book, discussion_date.
+- **ReadingTurn** (entity within Club aggregate): current_user, comments.
 
-> Nota: En el MVP los clubes solo existen dentro de un grupo familiar. "Grupos conectados" eliminados del MVP (ver `adr/0006-no-connected-groups-mvp.md`).
+> Note: In the MVP, clubs only exist within a family group. "Connected groups" removed from MVP (see `adr/0006-no-connected-groups-mvp.md`).
 
-### 4. Circulación
-- **Préstamo** (aggregate root): referencia a un Ejemplar de tipo físico exclusivamente, prestatario, fechas, estado.
+### 4. Circulation
+- **Loan** (aggregate root): references a Copy of type physical exclusively, borrower, dates, status.
 
-### 5. Reseñas
-- **Reseña** (aggregate root): usuario, libro, calificación, texto, visibility (`private` | `shared`), shared_with_type, shared_with_id.
+### 5. Reviews
+- **Review** (aggregate root): user, book, rating (integer 1–5), text, visibility (`private` | `shared`), shared_with_type, shared_with_id.
 
-> Nota: Visibilidad usa modelo `visibility` + `shared_with` explícito, no el antiguo `private|group|club` (ver `adr/0007-review-visibility-model.md`).
+> Note: Visibility uses the `visibility` + `shared_with` explicit model, not the old `private|group|club` (see `adr/0007-review-visibility-model.md`).
 
-### 6. Selección de Lectura
-- **Sorteo** (entidad): grupo_id, filtros aplicados, resultado, timestamp.
-- La lógica de disponibilidad valida que cada participante tenga acceso autorizado al libro (ver `adr/0008-reading-selection-availability.md`).
+### 6. Reading Selection
+- **Draw** (entity): group_id, applied filters, result, timestamp.
+- Availability logic validates that each participant has authorized access to the book (see `adr/0008-reading-selection-availability.md`).
 
-## Invariantes de agregado (resumen — detalle en business-rules.md)
+## Aggregate Invariants (summary — detail in business-rules.md)
 
-- Un `Ejemplar` de tipo digital solo puede tener un `usuario_id` propietario, inmutable tras la creación.
-- Un `Préstamo` solo puede crearse referenciando un `Ejemplar` con `tipo = fisico`.
-- Un `TurnoLectura` no puede activarse para un usuario que no posea su propio `Ejemplar` del `Libro` en cuestión.
-- El lector integrado solo puede abrir un archivo cuyo `ejemplar.usuario_id == request.user_id`.
+- A digital Copy can only have one owner `user_id`, immutable after creation.
+- A Loan can only be created referencing a Copy with `type = physical`.
+- A ReadingTurn cannot be activated for a user who doesn't own their own Copy of the Book in question.
+- The integrated reader can only open a file whose `copy.user_id == request.user_id`.
 
-## Relación entre contextos
+## Relationship Between Contexts
 
-Los contextos comparten identificadores (`usuario_id`, `libro_id`) pero no comparten modelos internos — por ejemplo, "Comunidad" no conoce el `archivo_ref` de un Ejemplar, solo sabe que existe y a quién pertenece.
+Contexts share identifiers (`user_id`, `book_id`) but not internal models — for example, "Community" doesn't know the `file_ref` of a Copy, it only knows one exists and who owns it.

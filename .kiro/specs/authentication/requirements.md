@@ -6,7 +6,7 @@ This module covers account registration with explicit data-processing consent, J
 
 ARCO rights (access, rectification, cancellation, opposition, portability) are owned by the Privacy module and integrated here via cross-cutting calls.
 
-Source: `docs/specs/authentication.md`, `docs/domain/business-rules.md` (rules 4, 5).
+Source: `docs/domain/business-rules.md` (rules 4, 5).
 
 ### Referenced ADRs
 - `adr/0004-custom-jwt-authentication.md` — JWT Access + Refresh Tokens

@@ -1,56 +1,56 @@
 # Architecture — EntreLíneas
 
-## Estilo: Clean Architecture + Domain-Driven Design (ligero)
+## Style: Clean Architecture + Domain-Driven Design (lightweight)
 
 ```
 ┌─────────────────────────────────────────────┐
 │  Interface layer                             │
-│  API REST (FastAPI) · Web (Next.js)          │
+│  REST API (FastAPI) · Web (Next.js)          │
 └───────────────────┬───────────────────────────┘
                     ↓
 ┌─────────────────────────────────────────────┐
 │  Application layer                           │
-│  Casos de uso (ver domain/use-cases.md)      │
-│  Interfaces/protocolos para infraestructura  │
+│  Use cases (see domain/use-cases.md)         │
+│  Interfaces/protocols for infrastructure     │
 └───────────────────┬───────────────────────────┘
                     ↓
 ┌─────────────────────────────────────────────┐
 │  Domain layer                                │
-│  Entidades, value objects, reglas de negocio │
-│  Sin dependencias externas (sin DB, sin HTTP)│
+│  Entities, value objects, business rules     │
+│  No external dependencies (no DB, no HTTP)   │
 └───────────────────┬───────────────────────────┘
                     ↓
 ┌─────────────────────────────────────────────┐
 │  Infrastructure layer                        │
-│  PostgreSQL · Storage cifrado · JWT Auth     │
-│  Implementaciones concretas de interfaces    │
+│  PostgreSQL · Encrypted storage · JWT Auth   │
+│  Concrete implementations of interfaces      │
 └─────────────────────────────────────────────┘
 ```
 
-Regla dura: el dominio nunca importa nada de infraestructura ni de framework. La infraestructura implementa interfaces definidas por el dominio/aplicación (Dependency Inversion). Ver `adr/0017-cloud-agnostic-abstractions.md`.
+Hard rule: the domain never imports anything from infrastructure or frameworks. Infrastructure implements interfaces defined by the domain/application (Dependency Inversion). See `adr/0017-cloud-agnostic-abstractions.md`.
 
-## Bounded contexts
+## Bounded Contexts
 
-1. **Identidad & Privacidad** — Usuario, ConsentimientoDatos, RefreshToken, derechos ARCO.
-2. **Biblioteca** — Libro, Ejemplar, ProgresoLectura, Marcador, Nota, almacenamiento aislado por usuario, lector integrado.
-3. **Comunidad** — GrupoFamiliar, Club, TurnoLectura. Clubes solo dentro de un grupo familiar en el MVP.
-4. **Circulación** — Préstamo (solo físico).
-5. **Reseñas** — Reseña, con visibilidad `private | shared` y destino explícito.
-6. **Selección de Lectura** — Sorteo, disponibilidad por participante. Spec dedicada.
+1. **Identity & Privacy** — User, DataConsent, RefreshToken, ARCO rights.
+2. **Library** — Book, Copy, ReadingProgress, Bookmark, Note, isolated per-user storage, integrated reader.
+3. **Community** — FamilyGroup, Club, ReadingTurn. Clubs only within a family group in the MVP.
+4. **Circulation** — Loan (physical only).
+5. **Reviews** — Review, with visibility `private | shared` and explicit target.
+6. **Reading Selection** — Draw, per-participant availability. Dedicated spec.
 
-Cada contexto puede evolucionar de forma relativamente independiente; comparten identificadores (usuario_id, libro_id) pero no lógica interna.
+Each context can evolve relatively independently; they share identifiers (user_id, book_id) but not internal logic.
 
-## Abstracciones de infraestructura (cloud agnostic — ver adr/0017)
+## Infrastructure Abstractions (cloud agnostic — see adr/0017)
 
-Toda dependencia externa se accede a través de interfaces definidas en el application layer:
+Every external dependency is accessed through interfaces defined in the application layer:
 
-- `FileStorage` → implementaciones: local filesystem, MinIO, S3, GCS, Supabase Storage.
-- `TokenService` → implementación: JWT (PyJWT).
-- `MetadataProvider` → implementaciones: Open Library, Google Books.
-- `NotificationService` → implementaciones intercambiables (email, push, etc.).
-- Repositorios (via SQLAlchemy) → abstraídos por protocolo/interfaz.
+- `FileStorage` → implementations: local filesystem, MinIO, S3, GCS, Supabase Storage.
+- `TokenService` → implementation: JWT (PyJWT).
+- `MetadataProvider` → implementations: Open Library, Google Books.
+- `NotificationService` → interchangeable implementations (email, push, etc.).
+- Repositories (via SQLAlchemy) → abstracted by protocol/interface.
 
-## Diagrama de alto nivel (infraestructura física)
+## High-Level Infrastructure Diagram
 
 ```
 ┌─────────────┐     ┌──────────────────┐     ┌───────────────────┐
@@ -61,18 +61,18 @@ Toda dependencia externa se accede a través de interfaces definidas en el appli
        │             ┌────────┴────────┐
        │             ▼                 ▼
        │    ┌─────────────────┐  ┌──────────────────┐
-       │    │ Storage cifrado  │  │ Servicio de       │
-       │    │ aislado por      │  │ auditoría/logs    │
-       │    │ usuario          │  │ (Ley 21.719)      │
+       │    │ Encrypted        │  │ Audit/logging     │
+       │    │ storage isolated │  │ service           │
+       │    │ per user         │  │ (Ley 21.719)      │
        │    └─────────────────┘  └──────────────────┘
        │
        ▼
 ┌─────────────────┐
-│ Lector EPUB/PDF │
+│ EPUB/PDF Reader │
 │ (epub.js/PDF.js)│
 └─────────────────┘
 ```
 
-## Por qué Clean Architecture aquí (y no algo más simple)
+## Why Clean Architecture (and not something simpler)
 
-El proyecto es también pieza de portafolio: demostrar separación de capas, testabilidad del dominio sin mockear infraestructura, y una base que sobrevive un cambio de framework o de proveedor cloud sin reescribir reglas de negocio. Ver `adr/0002-tech-stack.md` y `adr/0017-cloud-agnostic-abstractions.md`.
+The project is also a portfolio piece: it demonstrates layer separation, domain testability without mocking infrastructure, and a foundation that survives a framework or cloud provider change without rewriting business rules. See `adr/0002-tech-stack.md` and `adr/0017-cloud-agnostic-abstractions.md`.

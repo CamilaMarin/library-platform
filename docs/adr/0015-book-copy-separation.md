@@ -1,21 +1,21 @@
 # ADR-0015: Book / Book Copy Separation
 
-## Estado
-Aceptado
+## Status
+Accepted
 
-## Contexto
-El modelo de dominio ya distinguía entre `Libro` (metadatos de la obra) y `Ejemplar` (copia poseída por un usuario). Esta ADR formaliza y refuerza esa separación como decisión arquitectónica explícita.
+## Context
+The domain model already distinguished between Book (work metadata) and Copy (instance owned by a user). This ADR formalizes and reinforces that separation as an explicit architectural decision.
 
-## Decisión
-Mantener la separación estricta entre:
+## Decision
+Maintain strict separation between:
 
-- **Book (Libro):** Representa la obra intelectual. Contiene metadatos compartibles (título, autor, géneros, descripción, páginas, ISBN). Puede existir sin que nadie posea una copia.
-- **Book Copy (Ejemplar):** Representa una copia poseída. Cada copia tiene exactamente un propietario (`usuario_id`). Puede ser física (solo metadatos + estado) o digital (archivo cifrado aislado).
+- **Book:** Represents the intellectual work. Contains shareable metadata (title, author, genres, description, pages, ISBN). Can exist without anyone owning a copy.
+- **Book Copy:** Represents an owned instance. Each copy has exactly one owner (`user_id`). Can be physical (metadata + status only) or digital (encrypted, isolated file).
 
-Relación: Un Book puede tener múltiples Copies. Cada Copy pertenece a exactamente un User.
+Relationship: A Book can have multiple Copies. Each Copy belongs to exactly one User.
 
-## Consecuencias
-- Este modelo soporta naturalmente: libros físicos, libros digitales, préstamos (sobre copias físicas), bibliotecas compartidas (metadatos de Books visibles al grupo, Copies como detalle de propiedad).
-- Los préstamos referencian un `Copy`, no un `Book`.
-- El sorteo cruza Books × Copies × participantes para determinar disponibilidad.
-- La eliminación de un Book solo es posible si no tiene Copies asociadas (o se eliminan en cascada las del usuario que lo solicita).
+## Consequences
+- This model naturally supports: physical books, digital books, loans (on physical copies), shared libraries (Book metadata visible to the group, Copies as ownership detail).
+- Loans reference a Copy, not a Book.
+- The draw algorithm crosses Books × Copies × participants to determine availability.
+- Deleting a Book is only possible if it has no associated Copies (or the requesting user's own copies are cascade-deleted). Current decision: reject with `409 conflict`.

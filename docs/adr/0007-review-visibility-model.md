@@ -1,19 +1,19 @@
 # ADR-0007: Review Visibility Model
 
-## Estado
-Aceptado
+## Status
+Accepted
 
-## Contexto
-El modelo anterior de visibilidad de reseñas (`private | group | club`) era ambiguo: un usuario puede pertenecer a múltiples grupos y clubes, y no quedaba claro a cuál se refería cada opción.
+## Context
+The previous review visibility model (`private | group | club`) was ambiguous: a user can belong to multiple groups and clubs, and it wasn't clear which one each option referred to.
 
-## Decisión
-Reemplazar el modelo de visibilidad por dos campos:
+## Decision
+Replace the visibility model with two fields:
 
 - **visibility**: `private` | `shared`
-- **shared_with**: referencia explícita a un Grupo específico o un Club específico (solo cuando `visibility = shared`)
+- **shared_with**: explicit reference to a specific Group or a specific Club (only when `visibility = shared`)
 
-## Consecuencias
-- Se elimina la ambigüedad: cada reseña compartida indica exactamente con quién se comparte.
-- El schema de base de datos cambia: `resenas.visibilidad` se reemplaza por `resenas.visibility` + `resenas.shared_with_type` + `resenas.shared_with_id`.
-- El principio de "visibilidad siempre decidida explícitamente por el autor" (regla de negocio 7) se refuerza con este modelo.
-- Un usuario puede crear múltiples reseñas del mismo libro con visibilidades distintas, o una sola reseña compartida con un destino específico.
+## Consequences
+- Eliminates ambiguity: every shared review indicates exactly who it's shared with.
+- Database schema changes: `reviews.visibility` is replaced by `reviews.visibility` + `reviews.shared_with_type` + `reviews.shared_with_id`.
+- The principle of "visibility is always explicitly decided by the author" (business rule 6) is reinforced by this model.
+- A user can create multiple reviews of the same book with different visibilities, or a single review shared with one specific target.

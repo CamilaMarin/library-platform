@@ -1,19 +1,19 @@
 # ADR-0016: Configurable Data Retention
 
-## Estado
-Aceptado
+## Status
+Accepted
 
-## Contexto
-La Ley 21.719 exige políticas de retención de datos pero no prescribe periodos específicos para todos los casos. Hardcodear periodos de retención hace difícil adaptarse a cambios regulatorios o a interpretaciones legales futuras.
+## Context
+Ley 21.719 (Chile's Data Protection Law) requires data retention policies but does not prescribe specific periods for all cases. Hardcoding retention periods makes it difficult to adapt to regulatory changes or future legal interpretations.
 
-## Decisión
-- **No hardcodear periodos de retención** en el código.
-- Las políticas de retención deben ser **configurables** (vía configuración de aplicación, no constantes en código).
-- Toda política debe estar **documentada** y ser comprensible para el usuario.
-- Los usuarios deben ser **informados antes de cualquier eliminación** de datos por expiración de retención.
+## Decision
+- **Do not hardcode retention periods** in source code.
+- Retention policies must be **configurable** (via application configuration, not code constants).
+- Every policy must be **documented** and understandable to the user.
+- Users must be **informed before any deletion** triggered by retention expiry.
 
-## Consecuencias
-- Se necesita una tabla o configuración de `PoliticaRetencion` que defina periodos por tipo de dato.
-- El flujo de cancelación de cuenta no purga inmediatamente — informa al usuario del plazo y luego ejecuta la purga según la política configurada.
-- Facilita adaptarse si la APDP emite guías específicas sobre periodos de retención.
-- Requiere un job periódico que evalúe datos expirados contra la política vigente.
+## Consequences
+- A `RetentionPolicy` table or configuration is needed that defines periods per data type.
+- The account cancellation flow does not purge immediately — it informs the user of the timeline and then executes the purge according to the configured policy.
+- Makes it easier to adapt if APDP issues specific guidance on retention periods.
+- Requires a periodic job that evaluates expired data against the active policy.

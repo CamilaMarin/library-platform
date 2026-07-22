@@ -1,19 +1,19 @@
 # ADR-0017: Cloud Agnostic — All Dependencies Behind Abstractions
 
-## Estado
-Aceptado
+## Status
+Accepted
 
-## Contexto
-Complementa y formaliza el principio 7 del producto ("Cloud-agnostic y costo cero por defecto") y ADR-0002 (prioridad de infraestructura) como restricción arquitectónica explícita.
+## Context
+Complements and formalizes product principle 7 ("Cloud-agnostic and zero-cost by default") and ADR-0002 (infrastructure priority) as an explicit architectural constraint.
 
-## Decisión
-- El proyecto completo debe permanecer **cloud agnostic**.
-- Toda dependencia de infraestructura debe ser **reemplazable** sin modificar el domain ni el application layer.
-- Todo servicio externo debe accederse a través de **abstracciones** (interfaces/protocolos definidos en la capa de aplicación, implementados en infraestructura).
+## Decision
+- The entire project must remain **cloud agnostic**.
+- Every infrastructure dependency must be **replaceable** without modifying the domain or application layer.
+- Every external service must be accessed through **abstractions** (interfaces/protocols defined in the application layer, implemented in infrastructure).
 
-## Consecuencias
-- Storage de archivos: interfaz `FileStorage` → implementaciones: local filesystem, MinIO, S3, GCS, Supabase Storage.
-- Base de datos: SQLAlchemy como abstracción sobre PostgreSQL (portable a otros motores SQL si fuera necesario).
-- Envío de emails/notificaciones: interfaz `NotificationService` → implementaciones intercambiables.
-- No se usa ningún SDK propietario de cloud directamente en application/domain layers.
-- El docker-compose de desarrollo local es la implementación de referencia — cualquier deploy a cloud es solo otra implementación de las mismas interfaces.
+## Consequences
+- File storage: `FileStorage` interface → implementations: local filesystem, MinIO, S3, GCS, Supabase Storage.
+- Database: SQLAlchemy as abstraction over PostgreSQL (portable to other SQL engines if needed).
+- Email/notifications: `NotificationService` interface → interchangeable implementations.
+- No proprietary cloud SDK is used directly in application/domain layers.
+- The local docker-compose development environment is the reference implementation — any cloud deploy is just another implementation of the same interfaces.

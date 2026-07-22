@@ -1,19 +1,19 @@
-# ADR-0002: Stack tecnológico y prioridad de infraestructura
+# ADR-0002: Technology Stack and Infrastructure Priority
 
-## Estado
-Aceptado
+## Status
+Accepted
 
-## Contexto
-Dos conversaciones de planificación previas propusieron enfoques distintos de infraestructura: una sugería ir directo a GCP; la otra prioriza explícitamente costo cero (Local → Supabase → Render/Vercel → cloud pago solo si se justifica). Además, ambas coinciden en Clean Architecture, FastAPI y Next.js.
+## Context
+Two prior planning conversations proposed different infrastructure approaches: one suggested going straight to GCP; the other explicitly prioritized zero-cost (Local → Supabase → Render/Vercel → paid cloud only if justified). Both agreed on Clean Architecture, FastAPI, and Next.js.
 
-## Decisión
+## Decision
 - **Backend:** FastAPI + SQLAlchemy + Alembic.
 - **Frontend:** Next.js + React + TypeScript + Tailwind.
-- **Base de datos:** PostgreSQL.
-- **Infraestructura:** se prioriza costo cero — Local/Docker primero, luego Supabase (Postgres + Storage + Auth gestionados en free tier), luego Render/Vercel para deploy. GCP/AWS quedan como opción futura, solo si el proyecto escala más allá de lo que cubren los free tiers.
-- Se reconcilia así la propuesta inicial de GCP: queda como destino posible a largo plazo, no como decisión de arranque.
+- **Database:** PostgreSQL.
+- **Infrastructure:** zero-cost priority — Local/Docker first, then Supabase (Postgres + Storage as managed free tier), then Render/Vercel for deploy. GCP/AWS remain as a future option, only if the project scales beyond what free tiers cover.
+- This reconciles the initial GCP proposal: it stays as a possible long-term destination, not as the starting decision.
 
-## Consecuencias
-- Menor fricción y costo para mantener el proyecto activo como pieza de portafolio.
-- Supabase actúa como Postgres + Storage + Auth gestionados, reduciendo trabajo de infraestructura propia en las primeras fases.
-- Si el proyecto migra a GCP/AWS más adelante, Clean Architecture (ADR implícito en `architecture/architecture.md`) permite que ese cambio no toque el domain layer.
+## Consequences
+- Lower friction and cost to keep the project active as a portfolio piece.
+- Supabase acts as managed Postgres + Storage, reducing infrastructure overhead in early phases.
+- If the project migrates to GCP/AWS later, Clean Architecture (see `adr/0017`) ensures that change doesn't touch the domain layer.

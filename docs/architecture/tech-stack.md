@@ -3,55 +3,55 @@
 ## Frontend
 - Next.js + React + TypeScript
 - Tailwind CSS
-- epub.js (lector EPUB integrado)
-- PDF.js (lector PDF integrado)
+- epub.js (integrated EPUB reader)
+- PDF.js (integrated PDF reader)
 
 ## Backend
 - FastAPI (Python)
 - SQLAlchemy (ORM)
-- Alembic (migraciones)
+- Alembic (migrations)
 - PyJWT / python-jose (JWT tokens)
 
-## Base de datos
-- PostgreSQL (naturaleza fuertemente relacional: usuarios, grupos, préstamos, permisos)
+## Database
+- PostgreSQL (strongly relational: users, groups, loans, permissions)
 
-## Autenticación
-- JWT custom: Access Token (corta duración) + Refresh Token (larga duración, rotable).
-- No se usa Supabase Auth, Cognito ni sesiones server-side.
-- Justificación: cloud agnostic, vendor neutral, portable, fácil de testear.
-- Ver `adr/0004-custom-jwt-authentication.md`.
+## Authentication
+- Custom JWT: Access Token (short-lived) + Refresh Token (long-lived, rotatable).
+- Supabase Auth, Cognito, and server-side sessions are intentionally rejected.
+- Rationale: cloud agnostic, vendor neutral, portable, easy to test.
+- See `adr/0004-custom-jwt-authentication.md`.
 
-## Storage de archivos digitales
-- Object storage compatible S3, cifrado por usuario (server-side encryption por prefijo/clave).
-- En desarrollo local: filesystem o MinIO vía Docker.
-- Accedido a través de interfaz `FileStorage` (cloud agnostic, ver `adr/0017-cloud-agnostic-abstractions.md`).
+## Digital File Storage
+- S3-compatible object storage, encrypted per user (server-side encryption by prefix/key).
+- Local development: filesystem or MinIO via Docker.
+- Accessed through `FileStorage` interface (cloud agnostic, see `adr/0017-cloud-agnostic-abstractions.md`).
 
 ## CI/CD
-- GitHub Actions (lint, tests, build en cada PR; deploy en merge a main).
+- GitHub Actions (lint, tests, build on every PR; deploy on merge to main).
 
-## Contenedores
-- Docker + Docker Compose para desarrollo local reproducible.
+## Containers
+- Docker + Docker Compose for reproducible local development.
 
-## Prioridad de infraestructura (costo cero primero)
+## Infrastructure Priority (zero-cost first)
 
 ```
 Local (Docker)
    ↓
-Supabase (Postgres + Storage, free tier — sin Supabase Auth)
+Supabase (Postgres + Storage, free tier — without Supabase Auth)
    ↓
-Render / Vercel (deploy de API y frontend)
+Render / Vercel (API and frontend deploy)
    ↓
-GCP / AWS (solo si el proyecto escala y lo justifica económicamente)
+GCP / AWS (only if the project scales and justifies the cost)
 ```
 
-Ver `adr/0002-tech-stack.md` para la justificación completa.
+See `adr/0002-tech-stack.md` for the full rationale.
 
 ## Testing
-- Pytest (backend), con foco en cubrir el domain layer sin mocks pesados gracias a Clean Architecture.
-- Tests de integración para endpoints críticos (auth, préstamos, ARCO).
+- Pytest (backend), focused on covering the domain layer without heavy mocking thanks to Clean Architecture.
+- Integration tests for critical endpoints (auth, file access, ARCO, loans).
 
-## Explícitamente excluido del MVP
-- **Redis** — JWT no requiere estado server-side. Podrá introducirse en v1+ para cache o rate limiting. Ver `adr/0012-no-redis-mvp.md`.
+## Explicitly Excluded from MVP
+- **Redis** — JWT doesn't require server-side state. May be introduced in v1+ for caching or rate limiting. See `adr/0012-no-redis-mvp.md`.
 
-## Observabilidad (v1+)
-- Logging estructurado + el servicio de auditoría ya exigido por Ley 21.719 (ver `specs/privacy.md`) sirve como base de observabilidad de acceso a datos.
+## Observability (v1+)
+- Structured logging + the audit service already required by Ley 21.719 (Chile's Data Protection Law) serves as the foundation for data-access observability.

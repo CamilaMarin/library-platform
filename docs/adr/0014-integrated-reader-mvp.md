@@ -1,18 +1,18 @@
 # ADR-0014: Integrated EPUB/PDF Reader in MVP
 
-## Estado
-Aceptado
+## Status
+Accepted
 
-## Contexto
-Se debatió si el MVP debía incluir un lector integrado o solo gestión de biblioteca (metadatos). Dado que la propuesta de valor incluye "acompañar la lectura", un lector básico refuerza la experiencia y justifica que el usuario suba sus archivos a la plataforma.
+## Context
+It was debated whether the MVP should include an integrated reader or only library management (metadata). Since the value proposition includes "accompanying the reading experience," a basic reader reinforces the experience and justifies users uploading their files to the platform.
 
-## Decisión
-- El MVP incluye un **lector integrado de EPUB y PDF**.
-- El lector solo abre archivos subidos por el usuario autenticado actual (refuerza ADR-0001 y ADR-0009).
-- Se almacenan: progreso de lectura, marcadores (bookmarks) y notas, asociados al usuario y al ejemplar.
+## Decision
+- The MVP includes an **integrated EPUB and PDF reader**.
+- The reader only opens files uploaded by the currently authenticated user (reinforces ADR-0001 and ADR-0009).
+- Stored data: reading progress, bookmarks, and notes, associated with the user and the copy.
 
-## Consecuencias
-- Se necesita una librería de renderizado EPUB/PDF en el frontend (ej. epub.js, PDF.js).
-- El backend debe servir el archivo cifrado solo al propietario (validación estricta en el endpoint de descarga).
-- Se crean entidades adicionales: `ProgresoLectura`, `Marcador`, `Nota` — asociadas a un Ejemplar digital y su propietario.
-- Los datos del lector (progreso, notas) son datos personales y quedan cubiertos por Ley 21.719 (registro de tratamiento, exportación ARCO).
+## Consequences
+- A frontend EPUB/PDF rendering library is needed (epub.js, PDF.js).
+- The backend must serve the encrypted file only to the owner (strict validation on the download endpoint).
+- Additional entities are created: `ReadingProgress`, `Bookmark`, `Note` — associated with a digital Copy and its owner.
+- Reader data (progress, notes) is personal data and is covered by Ley 21.719 (Chile's Data Protection Law): processing record, ARCO export, deletion on cancellation.

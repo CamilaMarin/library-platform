@@ -1,125 +1,125 @@
 # PROJECT_CONTEXT.md — EntreLíneas
 
-> Documento de entrada (Nivel 1). Cualquier persona o agente de IA (Claude, Kiro, etc.) debería poder entender el proyecto completo leyendo solo este archivo. Para implementar un módulo específico, cargar además `specs/<módulo>.md`, las entidades relacionadas en `domain/entities.md` y las reglas de `domain/business-rules.md` (Nivel 2).
+> Level-1 entry document. Any person or AI agent (Claude, Kiro, etc.) should be able to understand the entire project by reading only this file. To implement a specific module, also load `.kiro/specs/<module>/`, the related entities in `domain/entities.md`, and the rules in `domain/business-rules.md` (Level 2).
 
 ## 1. Executive Summary
 
-EntreLíneas es una plataforma web para administrar bibliotecas personales (físicas y digitales) y fomentar la lectura compartida entre familias y pequeños clubes de lectura dentro de un grupo familiar.
+EntreLíneas is a web platform for managing personal libraries (physical and digital) and fostering shared reading among families and small book clubs within a family group.
 
-No compite con Goodreads ni con Kindle. El objetivo es conectar personas mediante historias, no acumular una red social pública de lectores.
+It does not compete with Goodreads or Kindle. The goal is to connect people through stories, not to accumulate a public network of readers.
 
-La plataforma permite: registrar libros físicos, administrar EPUB/PDF propios (sin compartirlos entre cuentas), crear grupos familiares, organizar clubes de lectura dentro del grupo, registrar préstamos físicos y turnos de lectura digital, leer con un lector integrado, comentar y reseñar, seleccionar lecturas conjuntas mediante sorteo, y ejercer control total sobre los propios datos (Ley 21.719, Chile).
+The platform enables: registering physical books, managing personal EPUB/PDF files (never shared between accounts), creating family groups, organizing book clubs within the group, tracking physical loans and digital reading turns, reading with an integrated reader, commenting and reviewing, selecting joint readings via draw, and exercising full control over personal data (Ley 21.719, Chile's Data Protection Law).
 
 ## 2. Product Vision
 
-Las historias unen a las personas. EntreLíneas busca ser el hogar digital donde las personas administran su biblioteca y comparten la experiencia de leer juntos. El foco principal son familias y pequeños clubes de lectura — no el público general de lectores.
+Stories bring people together. EntreLíneas aims to be the digital home where people manage their library and share the experience of reading together. The primary focus is families and small book clubs — not the general reading public.
 
-Ver detalle en `vision.md`.
+See detail in `vision.md`.
 
 ## 3. Product Principles
 
-1. Las personas primero que los libros.
-2. El usuario es dueño de su biblioteca y sus datos.
-3. Privacy by Design (Ley 21.719 desde el primer sprint).
-4. La app acompaña la lectura, no la reemplaza.
-5. Todo debe sentirse cercano y sencillo, aunque la función sea compleja.
-6. Cloud-agnostic y costo cero por defecto.
+1. People come before books.
+2. The user owns their library and their data.
+3. Privacy by Design (Ley 21.719 from the first sprint).
+4. The app accompanies reading, it doesn't replace it.
+5. Everything should feel close and simple, even if the function is complex.
+6. Cloud-agnostic and zero-cost by default.
 7. Mobile-first.
 
-Ver detalle en `product-principles.md`.
+See detail in `product-principles.md`.
 
-## 4. El problema
+## 4. The Problem
 
-Una familia con cientos de libros físicos y digitales no tenía forma sencilla de: saber qué libros tenía, compartir la biblioteca, organizar un club de lectura, elegir el siguiente libro, registrar opiniones, ni gestionar préstamos. Las soluciones actuales (Goodreads, StoryGraph, Calibre, Komga, Kavita, Audiobookshelf) cubren partes del problema — ninguna las reúne todas de forma simple y privada. Detalle completo en `research/competitors.md`.
+A family with hundreds of physical and digital books had no simple way to: know what books they had, share the library, organize a book club, choose the next book, record opinions, or manage loans. Current solutions (Goodreads, StoryGraph, Calibre, Komga, Kavita, Audiobookshelf) cover parts of the problem — none bring them all together simply and privately. Full detail in `research/competitors.md`.
 
-## 5. Usuarios objetivo
+## 5. Target Users
 
-Familias lectoras (caso principal), pequeños clubes de lectura dentro de un grupo familiar, lectores individuales dentro de un grupo familiar. Detalle en `research/users.md`.
+Reading families (primary case), small book clubs within a family group, individual readers within a family group. Detail in `research/users.md`.
 
-## 6. Dominio (resumen)
+## 6. Domain (summary)
 
-Usuario · GrupoFamiliar · Libro · Ejemplar (físico/digital) · Club · TurnoLectura · Préstamo · Reseña · ConsentimientoDatos · ProgresoLectura · Marcador · Nota
+User · FamilyGroup · Book · Copy (physical/digital) · Club · ReadingTurn · Loan · Review · DataConsent · ReadingProgress · Bookmark · Note
 
-Jerarquía social MVP: **Usuario → Grupo → Biblioteca compartida** (metadatos). No existen "grupos conectados" en el MVP.
+MVP social hierarchy: **User → Group → Shared Library** (metadata). No "connected groups" in the MVP.
 
-Detalle completo en `domain/entities.md`, `domain/business-rules.md`, `domain/use-cases.md`.
+Full detail in `domain/entities.md`, `domain/business-rules.md`, `domain/use-cases.md`.
 
-## 7. Arquitectura (resumen)
+## 7. Architecture (summary)
 
 ```
-Interface (API REST / Next.js)
+Interface (REST API / Next.js)
       ↓
-Application (casos de uso)
+Application (use cases)
       ↓
-Domain (entidades, reglas de negocio — sin dependencias externas)
+Domain (entities, business rules — no external dependencies)
       ↓
-Infrastructure (Postgres, storage cifrado, auth JWT)
+Infrastructure (Postgres, encrypted storage, JWT auth)
 ```
 
-Clean Architecture: el dominio nunca depende de frameworks ni de la base de datos. Toda dependencia externa se accede a través de abstracciones (interfaces) definidas en la capa de aplicación. Ver `adr/0017-cloud-agnostic-abstractions.md`.
+Clean Architecture: the domain never depends on frameworks or the database. Every external dependency is accessed through abstractions (interfaces) defined in the application layer. See `adr/0017-cloud-agnostic-abstractions.md`.
 
-Detalle en `architecture/architecture.md`.
+Detail in `architecture/architecture.md`.
 
 ## 8. Stack
 
 - **Frontend:** Next.js, React, TypeScript, Tailwind.
 - **Backend:** FastAPI (Python), SQLAlchemy, Alembic.
-- **Base de datos:** PostgreSQL.
-- **Autenticación:** JWT custom (Access Token + Refresh Token). Ver `adr/0004-custom-jwt-authentication.md`.
-- **Storage de archivos digitales:** object storage cifrado por usuario (nunca compartido entre cuentas).
+- **Database:** PostgreSQL.
+- **Authentication:** Custom JWT (Access Token + Refresh Token). See `adr/0004-custom-jwt-authentication.md`.
+- **Digital file storage:** encrypted object storage per user (never shared between accounts).
 - **CI/CD:** GitHub Actions.
-- **Contenedores:** Docker / Docker Compose.
-- **Lector integrado:** EPUB (epub.js) + PDF (PDF.js). Ver `adr/0014-integrated-reader-mvp.md`.
+- **Containers:** Docker / Docker Compose.
+- **Integrated reader:** EPUB (epub.js) + PDF (PDF.js). See `adr/0014-integrated-reader-mvp.md`.
 
-> **Nota:** Redis no forma parte del MVP (ver `adr/0012-no-redis-mvp.md`). Podrá introducirse en versiones futuras.
+> **Note:** Redis is not part of the MVP (see `adr/0012-no-redis-mvp.md`). It may be introduced in future versions.
 
-Detalle y justificación en `architecture/tech-stack.md` y `adr/0002-tech-stack.md`.
+Detail and rationale in `architecture/tech-stack.md` and `adr/0002-tech-stack.md`.
 
-## 9. Infraestructura — prioridad de costo
+## 9. Infrastructure — Cost Priority
 
 ```
-Local (Docker) → Supabase (Postgres + Storage, free tier) → Render / Vercel (deploy) → GCP/AWS (solo si el proyecto escala y lo justifica)
+Local (Docker) → Supabase (Postgres + Storage, free tier) → Render / Vercel (deploy) → GCP/AWS (only if the project scales and justifies it)
 ```
 
-> Supabase Auth se rechazó — se usa JWT custom. Supabase queda solo como opción de Postgres + Storage gestionado.
+> Supabase Auth was rejected — custom JWT is used. Supabase remains only as a managed Postgres + Storage option.
 
-## 10. Restricciones permanentes
+## 10. Permanent Constraints
 
-- Nunca almacenar ni distribuir un archivo digital con copyright entre distintas cuentas de usuario.
-- No usar servicios pagos por defecto; preferir open source y free tiers.
-- Toda integración externa debe tener interfaz (reemplazable, no acoplada a un proveedor).
-- Toda dependencia de infraestructura detrás de abstracciones — cloud agnostic siempre.
-- Cumplir Ley 21.719 (Chile) desde el diseño: minimización de datos, consentimiento explícito, derechos ARCO self-service, notificación de brechas en 72h, retención configurable.
-- Un préstamo solo puede registrarse sobre un ejemplar físico. Los libros digitales se coordinan mediante "turno de lectura", nunca transfiriendo el archivo.
-- El lector integrado solo abre archivos del usuario autenticado actual.
-- No hardcodear periodos de retención — deben ser configurables.
+- Never store or distribute a copyrighted digital file between different user accounts.
+- Do not use paid services by default; prefer open source and free tiers.
+- Every external integration must have an interface (replaceable, not coupled to a provider).
+- Every infrastructure dependency behind abstractions — always cloud agnostic.
+- Comply with Ley 21.719 (Chile's Data Protection Law) from design: data minimization, explicit consent, self-service ARCO rights, breach notification in 72h, configurable retention.
+- A loan can only be registered for a physical copy. Digital books are coordinated via "reading turns," never by transferring the file.
+- The integrated reader only opens files belonging to the currently authenticated user.
+- Do not hardcode retention periods — they must be configurable.
 
-## 11. Decisiones de alcance MVP
+## 11. MVP Scope Decisions
 
-- Cuentas de menores: **diferidas a v2**. Todos los usuarios MVP comparten el mismo modelo de permisos.
-- Grupos conectados: **eliminados del MVP**. Solo existe la jerarquía Usuario → Grupo → Biblioteca compartida.
-- Clubes: solo dentro de un grupo familiar (no entre grupos distintos en el MVP).
-- Redis: eliminado del MVP. JWT no requiere estado server-side.
-- Search e Import: parte del módulo Library, no módulos independientes.
-- Reading Selection (sorteo): spec dedicada por su complejidad.
+- Minor accounts: **deferred to v2**. All MVP users share the same permission model.
+- Connected groups: **removed from MVP**. Only the hierarchy User → Group → Shared Library exists.
+- Clubs: only within a family group (not across different groups in the MVP).
+- Redis: removed from MVP. JWT doesn't require server-side state.
+- Search and Import: part of the Library module, not independent modules.
+- Reading Selection (draw): dedicated spec due to its complexity.
 
-## 12. Convenciones
+## 12. Conventions
 
-REST + JSON · OpenAPI autogenerado (FastAPI) · Conventional Commits · PEP8 + Ruff (backend) · ESLint + Prettier (frontend) · Pytest · Docker obligatorio para desarrollo local.
+REST + JSON · OpenAPI auto-generated (FastAPI) · Conventional Commits · PEP8 + Ruff (backend) · ESLint + Prettier (frontend) · Pytest · Docker mandatory for local development.
 
-## 13. Roadmap (resumen)
+## 13. Roadmap (summary)
 
-MVP → v1 → v2 → Futuro. Detalle completo en `roadmap.md` y `research/features.md`.
+MVP → v1 → v2 → Future. Full detail in `roadmap.md` and `research/features.md`.
 
-## 14. Reglas para agentes de IA (Steering)
+## 14. AI Agent Rules (Steering)
 
-Ver `steering-rules.md` — reglas permanentes que no cambian entre tareas (Clean Architecture, testing obligatorio, dependency injection, etc.). Se cargan siempre junto con este documento.
+See `steering-rules.md` — permanent rules that don't change between tasks (Clean Architecture, mandatory testing, dependency injection, etc.). Always loaded alongside this document.
 
-## 15. Mapa de documentos
+## 15. Document Map
 
 ```
 docs/
-├── PROJECT_CONTEXT.md      ← estás aquí
+├── PROJECT_CONTEXT.md      ← you are here
 ├── vision.md
 ├── product-principles.md
 ├── roadmap.md
@@ -129,6 +129,9 @@ docs/
 ├── architecture/{architecture,tech-stack,coding-standards,api,database}.md
 ├── ux/{sitemap,user-flows,wireframes}.md
 ├── domain/{entities,business-rules,use-cases}.md
-├── specs/{authentication,library,clubs,loans,privacy,reading-selection}.md
 └── adr/0001-0017*.md
+
+.kiro/
+├── specs/{authentication,library,clubs,loans,privacy,reading-selection,reviews}/
+└── steering/*.md (10 files, auto-loaded by Kiro)
 ```

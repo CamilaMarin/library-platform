@@ -15,7 +15,7 @@ inclusion: always
 
 - Never invent functionality outside the approved scope defined in the specifications.
 - Never simplify or skip an acceptance criterion from a spec without flagging it explicitly as a decision pending human approval.
-- Do not create duplicate specification files in `docs/specs/` for modules that already have Kiro specs. The Kiro spec is the implementation source of truth.
+- Do not create duplicate specification files for modules that already have Kiro specs. The Kiro spec is the implementation source of truth.
 - If implementation reveals a case not contemplated by the spec, update the spec documentation (with approval) — do not silently implement undocumented behavior.
 
 ## Specification structure per module

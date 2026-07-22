@@ -4,7 +4,7 @@
 
 This module records physical-book loans between people. Loans exist only for physical copies; digital sharing is out of scope by design.
 
-Source: `docs/specs/loans.md`.
+Source: `docs/domain/business-rules.md` (rule 2).
 
 ### Referenced ADRs
 - `adr/0001-no-shared-file-storage.md` — No file sharing between accounts

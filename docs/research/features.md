@@ -1,45 +1,45 @@
 # Research — Feature Backlog
 
-Backlog clasificado por versión. Categorías base tomadas de la sesión de brainstorming y ajustadas a los principios del producto (círculo cerrado, sin compartir archivos, privacy by design).
+Backlog classified by version. Base categories from the brainstorming session, adjusted to product principles (closed circle, no file sharing, privacy by design).
 
-## MVP (Fase 1)
+## MVP (Phase 1)
 
-- **Books / Library**: alta de libros (metadatos de la obra), ejemplares físicos y digitales (modelo Book/Copy separado), edición y borrado. Búsqueda e import como casos de uso de Library (ver `adr/0010`, `adr/0011`).
-- **Integrated Reader**: lector EPUB/PDF integrado, progreso de lectura, marcadores y notas. Solo archivos propios (ver `adr/0014`).
-- **Groups**: creación de grupo familiar, invitación con aceptación explícita. Sin distinción adulto/menor en MVP (ver `adr/0005`).
-- **Reading Selection**: sorteo filtrable (género, páginas, disponibilidad para todos, no leído), modo "elección por turno". Spec dedicada (ver `adr/0013`). Disponibilidad = acceso autorizado por cada participante (ver `adr/0008`).
-- **Clubs**: creación de club dentro de un grupo familiar (no entre grupos en MVP, ver `adr/0006`), libro activo, fecha de discusión, comentarios con marcado de spoiler.
-- **Loans**: préstamo de ejemplares físicos, turno de lectura para digitales (sin transferencia de archivo).
-- **Reviews**: calificación + opinión, con visibilidad `private | shared` y destino explícito (grupo o club específico, ver `adr/0007`).
-- **Privacy**: consentimiento explícito, derechos ARCO self-service, registro de tratamiento, logs de auditoría, retención configurable (ver `adr/0016`).
-- **Authentication**: JWT custom con Access Token + Refresh Token (ver `adr/0004`). Sin Redis (ver `adr/0012`).
-- **Search**: búsqueda básica dentro de la biblioteca propia y del grupo (solo metadatos). Parte de Library.
-- **Import**: alta manual + autocompletado de metadatos (ISBN/título vía fuente pública tipo Open Library). Parte de Library.
+- **Books / Library**: book creation (intellectual work metadata), physical and digital copies (Book/Copy separated model), editing and deletion. Search and import as Library use cases (see `adr/0010`, `adr/0011`).
+- **Integrated Reader**: EPUB/PDF reader built into the platform, reading progress, bookmarks, and notes. Owner's files only (see `adr/0014`).
+- **Groups**: family group creation, invitation with explicit acceptance. No adult/minor distinction in MVP (see `adr/0005`).
+- **Reading Selection (Sorteo)**: filterable random draw (genre, pages, availability for all, unread), pick-by-turn mode. Dedicated spec (see `adr/0013`). Availability = authorized access per participant (see `adr/0008`).
+- **Clubs**: club creation within a family group (not across groups in MVP, see `adr/0006`), active book, discussion date, comments with spoiler marking.
+- **Loans (Préstamos)**: physical copy lending, digital reading turns (no file transfer).
+- **Reviews (Reseñas)**: rating (integer 1–5) + opinion, with visibility `private | shared` and explicit target (specific group or club, see `adr/0007`).
+- **Privacy**: explicit consent, self-service ARCO rights, processing record, audit logs, configurable retention (see `adr/0016`).
+- **Authentication**: custom JWT with Access Token + Refresh Token (see `adr/0004`). No Redis (see `adr/0012`).
+- **Search (Búsqueda)**: basic search within personal and group library (metadata only). Part of Library.
+- **Import**: manual entry + metadata autocomplete (ISBN/title via public source like Open Library). Part of Library.
 
-## v1 (Fase 2)
+## v1 (Phase 2)
 
-- **Bookmarks / Highlights / Notes avanzados**: funcionalidades extendidas del lector.
-- **Reading Sessions**: registro de sesiones de lectura (tiempo, páginas), base para estadísticas.
-- **Goals**: metas de lectura personales o de grupo (ej. "leer 12 libros este año").
-- **Statistics**: páginas leídas, libros por género, ritmo de lectura.
-- **Export**: exportación general de datos más allá de lo mínimo ARCO (ej. backup completo en JSON).
-- **Notifications**: recordatorios de club, devolución de préstamos, turnos de lectura.
-- **Redis**: cache, rate limiting, funcionalidades que lo justifiquen.
+- **Bookmarks / Highlights / Notes (advanced)**: extended reader functionality.
+- **Reading Sessions (Sesiones de Lectura)**: reading session tracking (time, pages), base for statistics.
+- **Goals (Metas)**: personal or group reading goals (e.g., "read 12 books this year").
+- **Statistics (Estadísticas)**: pages read, books by genre, reading pace.
+- **Export**: general data export beyond ARCO minimum (e.g., full JSON backup).
+- **Notifications (Notificaciones)**: club reminders, loan returns, reading turns.
+- **Redis**: caching, rate limiting, features that justify it.
 
-## v2 (Fase 3)
+## v2 (Phase 3)
 
-- **Authors / Series / Publishers / Collections**: enriquecimiento del catálogo de metadatos, listas temáticas.
-- **Minor accounts**: cuentas de menores con adulto responsable, permisos diferenciados (ver `adr/0005`).
-- **Connected groups**: potencialmente extender clubes más allá de un grupo familiar (requiere diseño previo, ver `adr/0006`).
-- **Challenges**: retos de lectura grupales con progreso compartido.
-- **Achievements**: logros/insignias por hitos de lectura (opcional, cuidando no convertir la app en gamificación distractora).
+- **Authors / Series / Publishers / Collections**: catalog metadata enrichment, themed lists.
+- **Minor accounts (Cuentas de menores)**: minor accounts with responsible adult, differentiated permissions (see `adr/0005`).
+- **Connected groups (Grupos conectados)**: potentially extending clubs beyond a family group (requires prior design, see `adr/0006`).
+- **Challenges (Retos)**: group reading challenges with shared progress.
+- **Achievements (Logros)**: badges for reading milestones (optional, avoiding distracting gamification).
 
-## Futuro (sin comprometer fecha)
+## Future (no committed date)
 
-- **Recommendations**: motor de recomendación, potencialmente con IA, basado en historial propio y del grupo.
-- **Friends / grupos conectados ampliados**: extender más allá del núcleo familiar manteniendo el modelo de círculo cerrado (nunca red pública). Requiere revisión de `product-principles.md` antes de implementarse.
+- **Recommendations (Recomendaciones)**: recommendation engine, potentially AI-based, from personal and group history.
+- **Extended connected groups**: extending beyond the family core while maintaining the closed-circle model (never a public network). Requires `product-principles.md` review before implementation.
 
-## Explícitamente descartado
+## Explicitly Discarded
 
-- Feed público / descubrimiento social abierto.
-- Cualquier forma de compartir o transferir el archivo digital entre cuentas (ver `adr/0001-no-shared-file-storage.md`).
+- Public feed / open social discovery.
+- Any form of digital file sharing or transfer between accounts (see `adr/0001-no-shared-file-storage.md`).

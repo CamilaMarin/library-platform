@@ -1,19 +1,19 @@
 # ADR-0009: Digital Books — Strict Isolation
 
-## Estado
-Aceptado
+## Status
+Accepted
 
-## Contexto
-Complementa y refuerza ADR-0001 con decisiones operativas específicas para el MVP.
+## Context
+Complements and reinforces ADR-0001 with specific operational decisions for the MVP.
 
-## Decisión
-- EntreLíneas **nunca redistribuye** libros digitales con copyright.
-- Los archivos EPUB/PDF subidos permanecen **estrictamente privados** del usuario que los subió.
-- Las bibliotecas compartidas (visibles al grupo) exponen **solo metadatos**, nunca archivos.
-- El lector integrado solo abre archivos que pertenecen al usuario autenticado actual.
-- **No existirá ninguna funcionalidad de compartir archivos en el MVP.**
+## Decision
+- EntreLíneas **never redistributes** copyrighted digital books.
+- Uploaded EPUB/PDF files remain **strictly private** to the user who uploaded them.
+- Shared libraries (visible to the group) expose **metadata only**, never files.
+- The integrated reader only opens files belonging to the currently authenticated user.
+- **No file-sharing functionality will exist in the MVP.**
 
-## Consecuencias
-- El endpoint de descarga/lectura valida `request.user_id == ejemplar.usuario_id` como invariante absoluto.
-- La biblioteca compartida del grupo es un catálogo de metadatos — nunca un repositorio de archivos accesibles por otros.
-- Se alinea con la posición legal de *Hachette v. Internet Archive* y con el principio de propiedad del usuario.
+## Consequences
+- The download/reader endpoint validates `request.user_id == copy.user_id` as an absolute invariant.
+- The group's shared library is a metadata catalog — never a repository of files accessible by others.
+- Aligns with the legal position in *Hachette v. Internet Archive* and with the user ownership principle.

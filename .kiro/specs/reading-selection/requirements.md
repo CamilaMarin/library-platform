@@ -4,7 +4,7 @@
 
 This module implements joint reading selection: a filtered random draw and an alternative pick-by-turn mode. It helps family groups decide what to read together. The availability rule ensures every participant has authorized access to the selected book.
 
-Source: `docs/specs/reading-selection.md`.
+Source: `docs/domain/business-rules.md` (rule 8), `adr/0008-reading-selection-availability.md`.
 
 ### Referenced ADRs
 - `adr/0008-reading-selection-availability.md` — Availability rule defined
