@@ -6,6 +6,19 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+## [M0] — Privacy Foundation
+
+### Added
+- DataConsent domain entity with validation (requires policy_version + purpose)
+- DataProcessingRecord domain entity
+- AuditLog domain entity + AuditService (high-value operations: registration, login, deletion, file upload, ARCO)
+- RetentionPolicy domain entity (configurable duration, no automated job)
+- Repository protocols (DataConsentRepository, DataProcessingRecordRepository, AuditLogRepository, RetentionPolicyRepository)
+- SQLAlchemy ORM models for all 4 privacy tables
+- SQLAlchemy repository implementations
+- Alembic migration 0002: data_consents, data_processing_records, audit_logs, retention_policies tables
+- 10 domain unit tests (entities + AuditService with in-memory test double)
+
 ## [M-1] — Architecture Validation
 
 ### Added

@@ -4,8 +4,8 @@ Last updated: 2025-07-21
 
 ## Overall Progress
 
-- Current milestone: **M0 (Privacy Foundation)**
-- Milestones completed: **1/11**
+- Current milestone: **M1 (Authentication)**
+- Milestones completed: **2/11**
 - Architecture frozen: **Yes**
 - Implementation started: **Yes**
 
@@ -14,7 +14,7 @@ Last updated: 2025-07-21
 | # | Milestone | Status | Tasks | Completed |
 |---|-----------|--------|-------|-----------|
 | M-1 | Architecture Validation | ✅ Complete | 7 | 7/7 |
-| M0 | Privacy Foundation | Not started | 3 | 0/3 |
+| M0 | Privacy Foundation | ✅ Complete | 3 | 3/3 |
 | M1 | Authentication | Not started | 7 | 0/7 |
 | M2 | Users & Groups | Not started | 4 | 0/4 |
 | M3 | Library | Not started | 7 | 0/7 |
@@ -120,8 +120,8 @@ Last updated: 2025-07-21
 
 ## Next Milestone
 
-**M0: Privacy Foundation**
+**M1: Authentication**
 
-Goal: Implement minimal privacy infrastructure (DataConsent, DataProcessingRecord, AuditLog service, RetentionPolicy entity).
+Goal: Implement JWT registration/login with consent gating, token rotation, and revocation.
 
-Prerequisites: M-1 complete ✅
+Prerequisites: M0 complete ✅ (DataConsent, AuditLog service available)
