@@ -26,5 +26,9 @@ line-length = 100
 [tool.ruff.lint]
 select = ["E", "F", "I", "N", "W"]
 
+[tool.setuptools.packages.find]
+include = ["app*"]
+exclude = ["alembic*"]
+
 [tool.pytest.ini_options]
 testpaths = ["tests"]

@@ -35,23 +35,21 @@ All external services accessed through abstractions (adr/0017): `FileStorage`, `
 - **Book** (catalog entity): title, author, genres, description, page_count, isbn.
 - **Copy** (aggregate root, belongs to a User): type (physical | digital), file_ref (digital only), status (available | on_loan).
 - **ReadingProgress**: user_id, copy_id, position, percentage, last_read_at.
-- **Bookmark**: user_id, copy_id, position, label, created_at.
-- **Note**: user_id, copy_id, position, text, created_at, updated_at.
+
+> Note: Bookmark and Note entities are deferred to v1 (reader-extras). See `.kiro/specs/reader/` for the full reader spec.
 
 Use cases:
 - `CreateBook`, `CreateCopy`, `EditBook`, `EditCopy`, `DeleteBook`, `DeleteCopy`
 - `SearchBooks` (personal + group library, metadata only)
 - `ImportBookMetadata` (autocomplete from external source)
 - `OpenReader` (validate ownership, serve file)
-- `SaveReadingProgress`, `CreateBookmark`, `DeleteBookmark`, `CreateNote`, `EditNote`, `DeleteNote`
+- `SaveReadingProgress`
 
 Endpoints:
 - `POST /books`, `GET /books?query=`, `PATCH /books/{id}`, `DELETE /books/{id}`
 - `POST /copies`, `GET /copies/{id}`, `PATCH /copies/{id}`, `DELETE /copies/{id}`
 - `GET /copies/{id}/file` (serve encrypted file to owner only)
 - `GET /copies/{id}/progress`, `PUT /copies/{id}/progress`
-- `POST /copies/{id}/bookmarks`, `DELETE /copies/{id}/bookmarks/{bookmark_id}`
-- `POST /copies/{id}/notes`, `PATCH /copies/{id}/notes/{note_id}`, `DELETE /copies/{id}/notes/{note_id}`
 
 ## Data Models
 
@@ -59,8 +57,6 @@ Endpoints:
 Book(id, title, author, genres[], description, page_count, isbn)
 Copy(id, user_id, book_id, type[physical|digital], file_ref, status[available|on_loan])
 ReadingProgress(id, user_id, copy_id, position, percentage, last_read_at)
-Bookmark(id, user_id, copy_id, position, label, created_at)
-Note(id, user_id, copy_id, position, text, created_at, updated_at)
 ```
 
 ## Correctness Properties
@@ -78,7 +74,7 @@ A `Book` can exist without any associated Copies.
 **Validates: Requirements 1.4**
 
 ### Property 4: Reader data ownership
-`ReadingProgress`, `Bookmark`, and `Note` can only exist for digital copies whose `usuario_id` matches the record's `user_id`.
+`ReadingProgress` can only exist for digital copies whose `user_id` matches the record's `user_id`.
 **Validates: Requirements 4.2**
 
 ### Property 5: Group search isolation

@@ -69,8 +69,8 @@ Source: `docs/domain/business-rules.md` (rules 1, 9, 11).
 1. THE SYSTEM SHALL include an integrated reader for EPUB and PDF files in the MVP.
 2. THE SYSTEM SHALL only allow opening files uploaded by the authenticated user — never files belonging to another user.
 3. THE SYSTEM SHALL store reading progress (position, percentage) associated with the user and the copy.
-4. THE SYSTEM SHALL allow creating, listing, and deleting bookmarks associated with a digital copy.
-5. THE SYSTEM SHALL allow creating, editing, listing, and deleting notes associated with a position in a digital copy.
-6. Reader data (progress, bookmarks, notes) ARE personal data covered by Ley 21.719 (audit logging, ARCO export, deletion on cancellation).
+4. Reading progress IS personal data covered by Ley 21.719 (audit logging, ARCO export, deletion on cancellation).
 
 > Reference: `adr/0014-integrated-reader-mvp.md`
+> Full reader spec: `.kiro/specs/reader/`
+> Note: Bookmarks and notes are deferred to v1 (reader-extras) per `docs/roadmap.md`.
