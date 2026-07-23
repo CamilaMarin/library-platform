@@ -1,7 +1,7 @@
 """Identity & Privacy domain entities.
 
 These are pure domain objects — no framework or infrastructure imports.
-Reference: ADR-0003 (Ley 21.719 compliance), ADR-0016 (configurable retention)
+Reference: ADR-0003 (Ley 21.719 compliance), ADR-0004 (JWT), ADR-0016 (configurable retention)
 """
 
 from dataclasses import dataclass, field
@@ -12,6 +12,9 @@ from uuid import UUID, uuid4
 
 def _utcnow() -> datetime:
     return datetime.now(timezone.utc)
+
+
+# --- Privacy entities (M0) ---
 
 
 class AuditAction(str, Enum):
@@ -89,3 +92,52 @@ class RetentionPolicy:
     duration_days: int = 365
     description: str = ""
     active: bool = True
+
+
+# --- Authentication entities (M1) ---
+
+
+@dataclass
+class User:
+    """Aggregate root for the Identity bounded context.
+
+    Password is stored as a bcrypt hash — never plain text.
+    Reference: ADR-0004, authentication/requirements.md Req 1.3
+    """
+
+    id: UUID = field(default_factory=uuid4)
+    name: str = ""
+    email: str = ""
+    password_hash: str = ""
+    privacy_settings: dict = field(default_factory=dict)
+    created_at: datetime = field(default_factory=_utcnow)
+
+    def __post_init__(self):
+        if not self.email:
+            raise ValueError("User requires an email")
+        if not self.name:
+            raise ValueError("User requires a name")
+
+
+@dataclass
+class RefreshToken:
+    """Long-lived token for obtaining new Access Tokens without re-login.
+
+    Rotation: issuing a new token always invalidates the previous one (atomic).
+    Reference: ADR-0004, authentication/design.md Property 4
+    """
+
+    id: UUID = field(default_factory=uuid4)
+    user_id: UUID = field(default_factory=uuid4)
+    token_hash: str = ""
+    expires_at: datetime = field(default_factory=_utcnow)
+    revoked: bool = False
+    created_at: datetime = field(default_factory=_utcnow)
+
+    @property
+    def is_expired(self) -> bool:
+        return datetime.now(timezone.utc) >= self.expires_at
+
+    @property
+    def is_usable(self) -> bool:
+        return not self.revoked and not self.is_expired
