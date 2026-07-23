@@ -1,7 +1,7 @@
-"""JWT utility functions — proof of concept for M-1 Architecture Validation.
+"""JWT token service — issues and verifies Access Tokens and Refresh Tokens.
 
-This module demonstrates JWT token issuance and verification works with the
-chosen stack (PyJWT). No business logic — that belongs to M1 (Authentication).
+Uses configuration from app.config (loaded from .env).
+No business logic — token mechanics only.
 
 Reference: ADR-0004 (Custom JWT Authentication)
 """
@@ -10,28 +10,46 @@ from datetime import datetime, timedelta, timezone
 
 import jwt
 
-# PoC secret — will be replaced by a proper secret management in M1
-_SECRET_KEY = "entrelineas-dev-secret-replace-in-production"
-_ALGORITHM = "HS256"
-_ACCESS_TOKEN_EXPIRE_MINUTES = 30
+from app.config import settings
 
 
 def create_access_token(user_id: str, expires_delta: timedelta | None = None) -> str:
     """Issue a JWT access token for the given user_id."""
     now = datetime.now(timezone.utc)
-    expire = now + (expires_delta or timedelta(minutes=_ACCESS_TOKEN_EXPIRE_MINUTES))
+    expire = now + (expires_delta or timedelta(minutes=settings.access_token_expire_minutes))
     payload = {
         "sub": user_id,
         "exp": expire,
         "iat": now,
         "type": "access",
     }
-    return jwt.encode(payload, _SECRET_KEY, algorithm=_ALGORITHM)
+    return jwt.encode(payload, settings.jwt_secret_key, algorithm=settings.jwt_algorithm)
+
+
+def create_refresh_token_value(user_id: str, expires_delta: timedelta | None = None) -> str:
+    """Issue a JWT refresh token for the given user_id."""
+    now = datetime.now(timezone.utc)
+    expire = now + (expires_delta or timedelta(days=settings.refresh_token_expire_days))
+    payload = {
+        "sub": user_id,
+        "exp": expire,
+        "iat": now,
+        "type": "refresh",
+    }
+    return jwt.encode(payload, settings.jwt_secret_key, algorithm=settings.jwt_algorithm)
 
 
 def verify_access_token(token: str) -> dict:
     """Verify and decode a JWT access token. Raises jwt.InvalidTokenError on failure."""
-    payload = jwt.decode(token, _SECRET_KEY, algorithms=[_ALGORITHM])
+    payload = jwt.decode(token, settings.jwt_secret_key, algorithms=[settings.jwt_algorithm])
     if payload.get("type") != "access":
         raise jwt.InvalidTokenError("Not an access token")
+    return payload
+
+
+def verify_refresh_token(token: str) -> dict:
+    """Verify and decode a JWT refresh token. Raises jwt.InvalidTokenError on failure."""
+    payload = jwt.decode(token, settings.jwt_secret_key, algorithms=[settings.jwt_algorithm])
+    if payload.get("type") != "refresh":
+        raise jwt.InvalidTokenError("Not a refresh token")
     return payload
