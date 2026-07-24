@@ -5,6 +5,8 @@ from uuid import UUID
 
 from pydantic import BaseModel, Field
 
+from app.library.domain.entities import Copy
+
 
 class CreateBookRequest(BaseModel):
     """Request body for POST /books."""
@@ -30,3 +32,30 @@ class BookResponse(BaseModel):
     created_at: datetime
 
     model_config = {"from_attributes": True}
+
+
+class CopyResponse(BaseModel):
+    """Response for a Copy entity.
+
+    Note: file_ref is NEVER included in API responses (ADR-0009 Property 2).
+    """
+
+    id: UUID
+    user_id: UUID
+    book_id: UUID
+    type: str
+    status: str
+    created_at: datetime
+
+    model_config = {"from_attributes": True}
+
+    @classmethod
+    def from_copy(cls, copy: Copy) -> "CopyResponse":
+        return cls(
+            id=copy.id,
+            user_id=copy.user_id,
+            book_id=copy.book_id,
+            type=copy.type.value,
+            status=copy.status.value,
+            created_at=copy.created_at,
+        )
