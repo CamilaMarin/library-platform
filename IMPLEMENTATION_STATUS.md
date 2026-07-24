@@ -1,6 +1,6 @@
 # Implementation Status — EntreLíneas
 
-Last updated: 2025-07-21
+Last updated: 2025-07-22
 
 ## Overall Progress
 
@@ -15,7 +15,7 @@ Last updated: 2025-07-21
 |---|-----------|--------|-------|-----------|
 | M-1 | Architecture Validation | ✅ Complete | 7 | 7/7 |
 | M0 | Privacy Foundation | ✅ Complete | 3 | 3/3 |
-| M1 | Authentication | In progress | 7 | 1/7 |
+| M1 | Authentication | In progress | 10 | 5/10 |
 | M2 | Users & Groups | Not started | 4 | 0/4 |
 | M3 | Library | Not started | 7 | 0/7 |
 | M4 | Reading Selection | Not started | 5 | 0/5 |
@@ -31,9 +31,9 @@ Last updated: 2025-07-21
 - **Status:** In progress
 - **Milestone:** M1, M2
 - **Spec:** `.kiro/specs/authentication/`
-- **Completed tasks:** 1/10 (User + RefreshToken entities, migration)
-- **Remaining tasks:** 9
-- **Test coverage:** Domain entities tested
+- **Completed tasks:** 5/10 (entities, migration, RegisterUser, login, token refresh)
+- **Remaining tasks:** 5
+- **Test coverage:** 67 tests passing (domain + integration)
 - **Open issues:** None
 - **Blocking issues:** None
 
@@ -102,7 +102,7 @@ Last updated: 2025-07-21
 | Risk | Status | Milestone | Notes |
 |------|--------|-----------|-------|
 | Docker networking (Windows/WSL2) | Open | M-1 | Will be validated in Architecture Validation |
-| JWT refresh token replay | Open | M1 | Mitigated by atomic rotation design |
+| JWT refresh token replay | Mitigated | M1 | Implemented: atomic rotation revokes old token before storing new one (RefreshTokenUseCase) |
 | Storage provider encryption | Open | M3 | Using MinIO SSE, no custom crypto |
 | Concurrent loan conflicts | Open | M7 | Will use SELECT FOR UPDATE |
 | ARCO export completeness | Open | M8 | Each module registers exportable data |
@@ -125,3 +125,15 @@ Last updated: 2025-07-21
 Goal: Implement JWT registration/login with consent gating, token rotation, and revocation.
 
 Prerequisites: M0 complete ✅ (DataConsent, AuditLog service available)
+
+Progress:
+- ✅ Task 1: Domain entities (User, DataConsent, FamilyGroup, RefreshToken) + migration
+- ✅ Task 2: RegisterUser use case + persistence (consent-gating)
+- ✅ Task 3: POST /auth/register + POST /auth/consent endpoints
+- ✅ Task 4: LoginUser use case + POST /auth/login (JWT issuance)
+- ✅ Task 5: RefreshToken use case + POST /auth/refresh (atomic rotation)
+- ⬜ Task 6: RevokeToken use case + POST /auth/logout
+- ⬜ Task 7: CreateFamilyGroup use case + POST /groups
+- ⬜ Task 8: InviteGroupMember / AcceptGroupInvitation
+- ⬜ Task 9: ARCO integration (GET /users/me/export, DELETE /users/me)
+- ⬜ Task 10: Domain + integration tests (full coverage)

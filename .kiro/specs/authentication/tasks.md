@@ -6,11 +6,11 @@ Implements account registration with consent gating, JWT authentication (access 
 
 ## Tasks
 
-- [ ] 1. Domain model: `User`, `DataConsent`, `FamilyGroup`, `RefreshToken` entities (no external dependencies) _(Req 1, 2, 3)_
-- [ ] 2. `RegisterUser` use case + persistence, blocked until `DataConsent` exists _(Req 1)_
-- [ ] 3. Endpoints `POST /auth/register` + `POST /auth/consent` _(Req 1)_
-- [ ] 4. `LoginUser` use case + `POST /auth/login` endpoint with secure password hashing, returns Access Token + Refresh Token _(Req 1.3, 2.1)_
-- [ ] 5. `RefreshToken` use case + `POST /auth/refresh` endpoint with token rotation _(Req 2.3)_
+- [x] 1. Domain model: `User`, `DataConsent`, `FamilyGroup`, `RefreshToken` entities (no external dependencies) _(Req 1, 2, 3)_
+- [x] 2. `RegisterUser` use case + persistence, blocked until `DataConsent` exists _(Req 1)_
+- [x] 3. Endpoints `POST /auth/register` + `POST /auth/consent` _(Req 1)_
+- [x] 4. `LoginUser` use case + `POST /auth/login` endpoint with secure password hashing, returns Access Token + Refresh Token _(Req 1.3, 2.1)_
+- [x] 5. `RefreshToken` use case + `POST /auth/refresh` endpoint with token rotation _(Req 2.3)_
 - [ ] 6. `RevokeToken` use case + `POST /auth/logout` endpoint _(Req 2.4)_
 - [ ] 7. `CreateFamilyGroup` use case + `POST /groups` endpoint _(Req 3.1)_
 - [ ] 8. `InviteGroupMember` / `AcceptGroupInvitation` use cases + endpoints, validating explicit acceptance _(Req 3.1, 3.2)_

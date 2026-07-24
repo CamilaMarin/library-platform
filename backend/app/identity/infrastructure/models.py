@@ -7,7 +7,7 @@ Reference: docs/architecture/database.md
 import uuid
 
 from sqlalchemy import Boolean, Column, DateTime, Integer, String, Text, func
-from sqlalchemy.dialects.postgresql import UUID
+from sqlalchemy.dialects.postgresql import JSON, UUID
 
 from app.database import Base
 
@@ -64,3 +64,29 @@ class RetentionPolicyModel(Base):
     duration_days = Column(Integer, nullable=False, default=365)
     description = Column(Text, nullable=False, default="")
     active = Column(Boolean, nullable=False, default=True)
+
+
+class UserModel(Base):
+    """ORM model for the users table."""
+
+    __tablename__ = "users"
+
+    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    name = Column(String(200), nullable=False)
+    email = Column(String(320), nullable=False, unique=True, index=True)
+    password_hash = Column(String(200), nullable=False)
+    privacy_settings = Column(JSON, nullable=False, server_default="{}")
+    created_at = Column(DateTime(timezone=True), nullable=False, server_default=func.now())
+
+
+class RefreshTokenModel(Base):
+    """ORM model for the refresh_tokens table."""
+
+    __tablename__ = "refresh_tokens"
+
+    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    user_id = Column(UUID(as_uuid=True), nullable=False, index=True)
+    token_hash = Column(String(64), nullable=False, unique=True)
+    expires_at = Column(DateTime(timezone=True), nullable=False)
+    revoked = Column(Boolean, nullable=False, default=False)
+    created_at = Column(DateTime(timezone=True), nullable=False, server_default=func.now())

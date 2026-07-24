@@ -7,6 +7,7 @@ Reference: ADR-0004 (Custom JWT Authentication)
 """
 
 from datetime import datetime, timedelta, timezone
+from uuid import uuid4
 
 import jwt
 
@@ -35,6 +36,7 @@ def create_refresh_token_value(user_id: str, expires_delta: timedelta | None = N
         "exp": expire,
         "iat": now,
         "type": "refresh",
+        "jti": str(uuid4()),
     }
     return jwt.encode(payload, settings.jwt_secret_key, algorithm=settings.jwt_algorithm)
 

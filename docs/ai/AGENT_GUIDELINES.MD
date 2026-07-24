@@ -102,7 +102,7 @@ Avoid vendor lock-in.
 
 - JWT Access Token
 - Refresh Token
-- Argon2 password hashing
+- bcrypt or Argon2 password hashing
 - HTTPS only
 - OWASP recommendations
 - Secrets outside source code

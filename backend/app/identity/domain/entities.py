@@ -136,7 +136,12 @@ class RefreshToken:
 
     @property
     def is_expired(self) -> bool:
-        return datetime.now(timezone.utc) >= self.expires_at
+        now = datetime.now(timezone.utc)
+        expires_at = self.expires_at
+        # Handle timezone-naive datetimes (e.g. from SQLite) by assuming UTC
+        if expires_at.tzinfo is None:
+            expires_at = expires_at.replace(tzinfo=timezone.utc)
+        return now >= expires_at
 
     @property
     def is_usable(self) -> bool:

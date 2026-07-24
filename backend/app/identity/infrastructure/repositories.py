@@ -13,13 +13,17 @@ from app.identity.domain.entities import (
     AuditLog,
     DataConsent,
     DataProcessingRecord,
+    RefreshToken,
     RetentionPolicy,
+    User,
 )
 from app.identity.infrastructure.models import (
     AuditLogModel,
     DataConsentModel,
     DataProcessingRecordModel,
+    RefreshTokenModel,
     RetentionPolicyModel,
+    UserModel,
 )
 
 
@@ -173,3 +177,121 @@ class SqlRetentionPolicyRepository:
             description=model.description,
             active=model.active,
         )
+
+
+class SqlUserRepository:
+    """SQLAlchemy implementation of UserRepository."""
+
+    def __init__(self, session: Session):
+        self._session = session
+
+    def save(self, user: User) -> User:
+        model = UserModel(
+            id=user.id,
+            name=user.name,
+            email=user.email,
+            password_hash=user.password_hash,
+            privacy_settings=user.privacy_settings,
+            created_at=user.created_at,
+        )
+        self._session.add(model)
+        self._session.flush()
+        return user
+
+    def find_by_email(self, email: str) -> User | None:
+        model = (
+            self._session.query(UserModel)
+            .filter(UserModel.email == email)
+            .first()
+        )
+        if not model:
+            return None
+        return User(
+            id=model.id,
+            name=model.name,
+            email=model.email,
+            password_hash=model.password_hash,
+            privacy_settings=model.privacy_settings or {},
+            created_at=model.created_at,
+        )
+
+    def find_by_id(self, user_id: UUID) -> User | None:
+        model = (
+            self._session.query(UserModel)
+            .filter(UserModel.id == user_id)
+            .first()
+        )
+        if not model:
+            return None
+        return User(
+            id=model.id,
+            name=model.name,
+            email=model.email,
+            password_hash=model.password_hash,
+            privacy_settings=model.privacy_settings or {},
+            created_at=model.created_at,
+        )
+
+
+class SqlRefreshTokenRepository:
+    """SQLAlchemy implementation of RefreshTokenRepository."""
+
+    def __init__(self, session: Session):
+        self._session = session
+
+    def save(self, token: RefreshToken) -> RefreshToken:
+        model = RefreshTokenModel(
+            id=token.id,
+            user_id=token.user_id,
+            token_hash=token.token_hash,
+            expires_at=token.expires_at,
+            revoked=token.revoked,
+            created_at=token.created_at,
+        )
+        self._session.add(model)
+        self._session.flush()
+        return token
+
+    def find_by_token_hash(self, token_hash: str) -> RefreshToken | None:
+        model = (
+            self._session.query(RefreshTokenModel)
+            .filter(RefreshTokenModel.token_hash == token_hash)
+            .first()
+        )
+        if not model:
+            return None
+        return RefreshToken(
+            id=model.id,
+            user_id=model.user_id,
+            token_hash=model.token_hash,
+            expires_at=model.expires_at,
+            revoked=model.revoked,
+            created_at=model.created_at,
+        )
+
+    def find_active_by_user_id(self, user_id: UUID) -> list[RefreshToken]:
+        models = (
+            self._session.query(RefreshTokenModel)
+            .filter(
+                RefreshTokenModel.user_id == user_id,
+                RefreshTokenModel.revoked.is_(False),
+            )
+            .all()
+        )
+        return [
+            RefreshToken(
+                id=m.id,
+                user_id=m.user_id,
+                token_hash=m.token_hash,
+                expires_at=m.expires_at,
+                revoked=m.revoked,
+                created_at=m.created_at,
+            )
+            for m in models
+        ]
+
+    def revoke(self, token_id: UUID) -> None:
+        self._session.query(RefreshTokenModel).filter(
+            RefreshTokenModel.id == token_id
+        ).update({"revoked": True})
+        self._session.flush()

@@ -6,6 +6,20 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+### Added (M1 — Authentication, in progress)
+- User domain entity with email/name validation and bcrypt password hash storage
+- RefreshToken domain entity with is_expired/is_usable properties and timezone-safe comparison
+- RegisterUser use case with consent-gating invariant (User + DataConsent in same transaction)
+- LoginUser use case with bcrypt verification, JWT Access + Refresh Token issuance, SHA-256 refresh token storage
+- RefreshTokenUseCase with atomic rotation (revoke old + store new in same transaction)
+- UserRepository and RefreshTokenRepository protocols (application layer abstractions)
+- SqlUserRepository and SqlRefreshTokenRepository (SQLAlchemy implementations)
+- UserModel and RefreshTokenModel (SQLAlchemy ORM)
+- REST endpoints: POST /auth/register, /auth/consent, /auth/login, /auth/refresh
+- Pydantic request/response schemas (RegisterRequest, LoginRequest, RefreshRequest, etc.)
+- Alembic migration 0003: users and refresh_tokens tables
+- 67 tests (domain unit + endpoint integration) — all passing
+
 ## [M0] — Privacy Foundation
 
 ### Added
