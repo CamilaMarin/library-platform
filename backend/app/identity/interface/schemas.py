@@ -101,3 +101,52 @@ class InvitationResponse(BaseModel):
     user_id: UUID
     status: str
     created_at: datetime
+
+
+# --- ARCO / User data export schemas ---
+
+
+class ExportUserProfile(BaseModel):
+    """User profile section of the export response (no password_hash)."""
+
+    name: str
+    email: str
+    created_at: datetime
+
+
+class ExportConsentItem(BaseModel):
+    """Single consent record in the export response."""
+
+    id: UUID
+    timestamp: datetime
+    policy_version: str
+    purpose: str
+
+
+class ExportMembershipItem(BaseModel):
+    """Single group membership record in the export response."""
+
+    id: UUID
+    group_id: UUID
+    status: str
+    created_at: datetime
+
+
+class ExportProcessingRecordItem(BaseModel):
+    """Single data processing record in the export response."""
+
+    id: UUID
+    data_type: str
+    purpose: str
+    legal_basis: str
+    collected_at: datetime
+    retention_expires_at: datetime | None
+
+
+class ExportResponse(BaseModel):
+    """Response body for GET /users/me/export — structured export of all identity-owned data."""
+
+    user: ExportUserProfile
+    consents: list[ExportConsentItem]
+    memberships: list[ExportMembershipItem]
+    processing_records: list[ExportProcessingRecordItem]

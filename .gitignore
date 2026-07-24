@@ -39,6 +39,7 @@ docker-compose.override.yml
 
 # Database
 *.db
+file::memory:
 
 # Coverage
 htmlcov/

@@ -66,6 +66,29 @@ class SqlDataConsentRepository:
             purpose=model.purpose,
         )
 
+    def find_all_by_user_id(self, user_id: UUID) -> list[DataConsent]:
+        models = (
+            self._session.query(DataConsentModel)
+            .filter(DataConsentModel.user_id == user_id)
+            .all()
+        )
+        return [
+            DataConsent(
+                id=m.id,
+                user_id=m.user_id,
+                timestamp=m.timestamp,
+                policy_version=m.policy_version,
+                purpose=m.purpose,
+            )
+            for m in models
+        ]
+
+    def delete_by_user_id(self, user_id: UUID) -> None:
+        self._session.query(DataConsentModel).filter(
+            DataConsentModel.user_id == user_id
+        ).delete()
+        self._session.flush()
+
 
 class SqlDataProcessingRecordRepository:
     """SQLAlchemy implementation of DataProcessingRecordRepository."""
@@ -105,6 +128,12 @@ class SqlDataProcessingRecordRepository:
             )
             for m in models
         ]
+
+    def delete_by_user_id(self, user_id: UUID) -> None:
+        self._session.query(DataProcessingRecordModel).filter(
+            DataProcessingRecordModel.user_id == user_id
+        ).delete()
+        self._session.flush()
 
 
 class SqlAuditLogRepository:
@@ -237,6 +266,12 @@ class SqlUserRepository:
             created_at=model.created_at,
         )
 
+    def delete(self, user_id: UUID) -> None:
+        self._session.query(UserModel).filter(
+            UserModel.id == user_id
+        ).delete()
+        self._session.flush()
+
 
 class SqlRefreshTokenRepository:
     """SQLAlchemy implementation of RefreshTokenRepository."""
@@ -298,6 +333,13 @@ class SqlRefreshTokenRepository:
     def revoke(self, token_id: UUID) -> None:
         self._session.query(RefreshTokenModel).filter(
             RefreshTokenModel.id == token_id
+        ).update({"revoked": True})
+        self._session.flush()
+
+    def revoke_all_by_user_id(self, user_id: UUID) -> None:
+        self._session.query(RefreshTokenModel).filter(
+            RefreshTokenModel.user_id == user_id,
+            RefreshTokenModel.revoked.is_(False),
         ).update({"revoked": True})
         self._session.flush()
 
@@ -407,4 +449,27 @@ class SqlGroupMembershipRepository:
         self._session.query(GroupMembershipModel).filter(
             GroupMembershipModel.id == membership_id
         ).update({"status": status.value})
+        self._session.flush()
+
+    def find_by_user_id(self, user_id: UUID) -> list[GroupMembership]:
+        models = (
+            self._session.query(GroupMembershipModel)
+            .filter(GroupMembershipModel.user_id == user_id)
+            .all()
+        )
+        return [
+            GroupMembership(
+                id=m.id,
+                group_id=m.group_id,
+                user_id=m.user_id,
+                status=MembershipStatus(m.status),
+                created_at=m.created_at,
+            )
+            for m in models
+        ]
+
+    def delete_by_user_id(self, user_id: UUID) -> None:
+        self._session.query(GroupMembershipModel).filter(
+            GroupMembershipModel.user_id == user_id
+        ).delete()
         self._session.flush()
