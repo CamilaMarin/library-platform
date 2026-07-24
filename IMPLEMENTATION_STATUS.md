@@ -4,8 +4,8 @@ Last updated: 2025-07-22
 
 ## Overall Progress
 
-- Current milestone: **M1 (Authentication)**
-- Milestones completed: **3/11**
+- Current milestone: **M3 (Library)**
+- Milestones completed: **4/11**
 - Architecture frozen: **Yes**
 - Implementation started: **Yes**
 
@@ -16,7 +16,7 @@ Last updated: 2025-07-22
 | M-1 | Architecture Validation | ✅ Complete | 7 | 7/7 |
 | M0 | Privacy Foundation | ✅ Complete | 3 | 3/3 |
 | M1 | Authentication | ✅ Complete | 10 | 10/10 |
-| M2 | Users & Groups | Not started | 4 | 0/4 |
+| M2 | Users & Groups | ✅ Complete | 4 | 4/4 |
 | M3 | Library | Not started | 7 | 0/7 |
 | M4 | Reading Selection | Not started | 5 | 0/5 |
 | M5 | Clubs | Not started | 5 | 0/5 |
@@ -120,22 +120,8 @@ Last updated: 2025-07-22
 
 ## Next Milestone
 
-**M1: Authentication**
+**M3: Library**
 
-Goal: Implement JWT registration/login with consent gating, token rotation, and revocation.
+Goal: Implement Books, Copies (physical + digital), Search, and FileStorage integration.
 
-Prerequisites: M0 complete ✅ (DataConsent, AuditLog service available)
-
-Progress:
-- ✅ Task 1: Domain entities (User, DataConsent, FamilyGroup, RefreshToken) + migration
-- ✅ Task 2: RegisterUser use case + persistence (consent-gating)
-- ✅ Task 3: POST /auth/register + POST /auth/consent endpoints
-- ✅ Task 4: LoginUser use case + POST /auth/login (JWT issuance)
-- ✅ Task 5: RefreshToken use case + POST /auth/refresh (atomic rotation)
-- ✅ Task 6: RevokeToken use case + POST /auth/logout
-- ✅ Task 7: CreateFamilyGroup use case + POST /groups (+ auth dependency)
-- ✅ Task 8: InviteGroupMember / AcceptGroupInvitation
-- ✅ Task 9: ARCO integration (GET /users/me/export, DELETE /users/me)
-- ✅ Task 10: Domain + integration tests (full coverage — 154 tests)
-
-**Milestone M1 complete — ready for M2.**
+Prerequisites: M2 complete ✅ (User, FamilyGroup entities available)
