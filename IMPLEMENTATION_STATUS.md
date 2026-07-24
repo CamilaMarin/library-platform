@@ -18,7 +18,7 @@ Last updated: 2025-07-22
 | M1 | Authentication | ✅ Complete | 10 | 10/10 |
 | M2 | Users & Groups | ✅ Complete | 4 | 4/4 |
 | M3 | Library | ✅ Complete | 7 | 6/7 |
-| M4 | Reading Selection | In progress | 5 | 4/5 |
+| M4 | Reading Selection | In progress | 5 | 5/5 |
 | M5 | Clubs | Not started | 5 | 0/5 |
 | M6 | Reviews | Not started | 5 | 0/5 |
 | M7 | Loans | Not started | 4 | 0/4 |
@@ -51,8 +51,8 @@ Last updated: 2025-07-22
 - **Status:** In progress
 - **Milestone:** M4
 - **Spec:** `.kiro/specs/reading-selection/`
-- **Completed tasks:** 4/7 (Entities, RunReadingDraw, PickByTurn, protocols)
-- **Remaining tasks:** 3 (Endpoints, integration tests)
+- **Completed tasks:** 6/7 (Entities, use cases, endpoints, infrastructure)
+- **Remaining tasks:** 1 (Integration tests)
 - **Test coverage:** 11 domain tests
 - **Open issues:** None
 - **Blocking issues:** None
