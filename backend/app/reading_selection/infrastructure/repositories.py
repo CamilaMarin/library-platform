@@ -129,12 +129,14 @@ class SqlCopyQueryService:
 
         result: dict[UUID, list[Copy]] = {}
         for m in models:
+            # Use redacted placeholder for digital — NEVER expose actual file_ref (ADR-0009)
+            safe_file_ref = "[redacted]" if m.type == "digital" else None
             copy = Copy(
                 id=m.id,
                 user_id=m.user_id,
                 book_id=m.book_id,
                 type=CopyType(m.type),
-                file_ref=None,  # NEVER expose file_ref (ADR-0009)
+                file_ref=safe_file_ref,
                 status=CopyStatus(m.status),
                 created_at=m.created_at,
             )
