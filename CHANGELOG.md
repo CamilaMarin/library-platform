@@ -6,6 +6,26 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+## [M4] — Reading Selection
+
+### Added
+- Draw domain entity (group_id, filters, participants, result)
+- TurnHistory domain entity (fair rotation tracking)
+- Availability validation logic (physical: available status, digital: ownership)
+- RunReadingDraw use case (filter by genre/pages/unread, validate availability, random select)
+- PickByTurn use case (deterministic rotation: oldest last_pick_date goes next)
+- POST /groups/{id}/draws — execute filtered random draw
+- GET /groups/{id}/draws — draw history
+- GET /groups/{id}/draws/next-picker — who picks next
+- SqlDrawRepository, SqlTurnHistoryRepository, SqlCopyQueryService, SqlBookQueryService
+- Alembic migration 0006: draws, turn_histories tables
+- 21 tests (11 domain + 10 integration) covering all correctness properties
+
+### Security
+- CopyQueryService uses `[redacted]` placeholder for digital file_ref (never exposes actual path)
+- Draw results never include file_ref (Property 3)
+- Source user attribution does not imply file access (Property 4)
+
 ## [M3] — Library
 
 ### Added
