@@ -19,6 +19,17 @@ class CreateBookRequest(BaseModel):
     isbn: str | None = Field(default=None, max_length=20)
 
 
+class UpdateBookRequest(BaseModel):
+    """Request body for PATCH /books/{id}. All fields optional."""
+
+    title: str | None = Field(default=None, min_length=1, max_length=500)
+    author: str | None = Field(default=None, min_length=1, max_length=500)
+    genres: list[str] | None = None
+    description: str | None = None
+    pages: int | None = Field(default=None, ge=1)
+    isbn: str | None = Field(default=None, max_length=20)
+
+
 class BookResponse(BaseModel):
     """Response for a Book entity."""
 

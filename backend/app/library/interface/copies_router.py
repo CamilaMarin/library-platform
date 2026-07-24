@@ -1,6 +1,6 @@
 """Copies REST endpoints.
 
-Reference: library/tasks.md#3, ADR-0001, ADR-0009, ADR-0015
+Reference: library/tasks.md#3, #4, ADR-0001, ADR-0009, ADR-0015
 """
 
 from uuid import UUID
@@ -85,3 +85,27 @@ async def create_digital_copy(
 
     db.commit()
     return CopyResponse.from_copy(copy)
+
+
+@router.delete("/{copy_id}", status_code=status.HTTP_204_NO_CONTENT)
+def delete_copy(
+    copy_id: UUID,
+    user_id: str = Depends(get_current_user_id),
+    db: Session = Depends(get_db),
+):
+    """Delete a copy. Only the owner can delete. Removes file if digital."""
+    from app.library.application.delete_copy import DeleteCopy
+
+    use_case = DeleteCopy(
+        copy_repository=SqlCopyRepository(db),
+        file_storage=LocalFileStorage(),
+    )
+
+    try:
+        use_case.execute(copy_id=copy_id, user_id=UUID(user_id))
+    except ValueError as e:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(e))
+    except PermissionError as e:
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail=str(e))
+
+    db.commit()
