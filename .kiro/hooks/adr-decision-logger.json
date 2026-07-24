@@ -1,0 +1,15 @@
+{
+  "version": "v1",
+  "hooks": [
+    {
+      "name": "ADR Decision Logger",
+      "trigger": "PostFileSave",
+      "description": "After modifying specification or architecture files, determine if an architectural decision was made and log it appropriately.",
+      "matcher": "\\.(kiro/specs|docs/architecture|docs/adr)/.*\\.md$",
+      "action": {
+        "type": "agent",
+        "prompt": "A specification or architecture file was modified. Determine: (1) Was an architectural decision made? (2) If yes, does it require a new ADR or can it be logged in docs/architecture/decision-log.md? (3) If a new ADR is needed, stop and recommend creating one before continuing. Log format: Date, Decision, Reason, Alternatives considered, Impact, Related ADR, Related spec, Related milestone."
+      }
+    }
+  ]
+}

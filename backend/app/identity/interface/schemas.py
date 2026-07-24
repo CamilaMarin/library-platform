@@ -65,3 +65,88 @@ class RefreshRequest(BaseModel):
     """Request body for POST /auth/refresh."""
 
     refresh_token: str = Field(..., min_length=1)
+
+
+class LogoutRequest(BaseModel):
+    """Request body for POST /auth/logout."""
+
+    refresh_token: str = Field(..., min_length=1)
+
+
+class CreateGroupRequest(BaseModel):
+    """Request body for POST /groups."""
+
+    name: str = Field(..., min_length=1, max_length=200)
+
+
+class CreateGroupResponse(BaseModel):
+    """Response body for successful group creation."""
+
+    id: UUID
+    name: str
+    created_at: datetime
+
+
+class InviteRequest(BaseModel):
+    """Request body for POST /groups/{group_id}/invitations."""
+
+    user_id: UUID
+
+
+class InvitationResponse(BaseModel):
+    """Response body for invitation operations."""
+
+    id: UUID
+    group_id: UUID
+    user_id: UUID
+    status: str
+    created_at: datetime
+
+
+# --- ARCO / User data export schemas ---
+
+
+class ExportUserProfile(BaseModel):
+    """User profile section of the export response (no password_hash)."""
+
+    name: str
+    email: str
+    created_at: datetime
+
+
+class ExportConsentItem(BaseModel):
+    """Single consent record in the export response."""
+
+    id: UUID
+    timestamp: datetime
+    policy_version: str
+    purpose: str
+
+
+class ExportMembershipItem(BaseModel):
+    """Single group membership record in the export response."""
+
+    id: UUID
+    group_id: UUID
+    status: str
+    created_at: datetime
+
+
+class ExportProcessingRecordItem(BaseModel):
+    """Single data processing record in the export response."""
+
+    id: UUID
+    data_type: str
+    purpose: str
+    legal_basis: str
+    collected_at: datetime
+    retention_expires_at: datetime | None
+
+
+class ExportResponse(BaseModel):
+    """Response body for GET /users/me/export — structured export of all identity-owned data."""
+
+    user: ExportUserProfile
+    consents: list[ExportConsentItem]
+    memberships: list[ExportMembershipItem]
+    processing_records: list[ExportProcessingRecordItem]

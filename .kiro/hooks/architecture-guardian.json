@@ -1,0 +1,15 @@
+{
+  "version": "v1",
+  "hooks": [
+    {
+      "name": "Architecture Guardian",
+      "trigger": "PreToolUse",
+      "description": "Before modifying code or specifications, verify compliance with approved ADRs, specifications, steering rules, MVP scope, and architecture freeze.",
+      "matcher": "fs_write|str_replace|fs_append",
+      "action": {
+        "type": "agent",
+        "prompt": "Before proceeding with this write operation, verify: (1) Does this change comply with all approved ADRs? (2) Does it stay within approved MVP scope? (3) Does it preserve the frozen architecture? (4) Does it follow the steering rules? If any of these checks fail, stop the operation and recommend creating a new ADR instead. Reference: .kiro/steering/workflow.md, .kiro/steering/domain-rules.md"
+      }
+    }
+  ]
+}

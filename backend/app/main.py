@@ -7,6 +7,8 @@ from sqlalchemy import text
 from app.config import settings
 from app.database import engine
 from app.identity.interface.auth_router import router as auth_router
+from app.identity.interface.groups_router import router as groups_router
+from app.identity.interface.users_router import router as users_router
 
 app = FastAPI(
     title="EntreLíneas API",
@@ -25,6 +27,8 @@ app.add_middleware(
 
 
 app.include_router(auth_router)
+app.include_router(groups_router)
+app.include_router(users_router)
 
 
 @app.get("/health")

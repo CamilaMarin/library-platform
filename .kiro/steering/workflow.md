@@ -19,6 +19,14 @@ inclusion: always
 - Follow Clean Architecture, SOLID, Privacy by Design, Cloud Agnostic principles.
 - Never violate an approved ADR.
 
+## Git branching rules
+
+- NEVER commit directly to main/master.
+- ALWAYS create a feature branch before any implementation work.
+- Branch format: `feat/<milestone>-<short-description>` (e.g., `feat/m1-auth-logout-family-groups`).
+- After a PR is merged, ALWAYS create a NEW branch from updated main for the next unit of work.
+- One PR per logical unit of work (related tasks from the same wave or milestone phase).
+
 ## Commit and approval rules
 
 - NEVER commit automatically.

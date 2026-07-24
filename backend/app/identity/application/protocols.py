@@ -13,6 +13,9 @@ from app.identity.domain.entities import (
     AuditLog,
     DataConsent,
     DataProcessingRecord,
+    FamilyGroup,
+    GroupMembership,
+    MembershipStatus,
     RefreshToken,
     RetentionPolicy,
     User,
@@ -26,6 +29,10 @@ class DataConsentRepository(Protocol):
 
     def find_by_user_id(self, user_id: UUID) -> DataConsent | None: ...
 
+    def find_all_by_user_id(self, user_id: UUID) -> list[DataConsent]: ...
+
+    def delete_by_user_id(self, user_id: UUID) -> None: ...
+
 
 class DataProcessingRecordRepository(Protocol):
     """Persistence interface for DataProcessingRecord."""
@@ -33,6 +40,8 @@ class DataProcessingRecordRepository(Protocol):
     def save(self, record: DataProcessingRecord) -> DataProcessingRecord: ...
 
     def find_by_user_id(self, user_id: UUID) -> list[DataProcessingRecord]: ...
+
+    def delete_by_user_id(self, user_id: UUID) -> None: ...
 
 
 class AuditLogRepository(Protocol):
@@ -60,6 +69,8 @@ class UserRepository(Protocol):
 
     def find_by_id(self, user_id: UUID) -> User | None: ...
 
+    def delete(self, user_id: UUID) -> None: ...
+
 
 class RefreshTokenRepository(Protocol):
     """Persistence interface for RefreshToken."""
@@ -71,3 +82,31 @@ class RefreshTokenRepository(Protocol):
     def find_active_by_user_id(self, user_id: UUID) -> list[RefreshToken]: ...
 
     def revoke(self, token_id: UUID) -> None: ...
+
+    def revoke_all_by_user_id(self, user_id: UUID) -> None: ...
+
+
+class FamilyGroupRepository(Protocol):
+    """Persistence interface for FamilyGroup."""
+
+    def save(self, group: FamilyGroup) -> FamilyGroup: ...
+
+    def find_by_id(self, group_id: UUID) -> FamilyGroup | None: ...
+
+
+class GroupMembershipRepository(Protocol):
+    """Persistence interface for GroupMembership."""
+
+    def save(self, membership: GroupMembership) -> GroupMembership: ...
+
+    def find_by_id(self, membership_id: UUID) -> GroupMembership | None: ...
+
+    def find_by_group_id(self, group_id: UUID) -> list[GroupMembership]: ...
+
+    def find_by_user_id(self, user_id: UUID) -> list[GroupMembership]: ...
+
+    def find_by_user_and_group(self, user_id: UUID, group_id: UUID) -> GroupMembership | None: ...
+
+    def update_status(self, membership_id: UUID, status: MembershipStatus) -> None: ...
+
+    def delete_by_user_id(self, user_id: UUID) -> None: ...
