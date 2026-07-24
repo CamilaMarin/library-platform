@@ -15,7 +15,7 @@ Last updated: 2025-07-21
 |---|-----------|--------|-------|-----------|
 | M-1 | Architecture Validation | ✅ Complete | 7 | 7/7 |
 | M0 | Privacy Foundation | ✅ Complete | 3 | 3/3 |
-| M1 | Authentication | Not started | 7 | 0/7 |
+| M1 | Authentication | In progress | 7 | 1/7 |
 | M2 | Users & Groups | Not started | 4 | 0/4 |
 | M3 | Library | Not started | 7 | 0/7 |
 | M4 | Reading Selection | Not started | 5 | 0/5 |
@@ -28,12 +28,12 @@ Last updated: 2025-07-21
 ## Modules
 
 ### Identity (Authentication, Users, Groups)
-- **Status:** Not started
+- **Status:** In progress
 - **Milestone:** M1, M2
 - **Spec:** `.kiro/specs/authentication/`
-- **Completed tasks:** 0/10
-- **Remaining tasks:** 10
-- **Test coverage:** 0%
+- **Completed tasks:** 1/10 (User + RefreshToken entities, migration)
+- **Remaining tasks:** 9
+- **Test coverage:** Domain entities tested
 - **Open issues:** None
 - **Blocking issues:** None
 
