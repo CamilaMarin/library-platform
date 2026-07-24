@@ -17,7 +17,7 @@ Last updated: 2025-07-22
 | M0 | Privacy Foundation | ✅ Complete | 3 | 3/3 |
 | M1 | Authentication | ✅ Complete | 10 | 10/10 |
 | M2 | Users & Groups | ✅ Complete | 4 | 4/4 |
-| M3 | Library | In progress | 7 | 2/7 |
+| M3 | Library | In progress | 7 | 3/7 |
 | M4 | Reading Selection | Not started | 5 | 0/5 |
 | M5 | Clubs | Not started | 5 | 0/5 |
 | M6 | Reviews | Not started | 5 | 0/5 |
@@ -41,8 +41,8 @@ Last updated: 2025-07-22
 - **Status:** In progress
 - **Milestone:** M3
 - **Spec:** `.kiro/specs/library/`
-- **Completed tasks:** 2/7 (Book/Copy entities + CreateBook endpoint)
-- **Remaining tasks:** 5 (CreateCopy, Edit/Delete, Search, Tests)
+- **Completed tasks:** 3/7 (Book/Copy entities + CreateBook + CreateCopy endpoints)
+- **Remaining tasks:** 4 (Edit/Delete, Search, Tests)
 - **Test coverage:** 11 domain tests
 - **Open issues:** None
 - **Blocking issues:** None
