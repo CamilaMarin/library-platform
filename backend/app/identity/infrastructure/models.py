@@ -6,6 +6,7 @@ Reference: docs/architecture/database.md
 
 import uuid
 
+import sqlalchemy as sa
 from sqlalchemy import Boolean, Column, DateTime, Integer, String, Text, func
 from sqlalchemy.dialects.postgresql import JSON, UUID
 
@@ -90,3 +91,33 @@ class RefreshTokenModel(Base):
     expires_at = Column(DateTime(timezone=True), nullable=False)
     revoked = Column(Boolean, nullable=False, default=False)
     created_at = Column(DateTime(timezone=True), nullable=False, server_default=func.now())
+
+
+class FamilyGroupModel(Base):
+    """ORM model for the family_groups table."""
+
+    __tablename__ = "family_groups"
+
+    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    name = Column(String(200), nullable=False)
+    created_at = Column(DateTime(timezone=True), nullable=False, server_default=func.now())
+
+
+class GroupMembershipModel(Base):
+    """ORM model for the group_memberships table."""
+
+    __tablename__ = "group_memberships"
+
+    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    group_id = Column(
+        UUID(as_uuid=True),
+        nullable=False,
+        index=True,
+    )
+    user_id = Column(UUID(as_uuid=True), nullable=False, index=True)
+    status = Column(String(20), nullable=False)
+    created_at = Column(DateTime(timezone=True), nullable=False, server_default=func.now())
+
+    __table_args__ = (
+        sa.UniqueConstraint("group_id", "user_id", name="uq_group_memberships_group_user"),
+    )

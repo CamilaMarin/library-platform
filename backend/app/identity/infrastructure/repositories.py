@@ -13,6 +13,9 @@ from app.identity.domain.entities import (
     AuditLog,
     DataConsent,
     DataProcessingRecord,
+    FamilyGroup,
+    GroupMembership,
+    MembershipStatus,
     RefreshToken,
     RetentionPolicy,
     User,
@@ -21,6 +24,8 @@ from app.identity.infrastructure.models import (
     AuditLogModel,
     DataConsentModel,
     DataProcessingRecordModel,
+    FamilyGroupModel,
+    GroupMembershipModel,
     RefreshTokenModel,
     RetentionPolicyModel,
     UserModel,
@@ -295,3 +300,89 @@ class SqlRefreshTokenRepository:
             RefreshTokenModel.id == token_id
         ).update({"revoked": True})
         self._session.flush()
+
+
+class SqlFamilyGroupRepository:
+    """SQLAlchemy implementation of FamilyGroupRepository."""
+
+    def __init__(self, session: Session):
+        self._session = session
+
+    def save(self, group: FamilyGroup) -> FamilyGroup:
+        model = FamilyGroupModel(
+            id=group.id,
+            name=group.name,
+            created_at=group.created_at,
+        )
+        self._session.add(model)
+        self._session.flush()
+        return group
+
+    def find_by_id(self, group_id: UUID) -> FamilyGroup | None:
+        model = (
+            self._session.query(FamilyGroupModel)
+            .filter(FamilyGroupModel.id == group_id)
+            .first()
+        )
+        if not model:
+            return None
+        return FamilyGroup(
+            id=model.id,
+            name=model.name,
+            created_at=model.created_at,
+        )
+
+
+class SqlGroupMembershipRepository:
+    """SQLAlchemy implementation of GroupMembershipRepository."""
+
+    def __init__(self, session: Session):
+        self._session = session
+
+    def save(self, membership: GroupMembership) -> GroupMembership:
+        model = GroupMembershipModel(
+            id=membership.id,
+            group_id=membership.group_id,
+            user_id=membership.user_id,
+            status=membership.status.value,
+            created_at=membership.created_at,
+        )
+        self._session.add(model)
+        self._session.flush()
+        return membership
+
+    def find_by_group_id(self, group_id: UUID) -> list[GroupMembership]:
+        models = (
+            self._session.query(GroupMembershipModel)
+            .filter(GroupMembershipModel.group_id == group_id)
+            .all()
+        )
+        return [
+            GroupMembership(
+                id=m.id,
+                group_id=m.group_id,
+                user_id=m.user_id,
+                status=MembershipStatus(m.status),
+                created_at=m.created_at,
+            )
+            for m in models
+        ]
+
+    def find_by_user_and_group(self, user_id: UUID, group_id: UUID) -> GroupMembership | None:
+        model = (
+            self._session.query(GroupMembershipModel)
+            .filter(
+                GroupMembershipModel.user_id == user_id,
+                GroupMembershipModel.group_id == group_id,
+            )
+            .first()
+        )
+        if not model:
+            return None
+        return GroupMembership(
+            id=model.id,
+            group_id=model.group_id,
+            user_id=model.user_id,
+            status=MembershipStatus(model.status),
+            created_at=model.created_at,
+        )

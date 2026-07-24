@@ -13,6 +13,8 @@ from app.identity.domain.entities import (
     AuditLog,
     DataConsent,
     DataProcessingRecord,
+    FamilyGroup,
+    GroupMembership,
     RefreshToken,
     RetentionPolicy,
     User,
@@ -71,3 +73,21 @@ class RefreshTokenRepository(Protocol):
     def find_active_by_user_id(self, user_id: UUID) -> list[RefreshToken]: ...
 
     def revoke(self, token_id: UUID) -> None: ...
+
+
+class FamilyGroupRepository(Protocol):
+    """Persistence interface for FamilyGroup."""
+
+    def save(self, group: FamilyGroup) -> FamilyGroup: ...
+
+    def find_by_id(self, group_id: UUID) -> FamilyGroup | None: ...
+
+
+class GroupMembershipRepository(Protocol):
+    """Persistence interface for GroupMembership."""
+
+    def save(self, membership: GroupMembership) -> GroupMembership: ...
+
+    def find_by_group_id(self, group_id: UUID) -> list[GroupMembership]: ...
+
+    def find_by_user_and_group(self, user_id: UUID, group_id: UUID) -> GroupMembership | None: ...

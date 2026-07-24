@@ -11,8 +11,8 @@ Implements account registration with consent gating, JWT authentication (access 
 - [x] 3. Endpoints `POST /auth/register` + `POST /auth/consent` _(Req 1)_
 - [x] 4. `LoginUser` use case + `POST /auth/login` endpoint with secure password hashing, returns Access Token + Refresh Token _(Req 1.3, 2.1)_
 - [x] 5. `RefreshToken` use case + `POST /auth/refresh` endpoint with token rotation _(Req 2.3)_
-- [ ] 6. `RevokeToken` use case + `POST /auth/logout` endpoint _(Req 2.4)_
-- [ ] 7. `CreateFamilyGroup` use case + `POST /groups` endpoint _(Req 3.1)_
+- [x] 6. `RevokeToken` use case + `POST /auth/logout` endpoint _(Req 2.4)_
+- [x] 7. `CreateFamilyGroup` use case + `POST /groups` endpoint _(Req 3.1)_
 - [ ] 8. `InviteGroupMember` / `AcceptGroupInvitation` use cases + endpoints, validating explicit acceptance _(Req 3.1, 3.2)_
 - [ ] 9. Integration with Privacy module's `ExerciseARCORight` for `GET /users/me/export` and `DELETE /users/me` _(Req 4)_
 - [ ] 10. Domain + integration tests covering every acceptance criterion in this spec

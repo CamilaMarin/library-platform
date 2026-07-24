@@ -65,3 +65,23 @@ class RefreshRequest(BaseModel):
     """Request body for POST /auth/refresh."""
 
     refresh_token: str = Field(..., min_length=1)
+
+
+class LogoutRequest(BaseModel):
+    """Request body for POST /auth/logout."""
+
+    refresh_token: str = Field(..., min_length=1)
+
+
+class CreateGroupRequest(BaseModel):
+    """Request body for POST /groups."""
+
+    name: str = Field(..., min_length=1, max_length=200)
+
+
+class CreateGroupResponse(BaseModel):
+    """Response body for successful group creation."""
+
+    id: UUID
+    name: str
+    created_at: datetime

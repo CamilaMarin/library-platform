@@ -119,6 +119,48 @@ class User:
             raise ValueError("User requires a name")
 
 
+# --- Family Group entities (M2) ---
+
+
+class MembershipStatus(str, Enum):
+    """Status of a user's membership in a family group."""
+
+    INVITED = "invited"
+    ACCEPTED = "accepted"
+
+
+@dataclass
+class FamilyGroup:
+    """Aggregate root for family groups.
+
+    A group must have a non-empty name.
+    Reference: authentication/requirements.md Req 3.1
+    """
+
+    id: UUID = field(default_factory=uuid4)
+    name: str = ""
+    created_at: datetime = field(default_factory=_utcnow)
+
+    def __post_init__(self):
+        if not self.name or not self.name.strip():
+            raise ValueError("FamilyGroup requires a non-empty name")
+
+
+@dataclass
+class GroupMembership:
+    """Tracks membership of a user in a family group.
+
+    Status transitions: invited -> accepted (explicit acceptance required).
+    Reference: authentication/design.md Property 2
+    """
+
+    id: UUID = field(default_factory=uuid4)
+    group_id: UUID = field(default_factory=uuid4)
+    user_id: UUID = field(default_factory=uuid4)
+    status: MembershipStatus = MembershipStatus.INVITED
+    created_at: datetime = field(default_factory=_utcnow)
+
+
 @dataclass
 class RefreshToken:
     """Long-lived token for obtaining new Access Tokens without re-login.

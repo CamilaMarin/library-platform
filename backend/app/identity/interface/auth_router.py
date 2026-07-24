@@ -1,7 +1,7 @@
-"""Auth REST endpoints — registration, consent, login, and token refresh.
+"""Auth REST endpoints — registration, consent, login, token refresh, and logout.
 
 Thin adapter layer: delegates all business logic to use cases.
-Reference: authentication/design.md, authentication/tasks.md#3, #4, #5
+Reference: authentication/design.md, authentication/tasks.md#3, #4, #5, #6
 """
 
 import jwt
@@ -18,6 +18,7 @@ from app.identity.application.register_user import (
     RegisterUser,
     RegisterUserInput,
 )
+from app.identity.application.revoke_token_use_case import RevokeTokenUseCase, TokenNotFoundError
 from app.identity.domain.entities import DataConsent
 from app.identity.infrastructure.repositories import (
     SqlAuditLogRepository,
@@ -30,6 +31,7 @@ from app.identity.interface.schemas import (
     ConsentResponse,
     LoginRequest,
     LoginResponse,
+    LogoutRequest,
     RefreshRequest,
     RegisterRequest,
     RegisterResponse,
@@ -164,3 +166,24 @@ def refresh(request: RefreshRequest, db: Session = Depends(get_db)):
         refresh_token=result.refresh_token,
         token_type=result.token_type,
     )
+
+
+@router.post("/logout")
+def logout(request: LogoutRequest, db: Session = Depends(get_db)):
+    """Revoke a refresh token (logout).
+
+    Always returns 200 regardless of token validity — prevents information leakage.
+    Reference: authentication/requirements.md Req 2.4
+    """
+    refresh_token_repo = SqlRefreshTokenRepository(db)
+    use_case = RevokeTokenUseCase(refresh_token_repository=refresh_token_repo)
+
+    try:
+        use_case.execute(request.refresh_token)
+    except (TokenNotFoundError, jwt.InvalidTokenError):
+        # Swallow errors — always return 200 (security best practice)
+        pass
+
+    db.commit()
+
+    return {"detail": "logged_out"}

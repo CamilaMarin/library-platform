@@ -18,7 +18,16 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 - REST endpoints: POST /auth/register, /auth/consent, /auth/login, /auth/refresh
 - Pydantic request/response schemas (RegisterRequest, LoginRequest, RefreshRequest, etc.)
 - Alembic migration 0003: users and refresh_tokens tables
-- 67 tests (domain unit + endpoint integration) — all passing
+- RevokeTokenUseCase (logout) — always returns 200 to prevent info leakage
+- POST /auth/logout endpoint with security-first design (no info leakage on invalid tokens)
+- FamilyGroup and GroupMembership domain entities with MembershipStatus enum
+- CreateFamilyGroup use case (creator auto-added as accepted member)
+- POST /groups/ endpoint with JWT authentication requirement
+- get_current_user_id dependency (extracts user from Bearer token — reusable for all auth endpoints)
+- FamilyGroupRepository and GroupMembershipRepository protocols + SQL implementations
+- FamilyGroupModel and GroupMembershipModel (SQLAlchemy ORM)
+- Alembic migration 0004: family_groups and group_memberships tables
+- 90 tests (domain unit + endpoint integration) — all passing
 
 ## [M0] — Privacy Foundation
 

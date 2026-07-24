@@ -15,7 +15,7 @@ Last updated: 2025-07-22
 |---|-----------|--------|-------|-----------|
 | M-1 | Architecture Validation | ✅ Complete | 7 | 7/7 |
 | M0 | Privacy Foundation | ✅ Complete | 3 | 3/3 |
-| M1 | Authentication | In progress | 10 | 5/10 |
+| M1 | Authentication | In progress | 10 | 7/10 |
 | M2 | Users & Groups | Not started | 4 | 0/4 |
 | M3 | Library | Not started | 7 | 0/7 |
 | M4 | Reading Selection | Not started | 5 | 0/5 |
@@ -31,9 +31,9 @@ Last updated: 2025-07-22
 - **Status:** In progress
 - **Milestone:** M1, M2
 - **Spec:** `.kiro/specs/authentication/`
-- **Completed tasks:** 5/10 (entities, migration, RegisterUser, login, token refresh)
-- **Remaining tasks:** 5
-- **Test coverage:** 67 tests passing (domain + integration)
+- **Completed tasks:** 7/10 (entities, migration, register, login, refresh, logout, family groups)
+- **Remaining tasks:** 3
+- **Test coverage:** 90 tests passing (domain + integration)
 - **Open issues:** None
 - **Blocking issues:** None
 
@@ -132,8 +132,8 @@ Progress:
 - ✅ Task 3: POST /auth/register + POST /auth/consent endpoints
 - ✅ Task 4: LoginUser use case + POST /auth/login (JWT issuance)
 - ✅ Task 5: RefreshToken use case + POST /auth/refresh (atomic rotation)
-- ⬜ Task 6: RevokeToken use case + POST /auth/logout
-- ⬜ Task 7: CreateFamilyGroup use case + POST /groups
+- ✅ Task 6: RevokeToken use case + POST /auth/logout
+- ✅ Task 7: CreateFamilyGroup use case + POST /groups (+ auth dependency)
 - ⬜ Task 8: InviteGroupMember / AcceptGroupInvitation
 - ⬜ Task 9: ARCO integration (GET /users/me/export, DELETE /users/me)
 - ⬜ Task 10: Domain + integration tests (full coverage)
