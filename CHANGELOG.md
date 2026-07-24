@@ -6,6 +6,27 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+## [M3] — Library
+
+### Added
+- Book domain entity (title, author, genres, description, pages, ISBN)
+- Copy domain entity (physical/digital, per-user ownership, file isolation)
+- CreateBook use case + POST /books endpoint
+- CreateCopy use case + POST /copies/physical, POST /copies/digital endpoints
+- EditBook use case + PATCH /books/{id}
+- DeleteBook use case + DELETE /books/{id} (409 if copies exist)
+- DeleteCopy use case + DELETE /copies/{id} (owner-only, removes file if digital)
+- SearchBooks use case + GET /books?query= (personal + group library, metadata only)
+- FileStorage protocol + LocalFileStorage adapter (per-user isolation)
+- BookRepository and CopyRepository protocols + SQL implementations
+- Alembic migration 0005: books, copies tables
+- 26 tests (11 domain + 15 integration) covering all correctness properties
+
+### Security
+- CopyResponse NEVER exposes file_ref (ADR-0009 Property 2)
+- DeleteCopy validates ownership before deletion (403 for non-owners)
+- Search results never include file_ref from other users' copies (Property 5)
+
 ### Added (M1 — Authentication, in progress)
 - User domain entity with email/name validation and bcrypt password hash storage
 - RefreshToken domain entity with is_expired/is_usable properties and timezone-safe comparison

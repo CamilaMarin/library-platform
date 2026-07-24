@@ -4,8 +4,8 @@ Last updated: 2025-07-22
 
 ## Overall Progress
 
-- Current milestone: **M3 (Library)**
-- Milestones completed: **4/11**
+- Current milestone: **M4 (Reading Selection)**
+- Milestones completed: **5/11**
 - Architecture frozen: **Yes**
 - Implementation started: **Yes**
 
@@ -17,7 +17,7 @@ Last updated: 2025-07-22
 | M0 | Privacy Foundation | ✅ Complete | 3 | 3/3 |
 | M1 | Authentication | ✅ Complete | 10 | 10/10 |
 | M2 | Users & Groups | ✅ Complete | 4 | 4/4 |
-| M3 | Library | Not started | 7 | 0/7 |
+| M3 | Library | ✅ Complete | 7 | 6/7 |
 | M4 | Reading Selection | Not started | 5 | 0/5 |
 | M5 | Clubs | Not started | 5 | 0/5 |
 | M6 | Reviews | Not started | 5 | 0/5 |
@@ -38,14 +38,14 @@ Last updated: 2025-07-22
 - **Blocking issues:** None
 
 ### Library (Books, Copies, Search)
-- **Status:** Not started
+- **Status:** Complete
 - **Milestone:** M3
 - **Spec:** `.kiro/specs/library/`
-- **Completed tasks:** 0/7
-- **Remaining tasks:** 7
-- **Test coverage:** 0%
+- **Completed tasks:** 6/7 (task 5 Import deferred to v1)
+- **Remaining tasks:** 0 (task 5 deferred)
+- **Test coverage:** 26 tests (11 domain + 15 integration)
 - **Open issues:** None
-- **Blocking issues:** Depends on M2 (User, FamilyGroup)
+- **Blocking issues:** None
 
 ### Reading Selection (Draw, Pick-by-Turn)
 - **Status:** Not started
@@ -120,8 +120,8 @@ Last updated: 2025-07-22
 
 ## Next Milestone
 
-**M3: Library**
+**M4: Reading Selection**
 
-Goal: Implement Books, Copies (physical + digital), Search, and FileStorage integration.
+Goal: Implement filtered random draw and pick-by-turn for family groups.
 
-Prerequisites: M2 complete ✅ (User, FamilyGroup entities available)
+Prerequisites: M3 complete ✅ (Book, Copy entities available)
