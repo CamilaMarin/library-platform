@@ -18,7 +18,7 @@ Last updated: 2025-07-22
 | M1 | Authentication | ✅ Complete | 10 | 10/10 |
 | M2 | Users & Groups | ✅ Complete | 4 | 4/4 |
 | M3 | Library | ✅ Complete | 7 | 6/7 |
-| M4 | Reading Selection | Not started | 5 | 0/5 |
+| M4 | Reading Selection | In progress | 5 | 2/5 |
 | M5 | Clubs | Not started | 5 | 0/5 |
 | M6 | Reviews | Not started | 5 | 0/5 |
 | M7 | Loans | Not started | 4 | 0/4 |
@@ -48,14 +48,14 @@ Last updated: 2025-07-22
 - **Blocking issues:** None
 
 ### Reading Selection (Draw, Pick-by-Turn)
-- **Status:** Not started
+- **Status:** In progress
 - **Milestone:** M4
 - **Spec:** `.kiro/specs/reading-selection/`
-- **Completed tasks:** 0/7
-- **Remaining tasks:** 7
-- **Test coverage:** 0%
+- **Completed tasks:** 2/7 (Draw + TurnHistory entities, availability logic)
+- **Remaining tasks:** 5 (RunReadingDraw, PickByTurn, endpoints, tests)
+- **Test coverage:** 11 domain tests
 - **Open issues:** None
-- **Blocking issues:** Depends on M3 (Book, Copy)
+- **Blocking issues:** None
 
 ### Community (Clubs, Reading Turns)
 - **Status:** Not started
