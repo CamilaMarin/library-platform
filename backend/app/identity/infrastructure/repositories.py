@@ -351,6 +351,22 @@ class SqlGroupMembershipRepository:
         self._session.flush()
         return membership
 
+    def find_by_id(self, membership_id: UUID) -> GroupMembership | None:
+        model = (
+            self._session.query(GroupMembershipModel)
+            .filter(GroupMembershipModel.id == membership_id)
+            .first()
+        )
+        if not model:
+            return None
+        return GroupMembership(
+            id=model.id,
+            group_id=model.group_id,
+            user_id=model.user_id,
+            status=MembershipStatus(model.status),
+            created_at=model.created_at,
+        )
+
     def find_by_group_id(self, group_id: UUID) -> list[GroupMembership]:
         models = (
             self._session.query(GroupMembershipModel)
@@ -386,3 +402,9 @@ class SqlGroupMembershipRepository:
             status=MembershipStatus(model.status),
             created_at=model.created_at,
         )
+
+    def update_status(self, membership_id: UUID, status: MembershipStatus) -> None:
+        self._session.query(GroupMembershipModel).filter(
+            GroupMembershipModel.id == membership_id
+        ).update({"status": status.value})
+        self._session.flush()

@@ -85,3 +85,19 @@ class CreateGroupResponse(BaseModel):
     id: UUID
     name: str
     created_at: datetime
+
+
+class InviteRequest(BaseModel):
+    """Request body for POST /groups/{group_id}/invitations."""
+
+    user_id: UUID
+
+
+class InvitationResponse(BaseModel):
+    """Response body for invitation operations."""
+
+    id: UUID
+    group_id: UUID
+    user_id: UUID
+    status: str
+    created_at: datetime

@@ -15,6 +15,7 @@ from app.identity.domain.entities import (
     DataProcessingRecord,
     FamilyGroup,
     GroupMembership,
+    MembershipStatus,
     RefreshToken,
     RetentionPolicy,
     User,
@@ -88,6 +89,10 @@ class GroupMembershipRepository(Protocol):
 
     def save(self, membership: GroupMembership) -> GroupMembership: ...
 
+    def find_by_id(self, membership_id: UUID) -> GroupMembership | None: ...
+
     def find_by_group_id(self, group_id: UUID) -> list[GroupMembership]: ...
 
     def find_by_user_and_group(self, user_id: UUID, group_id: UUID) -> GroupMembership | None: ...
+
+    def update_status(self, membership_id: UUID, status: MembershipStatus) -> None: ...
