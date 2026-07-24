@@ -150,6 +150,47 @@ Always wait for explicit approval before creating or recommending the next commi
 
 ---
 
+## Git Branching Strategy
+
+All implementation work happens on feature branches. Never commit directly to main/master.
+
+### Branch naming convention
+
+```
+feat/<milestone>-<short-description>
+fix/<short-description>
+docs/<short-description>
+refactor/<short-description>
+```
+
+Examples:
+- `feat/m1-auth-registration-login-refresh`
+- `feat/m1-auth-logout-family-groups`
+- `fix/refresh-token-timezone`
+
+### Rules
+
+- NEVER commit directly to main/master.
+- ALWAYS create a feature branch from the latest main before starting work.
+- Use Conventional Commit prefix in branch name (`feat/`, `fix/`, `docs/`, `refactor/`).
+- Include the milestone identifier when applicable (e.g., `m1-`, `m2-`).
+- One PR per logical unit of work (can contain multiple related tasks from the same wave).
+- After PR is merged, create a NEW branch from updated main for the next unit of work.
+- Delete merged feature branches (locally and remotely).
+
+### Workflow
+
+1. Before starting: `git checkout main && git pull origin main`
+2. Create branch: `git checkout -b feat/<milestone>-<description>`
+3. Work, commit, verify.
+4. Push: `git push -u origin feat/<milestone>-<description>`
+5. Create PR from GitHub.
+6. After merge: start again from step 1 for the next task.
+
+Never reuse a merged branch for new work.
+
+---
+
 ## Milestone Workflow
 
 Before starting a milestone:
