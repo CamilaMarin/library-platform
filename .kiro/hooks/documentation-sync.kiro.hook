@@ -8,6 +8,6 @@
   },
   "then": {
     "type": "askAgent",
-    "prompt": "Before finalizing, check documentation synchronization: (1) Are affected specifications still consistent with the implementation? (2) Is IMPLEMENTATION_STATUS.md updated with current progress? (3) Is CHANGELOG.md updated if user-visible behavior changed? (4) Are ADR references correct? (5) Are architecture diagrams current? Report any gaps that need to be addressed before the work can be considered complete."
+    "prompt": "Before finalizing, check documentation synchronization: (1) Are affected specifications still consistent with the implementation? (2) Is IMPLEMENTATION_STATUS.md updated with current progress? (3) Is CHANGELOG.md updated if user-visible behavior changed? (4) Are ADR references correct? (5) Are architecture diagrams current? (6) Is README.md progress table and features list updated? Report any gaps that need to be addressed before the work can be considered complete."
   }
 }
