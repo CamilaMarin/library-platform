@@ -45,4 +45,11 @@ def setup_database():
     """Create tables before each test and drop them after."""
     Base.metadata.create_all(bind=test_engine)
     yield
-    Base.metadata.drop_all(bind=test_engine)
+    # Use raw SQL with CASCADE to handle foreign key dependencies
+    with test_engine.connect() as conn:
+        conn.execute(
+            __import__("sqlalchemy").text(
+                "DROP SCHEMA public CASCADE; CREATE SCHEMA public;"
+            )
+        )
+        conn.commit()
