@@ -12,11 +12,8 @@ Reference: reviews/design.md Properties 3, 4, 5; ADR-0007
 
 from uuid import uuid4
 
-import pytest
-
 from app.reviews.application.list_reviews import ListReviews, ListReviewsRequest
 from app.reviews.domain.entities import Review, SharedWithType, Visibility
-
 
 # --- In-memory test doubles ---
 
@@ -541,7 +538,8 @@ class TestListBookReviewsEndpoint:
         book_id = uuid4()
         group_id = uuid4()
 
-        # Create private and shared reviews (shared with a nonexistent group — doesn't matter for author)
+        # Create private and shared reviews
+        # (shared with a nonexistent group — doesn't matter for author)
         self._create_review_via_api(
             client, headers, book_id=book_id, visibility="private", rating=1
         )

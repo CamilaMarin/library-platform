@@ -65,11 +65,25 @@ class EditReview:
             raise ForbiddenError("Only the author can edit this review")
 
         # Apply partial updates
-        new_rating = request.rating if request.rating is not None else review.rating
-        new_text = None if request.clear_text else (request.text if request.text is not None else review.text)
-        new_visibility = request.visibility if request.visibility is not None else review.visibility
-        new_shared_with_type = request.shared_with_type if request.visibility is not None else review.shared_with_type
-        new_shared_with_id = request.shared_with_id if request.visibility is not None else review.shared_with_id
+        new_rating = (
+            request.rating if request.rating is not None else review.rating
+        )
+        new_text = (
+            None if request.clear_text
+            else (request.text if request.text is not None else review.text)
+        )
+        new_visibility = (
+            request.visibility if request.visibility is not None
+            else review.visibility
+        )
+        new_shared_with_type = (
+            request.shared_with_type if request.visibility is not None
+            else review.shared_with_type
+        )
+        new_shared_with_id = (
+            request.shared_with_id if request.visibility is not None
+            else review.shared_with_id
+        )
 
         # Reconstruct with updated fields — domain entity validates invariants
         updated_review = Review(

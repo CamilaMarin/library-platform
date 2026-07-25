@@ -1,6 +1,6 @@
 """Reviews REST endpoints.
 
-Reference: reviews/tasks.md#2, #3, #4, ADR-0007, requirements.md Req 1.1, 1.2, 1.3, 1.4, 1.5, 2.1, 2.2, 2.3
+Reference: reviews/tasks.md#2-4, ADR-0007, requirements.md Req 1.1-1.5, 2.1-2.3
 """
 
 from uuid import UUID
@@ -13,8 +13,10 @@ from app.database import get_db
 from app.identity.interface.dependencies import get_current_user_id
 from app.reviews.application.create_review import (
     CreateReview,
-    CreateReviewRequest as CreateReviewInput,
     InvalidVisibilityTargetError,
+)
+from app.reviews.application.create_review import (
+    CreateReviewRequest as CreateReviewInput,
 )
 from app.reviews.application.delete_review import DeleteReview, DeleteReviewRequest
 from app.reviews.application.edit_review import (

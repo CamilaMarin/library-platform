@@ -7,7 +7,7 @@ This file covers gap scenarios NOT already tested in existing test files:
 
 Coverage map for design.md correctness properties:
 - Property 1 (private → null shared_with): test_review_entity.py, test_create_review_integration.py
-- Property 2 (shared → non-null shared_with): test_review_entity.py, test_create_review_integration.py
+- Property 2 (shared → non-null shared_with): test_review_entity.py, create_review_integration
 - Property 3 (shared → only group/club members): test_list_reviews_integration.py + THIS FILE
 - Property 4 (private → only author): test_list_reviews_integration.py + THIS FILE
 - Property 5 (mandatory access check): test_list_reviews_integration.py + THIS FILE
@@ -18,11 +18,8 @@ Reference: reviews/design.md, requirements.md Req 1, 2
 
 from uuid import uuid4
 
-import pytest
-
 from app.reviews.application.list_reviews import ListReviews, ListReviewsRequest
 from app.reviews.domain.entities import Review, SharedWithType, Visibility
-
 
 # --- In-memory test doubles ---
 
@@ -204,7 +201,8 @@ class TestDynamicMembershipAccessControl:
         assert result_after[0].id == review.id
 
     def test_multiple_reviews_dynamic_access(self):
-        """Multiple shared reviews from different groups — membership changes affect only relevant ones."""
+        """Multiple shared reviews from different groups — membership
+        changes affect only relevant ones."""
         repo, checker, uc = self._setup()
         author_id = uuid4()
         member_id = uuid4()
@@ -268,7 +266,8 @@ class TestEndToEndAccessControl:
         return repo, checker, uc
 
     def test_author_sees_own_private_non_member_of_shared(self):
-        """User sees own private reviews but NOT another user's shared review in non-member group."""
+        """User sees own private reviews but NOT another user's shared
+        review in non-member group."""
         repo, checker, uc = self._setup()
         user_a = uuid4()
         user_b = uuid4()
