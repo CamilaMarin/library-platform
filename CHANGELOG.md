@@ -6,6 +6,27 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+## [M5] — Clubs & Reading Turns
+
+### Added
+- Club domain entity (group_id singular per ADR-0006, name required)
+- ReadingTurn entity (coordinates who reads, validates copy ownership)
+- Comment entity (is_spoiler defaults to false per Property 3)
+- CreateClub use case + endpoint
+- SetActiveBook use case + endpoint
+- PostComment use case + endpoint
+- ActivateReadingTurn use case (validates copy ownership — Property 1)
+- CopyOwnershipQuery protocol (cross-context read, never file_ref)
+- Alembic migration 0007: clubs, reading_turns, turn_comments tables
+- 17 tests (8 domain + 9 integration)
+
+### Security
+- ActivateReadingTurn rejects users without a copy (CopyOwnershipError → 409)
+- CopyOwnershipQuery never returns file_ref (cross-context isolation)
+
+### Fixed
+- conftest.py teardown: use CASCADE for table drops with foreign keys
+
 ## [M4] — Reading Selection
 
 ### Added
