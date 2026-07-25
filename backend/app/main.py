@@ -12,6 +12,8 @@ from app.identity.interface.users_router import router as users_router
 from app.library.interface.books_router import router as books_router
 from app.library.interface.copies_router import router as copies_router
 from app.reading_selection.interface.draws_router import router as draws_router
+from app.reviews.interface.reviews_router import books_reviews_router
+from app.reviews.interface.reviews_router import router as reviews_router
 
 app = FastAPI(
     title="EntreLíneas API",
@@ -35,6 +37,8 @@ app.include_router(users_router)
 app.include_router(books_router)
 app.include_router(copies_router)
 app.include_router(draws_router)
+app.include_router(reviews_router)
+app.include_router(books_reviews_router)
 
 
 @app.get("/health")
