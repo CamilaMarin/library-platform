@@ -6,49 +6,17 @@ one test. Self-contained — no dependencies on other test files.
 Reference: .kiro/specs/authentication/requirements.md, design.md
 """
 
-import os
 from datetime import timedelta
 from uuid import uuid4
 
-# Override DATABASE_URL before any app import so the engine uses SQLite
-os.environ["DATABASE_URL"] = "sqlite:///file::memory:?cache=shared"
+import bcrypt
+import jwt as pyjwt
+from fastapi.testclient import TestClient
+from sqlalchemy import text
 
-import bcrypt  # noqa: E402
-import jwt as pyjwt  # noqa: E402
-import pytest  # noqa: E402
-from fastapi.testclient import TestClient  # noqa: E402
-from sqlalchemy import create_engine, text  # noqa: E402
-from sqlalchemy.orm import sessionmaker  # noqa: E402
-
-from app.auth.jwt import create_access_token  # noqa: E402
-from app.database import Base, get_db  # noqa: E402
-from app.main import app  # noqa: E402
-
-# --- Test infrastructure ---
-
-TEST_DATABASE_URL = "sqlite:///file::memory:?cache=shared"
-test_engine = create_engine(TEST_DATABASE_URL, connect_args={"check_same_thread": False})
-TestSession = sessionmaker(autocommit=False, autoflush=False, bind=test_engine)
-
-
-def override_get_db():
-    db = TestSession()
-    try:
-        yield db
-    finally:
-        db.close()
-
-
-app.dependency_overrides[get_db] = override_get_db
-
-
-@pytest.fixture(autouse=True)
-def setup_database():
-    """Create tables before each test and drop them after."""
-    Base.metadata.create_all(bind=test_engine)
-    yield
-    Base.metadata.drop_all(bind=test_engine)
-
+from app.auth.jwt import create_access_token
+from app.main import app
+from tests.conftest import TestSession
 
 client = TestClient(app)
 

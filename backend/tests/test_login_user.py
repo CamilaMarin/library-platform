@@ -7,32 +7,25 @@ Reference: authentication/tasks.md#4, requirements.md Req 1.3, 2.1
 """
 
 import hashlib
-import os
 from uuid import UUID
 
-# Override DATABASE_URL before any app import so the engine uses SQLite
-os.environ["DATABASE_URL"] = "sqlite:///file::memory:?cache=shared"
+import bcrypt
+import pytest
+from fastapi.testclient import TestClient
 
-import bcrypt  # noqa: E402
-import pytest  # noqa: E402
-from fastapi.testclient import TestClient  # noqa: E402
-from sqlalchemy import create_engine  # noqa: E402
-from sqlalchemy.orm import sessionmaker  # noqa: E402
-
-from app.database import Base, get_db  # noqa: E402
-from app.identity.application.audit_service import AuditService  # noqa: E402
-from app.identity.application.login_user import (  # noqa: E402
+from app.identity.application.audit_service import AuditService
+from app.identity.application.login_user import (
     InvalidCredentialsError,
     LoginUser,
     LoginUserInput,
 )
-from app.identity.domain.entities import (  # noqa: E402
+from app.identity.domain.entities import (
     AuditAction,
     AuditLog,
     RefreshToken,
     User,
 )
-from app.main import app  # noqa: E402
+from app.main import app
 
 # --- Test doubles ---
 
@@ -231,31 +224,6 @@ class TestLoginUserWrongPassword:
 
 
 # --- Integration tests for POST /auth/login endpoint ---
-
-
-TEST_DATABASE_URL = "sqlite:///file::memory:?cache=shared"
-test_engine = create_engine(TEST_DATABASE_URL, connect_args={"check_same_thread": False})
-TestSession = sessionmaker(autocommit=False, autoflush=False, bind=test_engine)
-
-
-def override_get_db():
-    db = TestSession()
-    try:
-        yield db
-    finally:
-        db.close()
-
-
-app.dependency_overrides[get_db] = override_get_db
-
-
-@pytest.fixture(autouse=True)
-def setup_database():
-    """Create tables before each test and drop them after."""
-    Base.metadata.create_all(bind=test_engine)
-    yield
-    Base.metadata.drop_all(bind=test_engine)
-
 
 client = TestClient(app)
 
