@@ -4,8 +4,8 @@ Last updated: 2025-07-22
 
 ## Overall Progress
 
-- Current milestone: **M4 (Reading Selection)**
-- Milestones completed: **5/11**
+- Current milestone: **M5 (Clubs)**
+- Milestones completed: **6/11**
 - Architecture frozen: **Yes**
 - Implementation started: **Yes**
 
@@ -18,7 +18,7 @@ Last updated: 2025-07-22
 | M1 | Authentication | ✅ Complete | 10 | 10/10 |
 | M2 | Users & Groups | ✅ Complete | 4 | 4/4 |
 | M3 | Library | ✅ Complete | 7 | 6/7 |
-| M4 | Reading Selection | Not started | 5 | 0/5 |
+| M4 | Reading Selection | ✅ Complete | 5 | 5/5 |
 | M5 | Clubs | Not started | 5 | 0/5 |
 | M6 | Reviews | Not started | 5 | 0/5 |
 | M7 | Loans | Not started | 4 | 0/4 |
@@ -48,14 +48,15 @@ Last updated: 2025-07-22
 - **Blocking issues:** None
 
 ### Reading Selection (Draw, Pick-by-Turn)
-- **Status:** Not started
+- **Status:** Complete
 - **Milestone:** M4
 - **Spec:** `.kiro/specs/reading-selection/`
-- **Completed tasks:** 0/7
-- **Remaining tasks:** 7
-- **Test coverage:** 0%
+- **Completed tasks:** 7/7
+- **Remaining tasks:** 0
+- **Test coverage:** 21 tests (11 domain + 10 integration)
+- **Test coverage:** 11 domain tests
 - **Open issues:** None
-- **Blocking issues:** Depends on M3 (Book, Copy)
+- **Blocking issues:** None
 
 ### Community (Clubs, Reading Turns)
 - **Status:** Not started
