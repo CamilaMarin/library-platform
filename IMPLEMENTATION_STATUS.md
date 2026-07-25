@@ -1,11 +1,11 @@
 # Implementation Status — EntreLíneas
 
-Last updated: 2025-07-22
+Last updated: 2025-07-23
 
 ## Overall Progress
 
-- Current milestone: **M6 (Reviews)**
-- Milestones completed: **7/11**
+- Current milestone: **M7 (Loans)**
+- Milestones completed: **8/11**
 - Architecture frozen: **Yes**
 - Implementation started: **Yes**
 
@@ -20,7 +20,7 @@ Last updated: 2025-07-22
 | M3 | Library | ✅ Complete | 7 | 6/7 |
 | M4 | Reading Selection | ✅ Complete | 5 | 5/5 |
 | M5 | Clubs | ✅ Complete | 5 | 5/5 |
-| M6 | Reviews | Not started | 5 | 0/5 |
+| M6 | Reviews | ✅ Complete | 6 | 6/6 |
 | M7 | Loans | Not started | 4 | 0/4 |
 | M8 | Privacy Panel | Not started | 7 | 0/7 |
 | M9 | Release Candidate | Not started | 10 | 0/10 |
@@ -69,14 +69,14 @@ Last updated: 2025-07-22
 - **Blocking issues:** None
 
 ### Reviews
-- **Status:** Not started
+- **Status:** Complete
 - **Milestone:** M6
 - **Spec:** `.kiro/specs/reviews/`
-- **Completed tasks:** 0/6
-- **Remaining tasks:** 6
-- **Test coverage:** 0%
+- **Completed tasks:** 6/6
+- **Remaining tasks:** 0
+- **Test coverage:** 85 tests (15 domain + 53 use case/integration + 10 comprehensive + 7 privacy)
 - **Open issues:** None
-- **Blocking issues:** Depends on M5 (Club membership for shared_with)
+- **Blocking issues:** None
 
 ### Circulation (Loans)
 - **Status:** Not started
@@ -121,8 +121,8 @@ Last updated: 2025-07-22
 
 ## Next Milestone
 
-**M4: Reading Selection**
+**M7: Loans**
 
-Goal: Implement filtered random draw and pick-by-turn for family groups.
+Goal: Implement book lending between family group members with copy reservation and conflict handling.
 
-Prerequisites: M3 complete ✅ (Book, Copy entities available)
+Prerequisites: M3 complete ✅ (Copy entity available)

@@ -6,6 +6,32 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+## [M6] — Reviews
+
+### Added
+- Review domain entity with explicit visibility control (private | shared + shared_with target)
+- Visibility enum (PRIVATE, SHARED) and SharedWithType enum (GROUP, CLUB)
+- Visibility invariants enforced in entity constructor (ADR-0007)
+- CreateReview use case + POST /reviews endpoint (explicit visibility required, Req 1.5)
+- EditReview use case + PATCH /reviews/{id} (author-only, partial updates, visibility invariants preserved)
+- DeleteReview use case + DELETE /reviews/{id} (author-only, 204 No Content)
+- ListReviews use case + GET /books/{id}/reviews (access-controlled: own + shared-with-membership)
+- MembershipChecker protocol + SqlMembershipChecker (queries group_memberships + clubs tables)
+- ExportReviews use case (ARCO access right — all user reviews for data export)
+- DeleteUserReviews use case (ARCO cancellation right — hard-delete all user reviews)
+- ReviewRepository protocol with find_by_id, find_by_book_id, find_by_user_id, save, update, delete, delete_all_by_user_id
+- SqlReviewRepository (SQLAlchemy implementation)
+- ReviewModel (SQLAlchemy ORM) + books_reviews_router for GET /books/{id}/reviews
+- 85 tests (domain + use case + integration + comprehensive access control + privacy)
+
+### Security
+- No review is ever served without an explicit access check (Property 5)
+- Private reviews only visible to author (Property 4)
+- Shared reviews only visible to active members of the target group/club at query time (Property 3)
+- Membership changes take effect immediately — no cached access (dynamic at query time)
+- Non-author edit/delete returns 403 Forbidden
+- Reviews are personal data (ADR-0003): included in ARCO export, deleted on account cancellation
+
 ## [M5] — Clubs & Reading Turns
 
 ### Added
