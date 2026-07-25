@@ -13,12 +13,12 @@ A web platform for managing personal libraries (physical and digital) and foster
 | M3 Library (Books, Copies, Search) | ✅ Complete |
 | M4 Reading Selection (Draw + Turn) | ✅ Complete |
 | M5 Clubs & Reading Turns | ✅ Complete |
-| M6 Reviews | Next |
-| M7 Loans | Pending |
+| M6 Reviews | ✅ Complete |
+| M7 Loans | Next |
 | M8 Privacy Panel | Pending |
 | M9 Release Candidate | Pending |
 
-**7/11 milestones complete** · Architecture frozen · 17 ADRs · 8 specs
+**8/11 milestones complete** · Architecture frozen · 17 ADRs · 8 specs
 
 ## Quick Start
 
@@ -49,6 +49,7 @@ make down      # Stop all services
 - **Library:** Books + Copies (physical/digital), file upload with per-user isolation, search
 - **Reading Selection:** Filtered random draw + pick-by-turn with availability validation
 - **Clubs:** Book clubs with active book, reading turns (ownership validated), spoiler-safe comments
+- **Reviews:** Book reviews with explicit visibility control (private or shared with group/club), access-controlled listing, ARCO privacy integration
 - **Privacy Foundation:** DataConsent, AuditLog (high-value operations), configurable RetentionPolicy
 
 ## Architecture
@@ -80,6 +81,7 @@ backend/           FastAPI + SQLAlchemy + Alembic
     identity/      Authentication, users, groups
     library/       Books, copies, file storage
     community/     Clubs, reading turns, comments
+    reviews/       Book reviews with visibility control
     reading_selection/  Draw, pick-by-turn
     auth/          JWT utilities
 frontend/          Next.js + React + TypeScript + Tailwind
