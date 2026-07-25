@@ -4,8 +4,8 @@ Last updated: 2025-07-22
 
 ## Overall Progress
 
-- Current milestone: **M5 (Clubs)**
-- Milestones completed: **6/11**
+- Current milestone: **M6 (Reviews)**
+- Milestones completed: **7/11**
 - Architecture frozen: **Yes**
 - Implementation started: **Yes**
 
@@ -19,7 +19,7 @@ Last updated: 2025-07-22
 | M2 | Users & Groups | ✅ Complete | 4 | 4/4 |
 | M3 | Library | ✅ Complete | 7 | 6/7 |
 | M4 | Reading Selection | ✅ Complete | 5 | 5/5 |
-| M5 | Clubs | Not started | 5 | 0/5 |
+| M5 | Clubs | ✅ Complete | 5 | 5/5 |
 | M6 | Reviews | Not started | 5 | 0/5 |
 | M7 | Loans | Not started | 4 | 0/4 |
 | M8 | Privacy Panel | Not started | 7 | 0/7 |
@@ -59,14 +59,14 @@ Last updated: 2025-07-22
 - **Blocking issues:** None
 
 ### Community (Clubs, Reading Turns)
-- **Status:** Not started
+- **Status:** Complete
 - **Milestone:** M5
 - **Spec:** `.kiro/specs/clubs/`
-- **Completed tasks:** 0/6
-- **Remaining tasks:** 6
-- **Test coverage:** 0%
+- **Completed tasks:** 6/6
+- **Remaining tasks:** 0
+- **Test coverage:** 17 tests (8 domain + 9 integration)
 - **Open issues:** None
-- **Blocking issues:** Depends on M3 (Copy ownership)
+- **Blocking issues:** None
 
 ### Reviews
 - **Status:** Not started
