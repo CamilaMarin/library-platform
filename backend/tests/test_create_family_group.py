@@ -6,29 +6,23 @@ and authentication enforcement.
 Reference: authentication/tasks.md#7, requirements.md Req 3.1
 """
 
-import os
 from uuid import UUID, uuid4
 
-# Override DATABASE_URL before any app import so the engine uses SQLite
-os.environ["DATABASE_URL"] = "sqlite:///file::memory:?cache=shared"
+import pytest
+from fastapi.testclient import TestClient
 
-import pytest  # noqa: E402
-from fastapi.testclient import TestClient  # noqa: E402
-from sqlalchemy import create_engine  # noqa: E402
-from sqlalchemy.orm import sessionmaker  # noqa: E402
-
-from app.auth.jwt import create_access_token  # noqa: E402
-from app.database import Base, get_db  # noqa: E402
-from app.identity.application.create_family_group import (  # noqa: E402
+from app.auth.jwt import create_access_token
+from app.identity.application.create_family_group import (
     CreateFamilyGroup,
     CreateFamilyGroupInput,
 )
-from app.identity.domain.entities import (  # noqa: E402
+from app.identity.domain.entities import (
     FamilyGroup,
     GroupMembership,
     MembershipStatus,
 )
-from app.main import app  # noqa: E402
+from app.main import app
+from tests.conftest import TestSession
 
 # --- In-memory test doubles for unit tests ---
 
@@ -140,31 +134,6 @@ class TestCreateFamilyGroupUseCase:
 
 
 # --- Integration tests: POST /groups endpoint ---
-
-# In-memory SQLite for testing
-TEST_DATABASE_URL = "sqlite:///file::memory:?cache=shared"
-test_engine = create_engine(TEST_DATABASE_URL, connect_args={"check_same_thread": False})
-TestSession = sessionmaker(autocommit=False, autoflush=False, bind=test_engine)
-
-
-def override_get_db():
-    db = TestSession()
-    try:
-        yield db
-    finally:
-        db.close()
-
-
-app.dependency_overrides[get_db] = override_get_db
-
-
-@pytest.fixture(autouse=True)
-def setup_database():
-    """Create tables before each test and drop them after."""
-    Base.metadata.create_all(bind=test_engine)
-    yield
-    Base.metadata.drop_all(bind=test_engine)
-
 
 client = TestClient(app)
 

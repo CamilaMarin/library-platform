@@ -1,47 +1,14 @@
 """Tests for auth endpoints: POST /auth/register and POST /auth/consent.
 
-Uses an in-memory SQLite database so no external services are needed.
+Uses PostgreSQL database via shared conftest.py fixtures.
 Reference: authentication/tasks.md#3, requirements.md Req 1
 """
 
-import os
 from uuid import uuid4
 
-# Override DATABASE_URL before any app import so the engine uses SQLite
-os.environ["DATABASE_URL"] = "sqlite:///file::memory:?cache=shared"
+from fastapi.testclient import TestClient
 
-import pytest  # noqa: E402
-from fastapi.testclient import TestClient  # noqa: E402
-from sqlalchemy import create_engine  # noqa: E402
-from sqlalchemy.orm import sessionmaker  # noqa: E402
-
-from app.database import Base, get_db  # noqa: E402
-from app.main import app  # noqa: E402
-
-# In-memory SQLite for testing
-TEST_DATABASE_URL = "sqlite:///file::memory:?cache=shared"
-test_engine = create_engine(TEST_DATABASE_URL, connect_args={"check_same_thread": False})
-TestSession = sessionmaker(autocommit=False, autoflush=False, bind=test_engine)
-
-
-def override_get_db():
-    db = TestSession()
-    try:
-        yield db
-    finally:
-        db.close()
-
-
-app.dependency_overrides[get_db] = override_get_db
-
-
-@pytest.fixture(autouse=True)
-def setup_database():
-    """Create tables before each test and drop them after."""
-    Base.metadata.create_all(bind=test_engine)
-    yield
-    Base.metadata.drop_all(bind=test_engine)
-
+from app.main import app
 
 client = TestClient(app)
 

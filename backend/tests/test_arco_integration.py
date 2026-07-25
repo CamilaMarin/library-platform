@@ -9,73 +9,45 @@ Covers:
 Reference: authentication/requirements.md Req 4.1, 4.2
 """
 
-import os
 from uuid import uuid4
 
-os.environ["DATABASE_URL"] = "sqlite:///file::memory:?cache=shared"
+import pytest
+from fastapi.testclient import TestClient
 
-import pytest  # noqa: E402
-from fastapi.testclient import TestClient  # noqa: E402
-from sqlalchemy import create_engine  # noqa: E402
-from sqlalchemy.orm import sessionmaker  # noqa: E402
-
-from app.database import Base, get_db  # noqa: E402
-from app.identity.application.audit_service import AuditService  # noqa: E402
-from app.identity.application.delete_user_account import (  # noqa: E402
+from app.identity.application.audit_service import AuditService
+from app.identity.application.delete_user_account import (
     DeleteUserAccount,
 )
 from app.identity.application.delete_user_account import (
     UserNotFoundError as DeleteUserNotFoundError,
 )
-from app.identity.application.export_user_data import (  # noqa: E402
+from app.identity.application.export_user_data import (
     ExportUserData,
 )
 from app.identity.application.export_user_data import (
     UserNotFoundError as ExportUserNotFoundError,
 )
-from app.identity.domain.entities import (  # noqa: E402
+from app.identity.domain.entities import (
     AuditAction,
     DataConsent,
     DataProcessingRecord,
+    FamilyGroup,
     GroupMembership,
     MembershipStatus,
     RefreshToken,
     User,
 )
-from app.identity.infrastructure.repositories import (  # noqa: E402
+from app.identity.infrastructure.repositories import (
     SqlAuditLogRepository,
     SqlDataConsentRepository,
     SqlDataProcessingRecordRepository,
+    SqlFamilyGroupRepository,
     SqlGroupMembershipRepository,
     SqlRefreshTokenRepository,
     SqlUserRepository,
 )
-from app.main import app  # noqa: E402
-
-# In-memory SQLite for testing
-TEST_DATABASE_URL = "sqlite:///file::memory:?cache=shared"
-test_engine = create_engine(TEST_DATABASE_URL, connect_args={"check_same_thread": False})
-TestSession = sessionmaker(autocommit=False, autoflush=False, bind=test_engine)
-
-
-def override_get_db():
-    db = TestSession()
-    try:
-        yield db
-    finally:
-        db.close()
-
-
-app.dependency_overrides[get_db] = override_get_db
-
-
-@pytest.fixture(autouse=True)
-def setup_database():
-    """Create tables before each test and drop them after."""
-    Base.metadata.create_all(bind=test_engine)
-    yield
-    Base.metadata.drop_all(bind=test_engine)
-
+from app.main import app
+from tests.conftest import TestSession
 
 client = TestClient(app)
 
@@ -145,6 +117,10 @@ class TestExportUserDataUseCase:
 
             # Create membership
             group_id = uuid4()
+            group_repo = SqlFamilyGroupRepository(db)
+            group = FamilyGroup(id=group_id, name="Test Family")
+            group_repo.save(group)
+
             membership = GroupMembership(
                 group_id=group_id, user_id=user_id, status=MembershipStatus.ACCEPTED
             )
