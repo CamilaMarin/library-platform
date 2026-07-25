@@ -10,8 +10,6 @@ Reference: reviews/requirements.md Req 2.3, ADR-0003
 
 from uuid import uuid4
 
-import pytest
-
 from app.reviews.application.delete_user_reviews import DeleteUserReviews
 from app.reviews.application.export_reviews import ExportReviews
 from app.reviews.domain.entities import Review, SharedWithType, Visibility
