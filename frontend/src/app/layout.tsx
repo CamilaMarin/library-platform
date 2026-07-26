@@ -1,9 +1,10 @@
 import type { Metadata } from "next";
+import { Providers } from "./providers";
 import "./globals.css";
 
 export const metadata: Metadata = {
   title: "EntreLíneas",
-  description: "Personal library management platform",
+  description: "Plataforma familiar de gestión de lectura",
 };
 
 export default function RootLayout({
@@ -13,7 +14,9 @@ export default function RootLayout({
 }) {
   return (
     <html lang="es">
-      <body>{children}</body>
+      <body className="min-h-screen bg-gray-50 antialiased">
+        <Providers>{children}</Providers>
+      </body>
     </html>
   );
 }
