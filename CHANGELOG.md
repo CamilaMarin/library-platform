@@ -6,6 +6,22 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+### Added (M6.5 — Frontend Catchup, in progress)
+- Next.js 16 frontend project infrastructure with React 19, TypeScript, Tailwind CSS
+- TypeScript type definitions for all API contracts (`src/types/index.ts`)
+- Token storage module with localStorage persistence and JWT payload decoding (`src/lib/token-storage.ts`)
+- Centralized API client with automatic Bearer token attachment, 401 refresh-and-retry, 4xx error propagation, 5xx toast notification, and network error handling (`src/lib/api-client.ts`)
+- Toast notification system with auto-dismiss, stacked display, and success/error/info variants (`src/context/toast-context.tsx`, `src/components/toast.tsx`)
+- Authentication context with login, register (no auto-login), logout, and session persistence across refreshes (`src/context/auth-context.tsx`)
+- ProtectedRoute component with redirect preservation (`src/components/protected-route.tsx`)
+- Shared form components: InputField, SelectField, StarRating, ConfirmDialog, Skeleton
+- Responsive navigation: desktop sidebar (w-64) + mobile bottom bar with active section highlight
+- Root layout with AuthProvider + ToastProvider composition (`src/app/layout.tsx`, `src/app/providers.tsx`)
+- Root page redirect based on auth state (`src/app/page.tsx`)
+- Testing infrastructure: Vitest, React Testing Library, MSW, fast-check
+- Property-based tests for API client (Properties 1–5: token attachment, refresh retry, logout on failure, error propagation, server error toast)
+- Unit tests for Toast context (7) and Auth context (9)
+
 ## [M6] — Reviews
 
 ### Added

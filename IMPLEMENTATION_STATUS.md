@@ -1,11 +1,11 @@
 # Implementation Status — EntreLíneas
 
-Last updated: 2025-07-23
+Last updated: 2025-07-24
 
 ## Overall Progress
 
-- Current milestone: **M7 (Loans)**
-- Milestones completed: **8/11**
+- Current milestone: **M6.5 (Frontend Catchup)** — in progress
+- Milestones completed: **8/12**
 - Architecture frozen: **Yes**
 - Implementation started: **Yes**
 
@@ -21,6 +21,7 @@ Last updated: 2025-07-23
 | M4 | Reading Selection | ✅ Complete | 5 | 5/5 |
 | M5 | Clubs | ✅ Complete | 5 | 5/5 |
 | M6 | Reviews | ✅ Complete | 6 | 6/6 |
+| M6.5 | Frontend Catchup | 🔄 In Progress | 24 | 11/24 |
 | M7 | Loans | Not started | 4 | 0/4 |
 | M8 | Privacy Panel | Not started | 7 | 0/7 |
 | M9 | Release Candidate | Not started | 10 | 0/10 |
@@ -88,6 +89,38 @@ Last updated: 2025-07-23
 - **Open issues:** None
 - **Blocking issues:** Depends on M3 (Copy entity)
 
+### Frontend (UI Catchup)
+- **Status:** In Progress
+- **Milestone:** M6.5
+- **Spec:** `.kiro/specs/frontend-catchup/`
+- **Completed tasks:** 11/24 (required) + 2/11 (optional PBTs)
+- **Remaining tasks:** 13 required
+- **Test coverage:** 7 toast tests + 9 auth context tests + 5 API client PBTs passing (21 tests total)
+- **Completed modules:**
+  - TypeScript type definitions (`src/types/index.ts`)
+  - Token storage (`src/lib/token-storage.ts`)
+  - API client with 401 refresh, error propagation, toast integration (`src/lib/api-client.ts`)
+  - Toast context + component (`src/context/toast-context.tsx`, `src/components/toast.tsx`)
+  - Auth context with login/register/logout (`src/context/auth-context.tsx`)
+  - ProtectedRoute component (`src/components/protected-route.tsx`)
+  - Shared form components (InputField, SelectField, StarRating, ConfirmDialog, Skeleton)
+  - Navigation component (desktop sidebar + mobile bottom bar)
+  - Root layout with providers (`src/app/layout.tsx`, `src/app/providers.tsx`)
+  - Root page redirect (`src/app/page.tsx`)
+  - Testing infrastructure (Vitest + RTL + MSW + fast-check)
+- **Remaining:**
+  - Login/Register pages
+  - Dashboard page
+  - Library page + Add Book/Copy
+  - Groups page
+  - Reading Selection page
+  - Clubs pages (list + detail)
+  - Reviews page
+  - Settings page
+  - Checkpoints (test verification passes)
+- **Open issues:** None
+- **Blocking issues:** None
+
 ### Privacy (Foundation + Panel)
 - **Status:** Not started
 - **Milestone:** M0, M8
@@ -121,7 +154,13 @@ Last updated: 2025-07-23
 
 ## Next Milestone
 
-**M7: Loans**
+**M6.5: Frontend Catchup** (in progress)
+
+Goal: Deliver complete Next.js 16 frontend covering all backend functionality from M0–M6 (auth, groups, library, selection, clubs, reviews, privacy).
+
+Prerequisites: M6 complete ✅ (all backend endpoints available)
+
+**After M6.5: M7 — Loans**
 
 Goal: Implement book lending between family group members with copy reservation and conflict handling.
 
