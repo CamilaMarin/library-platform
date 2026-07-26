@@ -1,11 +1,11 @@
 # Implementation Status — EntreLíneas
 
-Last updated: 2025-07-24
+Last updated: 2025-07-26
 
 ## Overall Progress
 
-- Current milestone: **M6.5 (Frontend Catchup)** — in progress
-- Milestones completed: **8/12**
+- Current milestone: **M7 (Loans)**
+- Milestones completed: **9/12**
 - Architecture frozen: **Yes**
 - Implementation started: **Yes**
 
@@ -21,7 +21,7 @@ Last updated: 2025-07-24
 | M4 | Reading Selection | ✅ Complete | 5 | 5/5 |
 | M5 | Clubs | ✅ Complete | 5 | 5/5 |
 | M6 | Reviews | ✅ Complete | 6 | 6/6 |
-| M6.5 | Frontend Catchup | 🔄 In Progress | 24 | 11/24 |
+| M6.5 | Frontend Catchup | ✅ Complete | 24 | 24/24 |
 | M7 | Loans | Not started | 4 | 0/4 |
 | M8 | Privacy Panel | Not started | 7 | 0/7 |
 | M9 | Release Candidate | Not started | 10 | 0/10 |
@@ -90,34 +90,32 @@ Last updated: 2025-07-24
 - **Blocking issues:** Depends on M3 (Copy entity)
 
 ### Frontend (UI Catchup)
-- **Status:** In Progress
+- **Status:** Complete
 - **Milestone:** M6.5
 - **Spec:** `.kiro/specs/frontend-catchup/`
-- **Completed tasks:** 11/24 (required) + 2/11 (optional PBTs)
-- **Remaining tasks:** 13 required
-- **Test coverage:** 7 toast tests + 9 auth context tests + 5 API client PBTs passing (21 tests total)
-- **Completed modules:**
-  - TypeScript type definitions (`src/types/index.ts`)
-  - Token storage (`src/lib/token-storage.ts`)
-  - API client with 401 refresh, error propagation, toast integration (`src/lib/api-client.ts`)
-  - Toast context + component (`src/context/toast-context.tsx`, `src/components/toast.tsx`)
-  - Auth context with login/register/logout (`src/context/auth-context.tsx`)
-  - ProtectedRoute component (`src/components/protected-route.tsx`)
-  - Shared form components (InputField, SelectField, StarRating, ConfirmDialog, Skeleton)
-  - Navigation component (desktop sidebar + mobile bottom bar)
-  - Root layout with providers (`src/app/layout.tsx`, `src/app/providers.tsx`)
-  - Root page redirect (`src/app/page.tsx`)
-  - Testing infrastructure (Vitest + RTL + MSW + fast-check)
-- **Remaining:**
-  - Login/Register pages
-  - Dashboard page
-  - Library page + Add Book/Copy
-  - Groups page
-  - Reading Selection page
-  - Clubs pages (list + detail)
-  - Reviews page
-  - Settings page
-  - Checkpoints (test verification passes)
+- **Completed tasks:** 24/24
+- **Remaining tasks:** 0
+- **Test coverage:** 24 tests passing (7 toast + 9 auth context + 5 API client PBTs + 3 ProtectedRoute PBTs)
+- **Pages delivered:**
+  - Login (`/login`) — email/password with error mapping
+  - Register (`/register`) — consent-gated, field validation
+  - Dashboard (`/dashboard`) — book count summary, navigation grid
+  - Library (`/library`) — search, pagination, add book, add copy
+  - Groups (`/groups`) — create, invite, accept/decline invitations, member list
+  - Selection (`/selection`) — per-group draw trigger with filters, history, next picker
+  - Clubs (`/clubs`) — list, create club
+  - Club Detail (`/clubs/[id]`) — active book, comments with spoiler toggle, members
+  - Reviews (`/reviews`) — create/edit/delete, star rating, privacy-first visibility
+  - Settings (`/settings`) — ARCO data export, account deletion with email confirmation
+- **Infrastructure:**
+  - API client (Bearer token, 401 refresh/retry, error propagation, toast integration)
+  - Token storage (localStorage, JWT decode)
+  - Auth context (login, register, logout, session persistence)
+  - Toast system (auto-dismiss, stacked, responsive)
+  - ProtectedRoute (redirect preservation)
+  - Navigation (desktop sidebar + mobile bottom bar)
+  - Shared components (InputField, SelectField, StarRating, ConfirmDialog, Skeleton)
+  - Testing infra (Vitest, React Testing Library, MSW, fast-check)
 - **Open issues:** None
 - **Blocking issues:** None
 
@@ -154,14 +152,8 @@ Last updated: 2025-07-24
 
 ## Next Milestone
 
-**M6.5: Frontend Catchup** (in progress)
-
-Goal: Deliver complete Next.js 16 frontend covering all backend functionality from M0–M6 (auth, groups, library, selection, clubs, reviews, privacy).
-
-Prerequisites: M6 complete ✅ (all backend endpoints available)
-
-**After M6.5: M7 — Loans**
+**M7: Loans**
 
 Goal: Implement book lending between family group members with copy reservation and conflict handling.
 
-Prerequisites: M3 complete ✅ (Copy entity available)
+Prerequisites: M3 complete ✅ (Copy entity available), M6.5 complete ✅ (Frontend available)

@@ -6,21 +6,37 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
-### Added (M6.5 — Frontend Catchup, in progress)
+### Added (M6.5 — Frontend Catchup)
 - Next.js 16 frontend project infrastructure with React 19, TypeScript, Tailwind CSS
 - TypeScript type definitions for all API contracts (`src/types/index.ts`)
 - Token storage module with localStorage persistence and JWT payload decoding (`src/lib/token-storage.ts`)
 - Centralized API client with automatic Bearer token attachment, 401 refresh-and-retry, 4xx error propagation, 5xx toast notification, and network error handling (`src/lib/api-client.ts`)
-- Toast notification system with auto-dismiss, stacked display, and success/error/info variants (`src/context/toast-context.tsx`, `src/components/toast.tsx`)
-- Authentication context with login, register (no auto-login), logout, and session persistence across refreshes (`src/context/auth-context.tsx`)
-- ProtectedRoute component with redirect preservation (`src/components/protected-route.tsx`)
+- Toast notification system with auto-dismiss, stacked display, and success/error/info variants
+- Authentication context with login, register (no auto-login), logout, and session persistence across refreshes
+- ProtectedRoute component with redirect preservation
 - Shared form components: InputField, SelectField, StarRating, ConfirmDialog, Skeleton
 - Responsive navigation: desktop sidebar (w-64) + mobile bottom bar with active section highlight
-- Root layout with AuthProvider + ToastProvider composition (`src/app/layout.tsx`, `src/app/providers.tsx`)
-- Root page redirect based on auth state (`src/app/page.tsx`)
+- Root layout with AuthProvider + ToastProvider composition
+- Root page redirect based on auth state
+- Login page (`/login`) with email/password, error mapping, redirect consumption
+- Registration page (`/register`) with consent-gating, field validation, Spanish error messages
+- Dashboard page (`/dashboard`) with book count summary and navigation grid
+- Library page (`/library`) with search (300ms debounce), pagination, add book form, add copy action
+- Groups page (`/groups`) with create group, invite by email, pending invitations accept/decline, member lists
+- Reading Selection page (`/selection`) with per-group draw triggers, optional filters, draw result display, history
+- Clubs list page (`/clubs`) with create club form
+- Club detail page (`/clubs/[id]`) with active book management, comments with spoiler toggle, members
+- Reviews page (`/reviews`) with create/edit/delete, star rating, privacy-first visibility (never defaults to shared), explicit sharing target selection
+- Settings page (`/settings`) with ARCO data export and account deletion requiring exact email confirmation
 - Testing infrastructure: Vitest, React Testing Library, MSW, fast-check
-- Property-based tests for API client (Properties 1–5: token attachment, refresh retry, logout on failure, error propagation, server error toast)
+- Property-based tests for API client (Properties 1–5) and ProtectedRoute (Properties 6–7)
 - Unit tests for Toast context (7) and Auth context (9)
+
+### Security
+- Review visibility never defaults to "shared" — explicit user choice required (Property 8)
+- Shared review submission rejected without explicit target selection (Property 9)
+- Account deletion requires exact email match before action is enabled (Property 10)
+- No content is ever "public" — all sharing is explicit to group or club (Ley 21.719 compliance)
 
 ## [M6] — Reviews
 

@@ -33,7 +33,7 @@ This plan implements the complete EntreLíneas Next.js 16 frontend covering auth
     - Create `src/__tests__/setup.ts` with MSW server setup, jest-dom matchers, and test utilities
     - _Requirements: 10.1, 10.2_
 
-  - [x]* 1.5 Write property tests for API client (Properties 1–5)
+  - [x] 1.5 Write property tests for API client (Properties 1–5)
     - **Property 1: Bearer token attachment** — For any request when access token exists, Authorization header must equal `Bearer {token}`
     - **Property 2: Token refresh and retry on 401** — For any 401 response, client calls refresh and retries exactly once
     - **Property 3: Failed refresh triggers logout** — When refresh also fails, client clears tokens and redirects to `/login`
@@ -63,7 +63,7 @@ This plan implements the complete EntreLíneas Next.js 16 frontend covering auth
     - Show loading skeleton while `isLoading` is true
     - _Requirements: 2.1, 2.2, 2.3_
 
-  - [ ]* 2.4 Write property tests for ProtectedRoute (Properties 6–7)
+  - [x] 2.4 Write property tests for ProtectedRoute (Properties 6–7)
     - **Property 6: Protected route redirect with destination preservation** — For any path not `/login` or `/register`, unauthenticated users redirect to `/login?redirect={originalPath}`
     - **Property 7: Post-login redirect consumption** — For any valid redirect param, after auth the user navigates to that stored path
     - **Validates: Requirements 2.1, 2.2, 2.3**
@@ -90,11 +90,11 @@ This plan implements the complete EntreLíneas Next.js 16 frontend covering auth
     - Create `src/app/page.tsx` that redirects to `/dashboard` if authenticated, `/login` if not
     - _Requirements: 2.1, 11.1, 11.5_
 
-- [ ] 4. Checkpoint - Ensure all tests pass
+- [x] 4. Checkpoint - Ensure all tests pass
   - Ensure all tests pass, ask the user if questions arise.
 
-- [ ] 5. Implement authentication pages
-  - [ ] 5.1 Create Login page
+- [x] 5. Implement authentication pages
+  - [x] 5.1 Create Login page
     - Create `src/app/login/page.tsx` as client component
     - Form fields: email, password, submit button
     - Client-side validation: required fields, email format
@@ -103,7 +103,7 @@ This plan implements the complete EntreLíneas Next.js 16 frontend covering auth
     - Map backend errors to Spanish messages using `ERROR_MESSAGES` map
     - _Requirements: 1.1, 1.2, 1.3, 2.3_
 
-  - [ ] 5.2 Create Registration page
+  - [x] 5.2 Create Registration page
     - Create `src/app/register/page.tsx` as client component
     - Form fields: display name, email, password, password confirmation, consent checkbox
     - Client-side validation: required fields, email format, passwords match, consent checked
@@ -112,7 +112,7 @@ This plan implements the complete EntreLíneas Next.js 16 frontend covering auth
     - On failure: display field-level errors from backend
     - _Requirements: 1.4, 1.5, 1.6_
 
-  - [ ]* 5.3 Write unit tests for auth pages
+  - [x] 5.3 Write unit tests for auth pages
     - Test login page renders correct fields and labels
     - Test successful login stores tokens and redirects
     - Test invalid login shows generic error message
@@ -121,8 +121,8 @@ This plan implements the complete EntreLíneas Next.js 16 frontend covering auth
     - Use MSW to mock `/auth/login` and `/auth/register` endpoints
     - _Requirements: 1.1, 1.2, 1.3, 1.4, 1.5, 1.6_
 
-- [ ] 6. Implement Dashboard page
-  - [ ] 6.1 Create Dashboard page
+- [x] 6. Implement Dashboard page
+  - [x] 6.1 Create Dashboard page
     - Create `src/app/dashboard/page.tsx` wrapped with ProtectedRoute
     - Fetch and display user's book count summary
     - Display navigation cards/links to Library, Groups, Selection, Clubs, Reviews, Settings
@@ -130,15 +130,15 @@ This plan implements the complete EntreLíneas Next.js 16 frontend covering auth
     - Show loading skeletons while fetching data
     - _Requirements: 3.1, 3.2, 3.3, 3.4, 11.3_
 
-  - [ ]* 6.2 Write unit tests for Dashboard
+  - [x] 6.2 Write unit tests for Dashboard
     - Test dashboard renders summary information
     - Test navigation links are present and functional
     - Test user name and logout are displayed
     - Test loading skeleton appears while data fetches
     - _Requirements: 3.1, 3.2, 3.3, 3.4_
 
-- [ ] 7. Implement Library Management page
-  - [ ] 7.1 Create Library page
+- [x] 7. Implement Library Management page
+  - [x] 7.1 Create Library page
     - Create `src/app/library/page.tsx` wrapped with ProtectedRoute
     - Fetch and display books list with title, author, copy count
     - Implement pagination or infinite scroll for large collections
@@ -147,13 +147,13 @@ This plan implements the complete EntreLíneas Next.js 16 frontend covering auth
     - Show loading skeletons while fetching
     - _Requirements: 4.1, 4.2, 4.6, 4.7, 11.3_
 
-  - [ ] 7.2 Implement Add Book and Add Copy functionality
+  - [x] 7.2 Implement Add Book and Add Copy functionality
     - Add "Add Book" form/modal with fields: title, author, ISBN (optional), genres, description, pages
     - On successful creation: show toast confirmation, add book to list without full reload
     - Add "Add Copy" action on existing books with format selection (physical/digital)
     - _Requirements: 4.3, 4.4, 4.5_
 
-  - [ ]* 7.3 Write unit tests for Library page
+  - [x] 7.3 Write unit tests for Library page
     - Test book list renders with correct data
     - Test search filters books by title/author
     - Test add book form submits correctly and updates list
@@ -161,8 +161,8 @@ This plan implements the complete EntreLíneas Next.js 16 frontend covering auth
     - Test pagination/scroll loads more items
     - _Requirements: 4.1, 4.2, 4.3, 4.4, 4.5, 4.6, 4.7_
 
-- [ ] 8. Implement Family Groups page
-  - [ ] 8.1 Create Groups page
+- [x] 8. Implement Family Groups page
+  - [x] 8.1 Create Groups page
     - Create `src/app/groups/page.tsx` wrapped with ProtectedRoute
     - Fetch and display user's family groups with member count
     - Implement "Create Group" form with name field
@@ -173,7 +173,7 @@ This plan implements the complete EntreLíneas Next.js 16 frontend covering auth
     - Display group members list for each group
     - _Requirements: 5.1, 5.2, 5.3, 5.4, 5.5, 5.6, 5.7_
 
-  - [ ]* 8.2 Write unit tests for Groups page
+  - [x] 8.2 Write unit tests for Groups page
     - Test groups list renders with member counts
     - Test create group form works
     - Test invite member shows toast on success
@@ -181,11 +181,11 @@ This plan implements the complete EntreLíneas Next.js 16 frontend covering auth
     - Test accept invitation updates groups list
     - _Requirements: 5.1, 5.2, 5.3, 5.4, 5.5, 5.6, 5.7_
 
-- [ ] 9. Checkpoint - Ensure all tests pass
+- [x] 9. Checkpoint - Ensure all tests pass
   - Ensure all tests pass, ask the user if questions arise.
 
-- [ ] 10. Implement Reading Selection page
-  - [ ] 10.1 Create Selection page
+- [x] 10. Implement Reading Selection page
+  - [x] 10.1 Create Selection page
     - Create `src/app/selection/page.tsx` wrapped with ProtectedRoute
     - Fetch and display current picker (whose turn) for each group
     - Implement draw trigger form with optional filters: genre, max pages, unread only
@@ -194,7 +194,7 @@ This plan implements the complete EntreLíneas Next.js 16 frontend covering auth
     - Show message when no books match filter criteria
     - _Requirements: 6.1, 6.2, 6.3, 6.4, 6.5, 6.6_
 
-  - [ ]* 10.2 Write unit tests for Selection page
+  - [x] 10.2 Write unit tests for Selection page
     - Test current picker displays correctly
     - Test draw trigger with filters works
     - Test draw result shows book info
@@ -202,14 +202,14 @@ This plan implements the complete EntreLíneas Next.js 16 frontend covering auth
     - Test empty filter results show appropriate message
     - _Requirements: 6.1, 6.2, 6.3, 6.4, 6.5, 6.6_
 
-- [ ] 11. Implement Clubs pages
-  - [ ] 11.1 Create Clubs list page
+- [x] 11. Implement Clubs pages
+  - [x] 11.1 Create Clubs list page
     - Create `src/app/clubs/page.tsx` wrapped with ProtectedRoute
     - Fetch and display clubs the user belongs to
     - Implement "Create Club" form with name and optional description
     - _Requirements: 7.1, 7.2_
 
-  - [ ] 11.2 Create Club detail page
+  - [x] 11.2 Create Club detail page
     - Create `src/app/clubs/[id]/page.tsx` wrapped with ProtectedRoute
     - Display active book, members list, and current reading turn
     - Allow club owner to set active book from available copies
@@ -218,7 +218,7 @@ This plan implements the complete EntreLíneas Next.js 16 frontend covering auth
     - Display spoiler warning indicator on spoiler-marked comments
     - _Requirements: 7.3, 7.4, 7.5, 7.6, 7.7, 7.8_
 
-  - [ ]* 11.3 Write unit tests for Clubs pages
+  - [x]* 11.3 Write unit tests for Clubs pages
     - Test clubs list renders correctly
     - Test create club form submits successfully
     - Test club detail shows active book and members
@@ -226,8 +226,8 @@ This plan implements the complete EntreLíneas Next.js 16 frontend covering auth
     - Test spoiler indicator displays
     - _Requirements: 7.1, 7.2, 7.3, 7.4, 7.5, 7.6, 7.7, 7.8_
 
-- [ ] 12. Implement Reviews page
-  - [ ] 12.1 Create Reviews page
+- [x] 12. Implement Reviews page
+  - [x] 12.1 Create Reviews page
     - Create `src/app/reviews/page.tsx` wrapped with ProtectedRoute
     - Fetch and display user's own reviews with book title, rating, and visibility
     - Implement create review form: star rating (1–5), optional text, visibility selector (private/shared)
@@ -238,12 +238,12 @@ This plan implements the complete EntreLíneas Next.js 16 frontend covering auth
     - Show toast on successful create/edit
     - _Requirements: 8.1, 8.2, 8.3, 8.4, 8.5, 8.6, 8.7_
 
-  - [ ]* 12.2 Write property tests for Reviews form (Properties 8–9)
+  - [x]* 12.2 Write property tests for Reviews form (Properties 8–9)
     - **Property 8: Review visibility never defaults to shared** — For any initial render of the review form, visibility is never pre-selected to "shared"
     - **Property 9: Shared review requires explicit target** — For any submission with visibility "shared", form rejects unless exactly one target (Group or Club) is selected
     - **Validates: Requirements 8.3, 8.4**
 
-  - [ ]* 12.3 Write unit tests for Reviews page
+  - [x]* 12.3 Write unit tests for Reviews page
     - Test reviews list renders with ratings and visibility
     - Test create review form with star rating interaction
     - Test visibility defaults to private
@@ -251,8 +251,8 @@ This plan implements the complete EntreLíneas Next.js 16 frontend covering auth
     - Test edit and delete actions work
     - _Requirements: 8.1, 8.2, 8.3, 8.4, 8.5, 8.7_
 
-- [ ] 13. Implement Settings page
-  - [ ] 13.1 Create Settings page
+- [x] 13. Implement Settings page
+  - [x] 13.1 Create Settings page
     - Create `src/app/settings/page.tsx` wrapped with ProtectedRoute
     - Implement "Export My Data" button that calls backend export endpoint
     - Show confirmation message when export is initiated
@@ -262,18 +262,18 @@ This plan implements the complete EntreLíneas Next.js 16 frontend covering auth
     - Display descriptive error messages if export or deletion fails
     - _Requirements: 9.1, 9.2, 9.3, 9.4, 9.5, 9.6_
 
-  - [ ]* 13.2 Write property test for Settings (Property 10)
+  - [x]* 13.2 Write property test for Settings (Property 10)
     - **Property 10: Account deletion requires exact email confirmation** — For any string that does not exactly match the user's email, the delete action remains disabled
     - **Validates: Requirements 9.4**
 
-  - [ ]* 13.3 Write unit tests for Settings page
+  - [x]* 13.3 Write unit tests for Settings page
     - Test export button triggers request and shows confirmation
     - Test delete account requires exact email match
     - Test deletion clears state and redirects
     - Test error messages display on failure
     - _Requirements: 9.1, 9.2, 9.3, 9.4, 9.5, 9.6_
 
-- [ ] 14. Final checkpoint - Ensure all tests pass
+- [x] 14. Final checkpoint - Ensure all tests pass
   - Ensure all tests pass, ask the user if questions arise.
 
 ## Notes
