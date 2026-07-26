@@ -12,4 +12,9 @@ For architectural decisions, see `docs/adr/`. This log captures smaller design c
 
 ## Entries
 
-_No entries yet. First entry will be logged when an implementation decision is made that doesn't require a full ADR._
+| Date | Decision | Reason | Alternatives | Impact | Related ADR | Related Spec | Milestone |
+|------|----------|--------|-------------|--------|-------------|-------------|-----------|
+| 2025-07-26 | Frontend state managed with React Context only (no Redux/Zustand) | App is session-scoped, each page fetches its own data; no cross-page shared state complex enough to justify a library | Redux, Zustand, Jotai | Low — easily reversible if state complexity grows | ADR-0002 | frontend-catchup | M6.5 |
+| 2025-07-26 | JWT tokens stored in localStorage | Simplest approach for MVP; works across refreshes; backend already validates tokens server-side | httpOnly cookies (requires BFF/proxy), in-memory only (lost on refresh) | Medium — acceptable for MVP, may migrate to httpOnly cookies for production hardening | ADR-0004, ADR-0012 | frontend-catchup | M6.5 |
+| 2025-07-26 | Plain fetch wrapper instead of axios or external HTTP client | Zero additional dependencies; typed wrapper gives same DX; aligns with "no new deps beyond approved stack" principle | axios, ky, ofetch | Low — internal to api-client module, swappable | ADR-0002 | frontend-catchup | M6.5 |
+| 2025-07-26 | Client Components as default for API-interactive pages; Server Components only for static shells | Pages need auth state + API calls which require client-side execution; SSR adds complexity without clear benefit for an authenticated SPA | Full SSR with server actions, hybrid RSC data fetching | Low — can adopt more RSC patterns incrementally as Next.js patterns mature | ADR-0002 | frontend-catchup | M6.5 |
