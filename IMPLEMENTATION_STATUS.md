@@ -4,8 +4,8 @@ Last updated: 2025-07-26
 
 ## Overall Progress
 
-- Current milestone: **M8 (Privacy Panel)**
-- Milestones completed: **10/12**
+- Current milestone: **M9 (Release Candidate)**
+- Milestones completed: **11/12**
 - Architecture frozen: **Yes**
 - Implementation started: **Yes**
 
@@ -23,7 +23,7 @@ Last updated: 2025-07-26
 | M6 | Reviews | ✅ Complete | 6 | 6/6 |
 | M6.5 | Frontend Catchup | ✅ Complete | 24 | 24/24 |
 | M7 | Loans | ✅ Complete | 5 | 5/5 |
-| M8 | Privacy Panel | Not started | 7 | 0/7 |
+| M8 | Privacy Panel | ✅ Complete | 10 | 10/10 |
 | M9 | Release Candidate | Not started | 10 | 0/10 |
 
 ## Modules
@@ -121,14 +121,24 @@ Last updated: 2025-07-26
 - **Blocking issues:** None
 
 ### Privacy (Foundation + Panel)
-- **Status:** Not started
+- **Status:** Complete
 - **Milestone:** M0, M8
 - **Spec:** `.kiro/specs/privacy/`
-- **Completed tasks:** 0/10
-- **Remaining tasks:** 10
-- **Test coverage:** 0%
+- **Completed tasks:** 10/10
+- **Remaining tasks:** 0
+- **Test coverage:** 10 domain tests (M0) + 15 ARCO tests + 10 purge tests + 11 encryption tests + 11 retention tests
+- **Implemented:**
+  - DataConsent, DataProcessingRecord, AuditLog entities + repositories (M0)
+  - RetentionPolicy entity with configurable retention job (ADR-0016)
+  - ARCO rights: Export (Access), RectifyUserData (Rectification), DeleteUserAccount (Cancellation), OpposeDataProcessing (Opposition)
+  - PurgeUserData: cross-cutting data cleanup (digital files, copies, reviews, loans, audit anonymization)
+  - FieldEncryptor: Fernet symmetric encryption for PII fields
+  - Retention job: configurable policy enforcement via DB (POST /admin/retention/run + CLI script)
+  - Data minimization audit document
+  - Breach notification playbook (Ley 21.719 Art. 14 bis)
+  - Visibility checks enforced across all modules
 - **Open issues:** None
-- **Blocking issues:** None (M0 has no dependencies)
+- **Blocking issues:** None
 
 ## Risk Log
 
@@ -150,11 +160,12 @@ Last updated: 2025-07-26
 | Metadata Import (Open Library) | Convenience, no dependency | Was M3 |
 | Advanced audit logging | Extensible later | Was M0 |
 | Automated retention worker | Operational, not domain | Was M8 |
+| Application-level encryption at rest | Key management complexity; infrastructure-level encryption sufficient pre-launch; gated by legal review (ADR-0018) | Was M8 (Task 6) |
 
 ## Next Milestone
 
-**M8: Privacy Panel**
+**M9: Release Candidate**
 
-Goal: Implement full privacy management panel (consent management, data processing records, retention policies, ARCO rights dashboard).
+Goal: Final integration testing, performance validation, deployment preparation, and release readiness.
 
-Prerequisites: M0 complete ✅ (Privacy foundation), M7 complete ✅
+Prerequisites: M8 complete ✅ (All privacy compliance in place)

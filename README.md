@@ -15,11 +15,11 @@ A web platform for managing personal libraries (physical and digital) and foster
 | M5 Clubs & Reading Turns | ✅ Complete |
 | M6 Reviews | ✅ Complete |
 | M6.5 Frontend Catchup | ✅ Complete |
-| M7 Loans | Next |
-| M8 Privacy Panel | Pending |
-| M9 Release Candidate | Pending |
+| M7 Loans | ✅ Complete |
+| M8 Privacy Panel | ✅ Complete |
+| M9 Release Candidate | Next |
 
-**9/12 milestones complete** · Architecture frozen · 17 ADRs · 9 specs
+**11/12 milestones complete** · Architecture frozen · 17 ADRs · 9 specs
 
 ## Quick Start
 
@@ -52,6 +52,7 @@ make down      # Stop all services
 - **Clubs:** Book clubs with active book, reading turns (ownership validated), spoiler-safe comments
 - **Reviews:** Book reviews with explicit visibility control (private or shared with group/club), access-controlled listing, ARCO privacy integration
 - **Privacy Foundation:** DataConsent, AuditLog (high-value operations), configurable RetentionPolicy
+- **Privacy Panel (M8):** Full ARCO rights (export, rectify, delete, oppose), configurable retention job, field-level encryption infrastructure, data purge on account deletion, breach notification playbook
 - **Frontend (M6.5):** Complete Next.js UI covering all backend features — login/register, dashboard, library management, groups, reading selection, clubs with comments, reviews with privacy-first visibility, settings with ARCO export and account deletion
 - **Loans Frontend (M7):** Loans page with active/returned tabs, library integration with copy status badges and "Prestar" action, inline loan form with group member selection
 
