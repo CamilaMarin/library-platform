@@ -6,6 +6,33 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+## [M8] — Privacy Panel
+
+### Added
+- RectifyUserData use case + `PATCH /users/me` endpoint (ARCO rectification right)
+- OpposeDataProcessing use case + `POST /users/me/oppose` endpoint (ARCO opposition right)
+- PurgeUserData service: cross-cutting data cleanup on account cancellation (digital files, copies, books, reviews, loans, audit log anonymization)
+- FieldEncryptor: Fernet symmetric encryption for PII fields (`app/security/encryption.py`)
+- `ENCRYPTION_KEY` configuration with dev default
+- RetentionJob service: reads active policies from DB, enforces configurable retention (ADR-0016)
+- `POST /admin/retention/run` endpoint to trigger retention job manually
+- CLI script `scripts/run_retention.py` for scheduled retention execution
+- Admin router registered in `app/main.py`
+- Data minimization audit document (`docs/security/data-minimization-audit.md`)
+- Breach notification playbook (`docs/security/breach-notification-playbook.md`) — Ley 21.719 Art. 14 bis
+- Encryption at rest documentation (`docs/security/encryption-at-rest.md`)
+- ARCO_RECTIFY and ARCO_OPPOSE audit actions
+- 47 new tests (15 ARCO + 10 purge + 11 encryption + 11 retention)
+
+### Security
+- Full ARCO compliance: Access (export), Rectification (name/email update), Cancellation (account deletion + data purge), Opposition (opt-out of non-essential processing)
+- Digital files purged from MinIO on account deletion
+- Audit logs anonymized after configurable retention period (zero-UUID sentinel)
+- Field-level encryption infrastructure ready for PII columns
+- Inactive accounts flagged for deletion (not auto-deleted) per retention policy
+- Data minimization audit confirms no unnecessary PII collected
+- Breach notification procedure documented with 72-hour APDP notification requirement
+
 ## [M7] — Loans
 
 ### Added

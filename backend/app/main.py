@@ -8,6 +8,7 @@ from app.circulation.interface.loans_router import return_router as loans_return
 from app.circulation.interface.loans_router import router as loans_router
 from app.config import settings
 from app.database import engine
+from app.identity.interface.admin_router import router as admin_router
 from app.identity.interface.auth_router import router as auth_router
 from app.identity.interface.groups_router import router as groups_router
 from app.identity.interface.users_router import router as users_router
@@ -33,6 +34,7 @@ app.add_middleware(
 )
 
 
+app.include_router(admin_router)
 app.include_router(auth_router)
 app.include_router(groups_router)
 app.include_router(users_router)

@@ -25,6 +25,8 @@ class AuditAction(str, Enum):
     ACCOUNT_DELETED = "account_deleted"
     FILE_UPLOADED = "file_uploaded"
     ARCO_REQUEST = "arco_request"
+    ARCO_RECTIFY = "arco_rectify"
+    ARCO_OPPOSE = "arco_oppose"
 
 
 @dataclass

@@ -150,3 +150,35 @@ class ExportResponse(BaseModel):
     consents: list[ExportConsentItem]
     memberships: list[ExportMembershipItem]
     processing_records: list[ExportProcessingRecordItem]
+
+
+# --- ARCO Rectification & Opposition schemas ---
+
+
+class RectifyRequest(BaseModel):
+    """Request body for PATCH /users/me — rectify user data."""
+
+    name: str | None = Field(None, min_length=1, max_length=200)
+    email: str | None = Field(None, min_length=3, max_length=320)
+
+
+class RectifyResponse(BaseModel):
+    """Response body for successful rectification."""
+
+    user_id: UUID
+    name: str
+    email: str
+
+
+class OpposeRequest(BaseModel):
+    """Request body for POST /users/me/oppose — oppose data processing."""
+
+    purpose: str = Field(..., min_length=1, max_length=200)
+
+
+class OpposeResponse(BaseModel):
+    """Response body for successful opposition registration."""
+
+    user_id: UUID
+    processing_purpose: str
+    opposed: bool

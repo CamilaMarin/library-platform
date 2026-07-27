@@ -266,6 +266,17 @@ class SqlUserRepository:
             created_at=model.created_at,
         )
 
+    def update(self, user: User) -> User:
+        self._session.query(UserModel).filter(
+            UserModel.id == user.id
+        ).update({
+            "name": user.name,
+            "email": user.email,
+            "privacy_settings": user.privacy_settings,
+        })
+        self._session.flush()
+        return user
+
     def delete(self, user_id: UUID) -> None:
         self._session.query(UserModel).filter(
             UserModel.id == user_id
