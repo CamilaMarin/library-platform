@@ -1,4 +1,4 @@
-"""Users REST endpoints — user data export, account deletion, rectification, and opposition (ARCO rights).
+"""Users REST endpoints — ARCO rights (export, rectify, delete, oppose).
 
 Thin adapter layer: delegates all business logic to use cases.
 Reference: authentication/requirements.md Req 4.1, 4.2; privacy/requirements.md Req 1.2
@@ -17,7 +17,6 @@ from app.identity.application.delete_user_account import (
 from app.identity.application.delete_user_account import (
     UserNotFoundError as DeleteUserNotFoundError,
 )
-from app.identity.application.purge_user_data import PurgeUserData
 from app.identity.application.export_user_data import (
     ExportUserData,
 )
@@ -30,6 +29,7 @@ from app.identity.application.oppose_data_processing import (
 from app.identity.application.oppose_data_processing import (
     UserNotFoundError as OpposeUserNotFoundError,
 )
+from app.identity.application.purge_user_data import PurgeUserData
 from app.identity.application.rectify_user_data import (
     EmailAlreadyTakenError,
     InvalidEmailError,
@@ -47,7 +47,6 @@ from app.identity.infrastructure.repositories import (
     SqlRefreshTokenRepository,
     SqlUserRepository,
 )
-from app.library.infrastructure.file_storage import LocalFileStorage
 from app.identity.interface.dependencies import get_current_user_id
 from app.identity.interface.schemas import (
     ExportConsentItem,
@@ -60,6 +59,7 @@ from app.identity.interface.schemas import (
     RectifyRequest,
     RectifyResponse,
 )
+from app.library.infrastructure.file_storage import LocalFileStorage
 
 router = APIRouter(prefix="/users", tags=["users"])
 

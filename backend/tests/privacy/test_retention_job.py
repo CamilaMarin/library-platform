@@ -21,7 +21,6 @@ from app.identity.application.audit_service import AuditService
 from app.identity.application.retention_job import (
     DELETED_USER_SENTINEL,
     RetentionJob,
-    RetentionJobResult,
 )
 from app.identity.domain.entities import AuditAction
 from app.identity.infrastructure.models import (
@@ -32,7 +31,6 @@ from app.identity.infrastructure.models import (
     UserModel,
 )
 from app.identity.infrastructure.repositories import SqlAuditLogRepository
-
 from tests.conftest import TestSession
 
 
@@ -275,7 +273,7 @@ class TestDurationFromDatabase:
         policy = _create_retention_policy(db_session, "audit_logs", duration_days=60)
 
         job = RetentionJob(session=db_session, audit_service=audit_service)
-        result1 = job.execute()
+        job.execute()
 
         db_session.refresh(log_entry)
         assert log_entry.actor_user_id == user_id  # Not anonymized
@@ -287,7 +285,7 @@ class TestDurationFromDatabase:
         db_session.flush()
 
         job2 = RetentionJob(session=db_session, audit_service=audit_service)
-        result2 = job2.execute()
+        job2.execute()
 
         db_session.refresh(log_entry)
         assert log_entry.actor_user_id == DELETED_USER_SENTINEL  # Now anonymized
@@ -403,7 +401,7 @@ class TestInactiveAccountsRetention:
         db_session.flush()
 
         job = RetentionJob(session=db_session, audit_service=audit_service)
-        result = job.execute()
+        job.execute()
 
         db_session.refresh(user)
         assert user.privacy_settings.get("flagged_for_deletion") is not True

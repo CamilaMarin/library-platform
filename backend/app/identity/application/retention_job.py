@@ -29,7 +29,6 @@ from app.identity.infrastructure.models import (
     UserModel,
 )
 
-
 # Zero UUID used as anonymized placeholder for deleted users in audit logs
 DELETED_USER_SENTINEL = UUID("00000000-0000-0000-0000-000000000000")
 

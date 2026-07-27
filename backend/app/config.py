@@ -18,7 +18,7 @@ class Settings(BaseSettings):
     refresh_token_expire_days: int = 7
 
     # Encryption settings (Req 1.6 — Ley 21.719 encryption at rest for PII fields)
-    # Generate production key: python -c "from cryptography.fernet import Fernet; print(Fernet.generate_key().decode())"
+    # Generate key: Fernet.generate_key().decode()
     encryption_key: str = "ErHYd3Uxt5uzAU72wsb8EE9Lrd7xXr0orIR3Tn5-Nfo="
 
 

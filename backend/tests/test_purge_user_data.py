@@ -14,15 +14,11 @@ Reference: privacy/requirements.md Req 1.2, 1.7
 from datetime import datetime, timedelta, timezone
 from uuid import uuid4
 
-import pytest
-
 from app.circulation.infrastructure.models import LoanModel
 from app.identity.application.purge_user_data import (
-    DEFAULT_AUDIT_RETENTION_DAYS,
     DELETED_USER_SENTINEL,
     PurgeUserData,
 )
-from app.identity.domain.entities import AuditAction, User
 from app.identity.infrastructure.models import AuditLogModel, UserModel
 from app.library.infrastructure.models import BookModel, CopyModel
 from app.reviews.infrastructure.models import ReviewModel

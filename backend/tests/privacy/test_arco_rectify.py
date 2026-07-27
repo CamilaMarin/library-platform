@@ -15,17 +15,11 @@ from fastapi.testclient import TestClient
 
 from app.identity.application.audit_service import AuditService
 from app.identity.application.oppose_data_processing import OpposeDataProcessing
-from app.identity.application.oppose_data_processing import (
-    UserNotFoundError as OpposeUserNotFoundError,
-)
 from app.identity.application.rectify_user_data import (
     EmailAlreadyTakenError,
     InvalidEmailError,
     NoFieldsProvidedError,
     RectifyUserData,
-)
-from app.identity.application.rectify_user_data import (
-    UserNotFoundError as RectifyUserNotFoundError,
 )
 from app.identity.domain.entities import AuditAction, User
 from app.identity.infrastructure.repositories import (

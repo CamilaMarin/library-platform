@@ -37,7 +37,7 @@ def main() -> None:
 
         session.commit()
 
-        print(f"Retention job completed:")
+        print("Retention job completed:")
         print(f"  Policies processed: {result.policies_processed}")
         print(f"  Records affected:   {result.records_affected}")
         print()
