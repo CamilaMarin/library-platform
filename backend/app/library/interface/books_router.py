@@ -60,7 +60,7 @@ def create_book(
 @router.get("/", response_model=list[BookResponse])
 def search_books(
     query: str = "",
-    user_id: str = Depends(get_current_user_id),
+    user_id: UUID = Depends(get_current_user_id),
     db: Session = Depends(get_db),
 ):
     """Search books in personal and group library. Metadata only, never file_ref."""
@@ -69,7 +69,7 @@ def search_books(
 
     # TODO: get group member IDs from user's groups for shared library search
     # For now, search personal library only
-    books = use_case.execute(query=query, user_id=UUID(user_id))
+    books = use_case.execute(query=query, user_id=user_id)
 
     return [
         BookResponse(

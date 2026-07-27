@@ -1,11 +1,11 @@
 # Implementation Status — EntreLíneas
 
-Last updated: 2025-07-23
+Last updated: 2025-07-26
 
 ## Overall Progress
 
 - Current milestone: **M7 (Loans)**
-- Milestones completed: **8/11**
+- Milestones completed: **9/12**
 - Architecture frozen: **Yes**
 - Implementation started: **Yes**
 
@@ -21,6 +21,7 @@ Last updated: 2025-07-23
 | M4 | Reading Selection | ✅ Complete | 5 | 5/5 |
 | M5 | Clubs | ✅ Complete | 5 | 5/5 |
 | M6 | Reviews | ✅ Complete | 6 | 6/6 |
+| M6.5 | Frontend Catchup | ✅ Complete | 24 | 24/24 |
 | M7 | Loans | Not started | 4 | 0/4 |
 | M8 | Privacy Panel | Not started | 7 | 0/7 |
 | M9 | Release Candidate | Not started | 10 | 0/10 |
@@ -88,6 +89,36 @@ Last updated: 2025-07-23
 - **Open issues:** None
 - **Blocking issues:** Depends on M3 (Copy entity)
 
+### Frontend (UI Catchup)
+- **Status:** Complete
+- **Milestone:** M6.5
+- **Spec:** `.kiro/specs/frontend-catchup/`
+- **Completed tasks:** 24/24
+- **Remaining tasks:** 0
+- **Test coverage:** 24 tests passing (7 toast + 9 auth context + 5 API client PBTs + 3 ProtectedRoute PBTs)
+- **Pages delivered:**
+  - Login (`/login`) — email/password with error mapping
+  - Register (`/register`) — consent-gated, field validation
+  - Dashboard (`/dashboard`) — book count summary, navigation grid
+  - Library (`/library`) — search, pagination, add book, add copy
+  - Groups (`/groups`) — create, invite, accept/decline invitations, member list
+  - Selection (`/selection`) — per-group draw trigger with filters, history, next picker
+  - Clubs (`/clubs`) — list, create club
+  - Club Detail (`/clubs/[id]`) — active book, comments with spoiler toggle, members
+  - Reviews (`/reviews`) — create/edit/delete, star rating, privacy-first visibility
+  - Settings (`/settings`) — ARCO data export, account deletion with email confirmation
+- **Infrastructure:**
+  - API client (Bearer token, 401 refresh/retry, error propagation, toast integration)
+  - Token storage (localStorage, JWT decode)
+  - Auth context (login, register, logout, session persistence)
+  - Toast system (auto-dismiss, stacked, responsive)
+  - ProtectedRoute (redirect preservation)
+  - Navigation (desktop sidebar + mobile bottom bar)
+  - Shared components (InputField, SelectField, StarRating, ConfirmDialog, Skeleton)
+  - Testing infra (Vitest, React Testing Library, MSW, fast-check)
+- **Open issues:** None
+- **Blocking issues:** None
+
 ### Privacy (Foundation + Panel)
 - **Status:** Not started
 - **Milestone:** M0, M8
@@ -125,4 +156,4 @@ Last updated: 2025-07-23
 
 Goal: Implement book lending between family group members with copy reservation and conflict handling.
 
-Prerequisites: M3 complete ✅ (Copy entity available)
+Prerequisites: M3 complete ✅ (Copy entity available), M6.5 complete ✅ (Frontend available)
