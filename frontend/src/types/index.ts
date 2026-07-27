@@ -134,6 +134,46 @@ export interface ExportData {
   }>;
 }
 
+// === Loans ===
+export interface Loan {
+  id: string;
+  copy_id: string;
+  borrower_user_id: string;
+  loan_date: string;
+  estimated_return_date: string | null;
+  returned_date: string | null;
+  status: "active" | "returned";
+}
+
+export interface LoanWithDetails extends Loan {
+  book_title: string;
+  borrower_name: string;
+}
+
+export interface CreateLoanRequest {
+  borrower_user_id: string;
+  estimated_return_date?: string;
+}
+
+export interface CopyWithLoanStatus {
+  id: string;
+  book_id: string;
+  user_id: string;
+  format: "physical" | "digital";
+  filename: string | null;
+  created_at: string;
+  loan_status: "available" | "on_loan";
+  active_loan?: {
+    borrower_name: string;
+    loan_date: string;
+  } | null;
+}
+
+export interface GroupMember {
+  user_id: string;
+  name: string;
+}
+
 // === API Error ===
 export interface ApiError {
   status: number;

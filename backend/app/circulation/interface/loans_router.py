@@ -1,12 +1,12 @@
 """Loans REST endpoints.
 
-Reference: loans/design.md, ADR-0015, Requirements 1.1, 1.3
+Reference: loans/design.md, ADR-0015, Requirements 1.1, 1.2, 1.3
 """
 
 from datetime import datetime
 from uuid import UUID
 
-from fastapi import APIRouter, Depends, status
+from fastapi import APIRouter, Depends, Query, status
 from fastapi.exceptions import HTTPException
 from pydantic import BaseModel
 from sqlalchemy.orm import Session
@@ -37,6 +37,20 @@ class LoanResponse(BaseModel):
     estimated_return_date: datetime | None
     returned_date: datetime | None
     status: str
+
+
+class LoanWithDetailsResponse(BaseModel):
+    """Response body for a loan with denormalized book and borrower info."""
+
+    id: UUID
+    copy_id: UUID
+    borrower_user_id: UUID
+    loan_date: datetime
+    estimated_return_date: datetime | None
+    returned_date: datetime | None
+    status: str
+    book_title: str
+    borrower_name: str
 
 
 @router.post(
@@ -104,6 +118,39 @@ def create_loan(
 # --- Return endpoint (separate prefix for /loans/{id}) ---
 
 return_router = APIRouter(prefix="/loans", tags=["loans"])
+
+
+@return_router.get("/", response_model=list[LoanWithDetailsResponse])
+def list_loans(
+    status: str | None = Query(default=None, description="Filter by status: active or returned"),
+    user_id: UUID = Depends(get_current_user_id),
+    db: Session = Depends(get_db),
+):
+    """List loans for the authenticated user's copies.
+
+    Returns loans where the authenticated user is the copy owner,
+    with denormalized book_title and borrower_name.
+    Optionally filter by status (active or returned).
+    Reference: Requirements 1.2, 2.1
+    """
+    loan_repository = SqlLoanRepository(db)
+    loans = loan_repository.find_by_owner_with_status(
+        owner_user_id=user_id, status=status
+    )
+    return [
+        LoanWithDetailsResponse(
+            id=loan.id,
+            copy_id=loan.copy_id,
+            borrower_user_id=loan.borrower_user_id,
+            loan_date=loan.loan_date,
+            estimated_return_date=loan.estimated_return_date,
+            returned_date=loan.returned_date,
+            status=loan.status,
+            book_title=loan.book_title,
+            borrower_name=loan.borrower_name,
+        )
+        for loan in loans
+    ]
 
 
 @return_router.patch("/{loan_id}/return", response_model=LoanResponse)
