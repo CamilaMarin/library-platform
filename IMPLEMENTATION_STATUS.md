@@ -4,8 +4,8 @@ Last updated: 2025-07-26
 
 ## Overall Progress
 
-- Current milestone: **M7 (Loans)**
-- Milestones completed: **9/12**
+- Current milestone: **M8 (Privacy Panel)**
+- Milestones completed: **10/12**
 - Architecture frozen: **Yes**
 - Implementation started: **Yes**
 
@@ -22,7 +22,7 @@ Last updated: 2025-07-26
 | M5 | Clubs | ✅ Complete | 5 | 5/5 |
 | M6 | Reviews | ✅ Complete | 6 | 6/6 |
 | M6.5 | Frontend Catchup | ✅ Complete | 24 | 24/24 |
-| M7 | Loans | Not started | 4 | 0/4 |
+| M7 | Loans | ✅ Complete | 5 | 5/5 |
 | M8 | Privacy Panel | Not started | 7 | 0/7 |
 | M9 | Release Candidate | Not started | 10 | 0/10 |
 
@@ -80,14 +80,14 @@ Last updated: 2025-07-26
 - **Blocking issues:** None
 
 ### Circulation (Loans)
-- **Status:** Not started
+- **Status:** Complete
 - **Milestone:** M7
 - **Spec:** `.kiro/specs/loans/`
-- **Completed tasks:** 0/5
-- **Remaining tasks:** 5
-- **Test coverage:** 0%
+- **Completed tasks:** 5/5
+- **Remaining tasks:** 0
+- **Test coverage:** 16 tests (7 domain + 5 integration + 4 regression/ADR compliance)
 - **Open issues:** None
-- **Blocking issues:** Depends on M3 (Copy entity)
+- **Blocking issues:** None
 
 ### Frontend (UI Catchup)
 - **Status:** Complete
@@ -152,8 +152,8 @@ Last updated: 2025-07-26
 
 ## Next Milestone
 
-**M7: Loans**
+**M8: Privacy Panel**
 
-Goal: Implement book lending between family group members with copy reservation and conflict handling.
+Goal: Implement full privacy management panel (consent management, data processing records, retention policies, ARCO rights dashboard).
 
-Prerequisites: M3 complete ✅ (Copy entity available), M6.5 complete ✅ (Frontend available)
+Prerequisites: M0 complete ✅ (Privacy foundation), M7 complete ✅
