@@ -16,7 +16,14 @@ const mockRouter = {
 };
 
 let mockPathname = "/dashboard";
-let mockAuthState = {
+let mockAuthState: {
+  isAuthenticated: boolean;
+  isLoading: boolean;
+  user: { id: string; name: string; email: string } | null;
+  login: ReturnType<typeof vi.fn>;
+  register: ReturnType<typeof vi.fn>;
+  logout: ReturnType<typeof vi.fn>;
+} = {
   isAuthenticated: false,
   isLoading: false,
   user: null,
