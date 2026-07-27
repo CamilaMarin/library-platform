@@ -7,6 +7,7 @@ Reference: authentication/design.md, authentication/requirements.md Req 3.1, 3.2
 from uuid import UUID
 
 from fastapi import APIRouter, Depends, HTTPException, status
+from pydantic import BaseModel
 from sqlalchemy.orm import Session
 
 from app.database import get_db
@@ -38,6 +39,60 @@ from app.identity.interface.schemas import (
 )
 
 router = APIRouter(prefix="/groups", tags=["groups"])
+
+
+class GroupMemberResponse(BaseModel):
+    """Response body for a group member with user name."""
+
+    user_id: UUID
+    name: str
+
+
+@router.get("/{group_id}/members", response_model=list[GroupMemberResponse])
+def list_group_members(
+    group_id: UUID,
+    current_user_id: UUID = Depends(get_current_user_id),
+    db: Session = Depends(get_db),
+):
+    """List accepted members of a group with their names.
+
+    The requester must be an accepted member of the group.
+    Returns user_id and name for each accepted member.
+    Reference: loans-frontend design — group members for borrower selection.
+    """
+    from app.identity.infrastructure.models import GroupMembershipModel, UserModel
+
+    # Verify the requester is an accepted member
+    requester_membership = (
+        db.query(GroupMembershipModel)
+        .filter(
+            GroupMembershipModel.group_id == group_id,
+            GroupMembershipModel.user_id == current_user_id,
+            GroupMembershipModel.status == "accepted",
+        )
+        .first()
+    )
+    if not requester_membership:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="not_group_member",
+        )
+
+    # Get all accepted members with names
+    members = (
+        db.query(GroupMembershipModel.user_id, UserModel.name)
+        .join(UserModel, GroupMembershipModel.user_id == UserModel.id)
+        .filter(
+            GroupMembershipModel.group_id == group_id,
+            GroupMembershipModel.status == "accepted",
+        )
+        .all()
+    )
+
+    return [
+        GroupMemberResponse(user_id=m[0], name=m[1])
+        for m in members
+    ]
 
 
 @router.post("/", response_model=CreateGroupResponse, status_code=status.HTTP_201_CREATED)

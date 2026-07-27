@@ -5,7 +5,8 @@ Reference: library/tasks.md#3, #4, ADR-0001, ADR-0009, ADR-0015
 
 from uuid import UUID
 
-from fastapi import APIRouter, Depends, File, Form, HTTPException, UploadFile, status
+from fastapi import APIRouter, Depends, File, Form, HTTPException, Query, UploadFile, status
+from pydantic import BaseModel
 from sqlalchemy.orm import Session
 
 from app.database import get_db
@@ -20,6 +21,88 @@ from app.library.infrastructure.repositories import SqlBookRepository, SqlCopyRe
 from app.library.interface.schemas import CopyResponse
 
 router = APIRouter(prefix="/copies", tags=["copies"])
+
+
+class ActiveLoanInfo(BaseModel):
+    """Active loan info for a copy."""
+
+    borrower_name: str
+    loan_date: str
+
+
+class CopyWithLoanStatusResponse(BaseModel):
+    """Copy with loan status information."""
+
+    id: UUID
+    book_id: UUID
+    user_id: UUID
+    format: str
+    filename: str | None
+    created_at: str
+    loan_status: str
+    active_loan: ActiveLoanInfo | None = None
+
+
+@router.get("/", response_model=list[CopyWithLoanStatusResponse])
+def list_copies_with_loan_status(
+    book_id: UUID | None = Query(default=None, description="Filter by book ID"),
+    user_id: str = Depends(get_current_user_id),
+    db: Session = Depends(get_db),
+):
+    """List copies for the authenticated user with loan status.
+
+    Optionally filter by book_id. Returns copies with their current
+    loan status (available or on_loan) and active loan details.
+    Never exposes file_ref per ADR-0009.
+    Reference: Requirements 5.1, 5.4
+    """
+    from app.circulation.infrastructure.models import LoanModel
+    from app.identity.infrastructure.models import UserModel
+    from app.library.infrastructure.models import CopyModel
+
+    query = db.query(CopyModel).filter(CopyModel.user_id == UUID(user_id))
+
+    if book_id:
+        query = query.filter(CopyModel.book_id == book_id)
+
+    copies = query.all()
+
+    results = []
+    for copy in copies:
+        loan_status = "available"
+        active_loan = None
+
+        if copy.type == "physical":
+            # Check for active loan on this copy
+            active_loan_model = (
+                db.query(LoanModel)
+                .filter(LoanModel.copy_id == copy.id, LoanModel.status == "active")
+                .first()
+            )
+            if active_loan_model:
+                loan_status = "on_loan"
+                borrower = (
+                    db.query(UserModel)
+                    .filter(UserModel.id == active_loan_model.borrower_user_id)
+                    .first()
+                )
+                active_loan = ActiveLoanInfo(
+                    borrower_name=borrower.name if borrower else "Desconocido",
+                    loan_date=active_loan_model.loan_date.isoformat(),
+                )
+
+        results.append(CopyWithLoanStatusResponse(
+            id=copy.id,
+            book_id=copy.book_id,
+            user_id=copy.user_id,
+            format=copy.type,
+            filename=None,  # Never expose file_ref per ADR-0009
+            created_at=copy.created_at.isoformat(),
+            loan_status=loan_status,
+            active_loan=active_loan,
+        ))
+
+    return results
 
 
 @router.post("/physical", response_model=CopyResponse, status_code=status.HTTP_201_CREATED)
