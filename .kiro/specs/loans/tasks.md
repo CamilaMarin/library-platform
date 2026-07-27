@@ -6,11 +6,11 @@ Implements physical-book loan tracking. Depends on `library` for `Copy` entities
 
 ## Tasks
 
-- [ ] 1. Domain model: `Loan` entity with a hard constraint that `copy.type == physical` _(Req 1.1)_
-- [ ] 2. `RegisterLoan` use case + `POST /copies/{id}/loans` endpoint, rejecting digital copies with a clear error _(Req 1.1, 1.3)_
-- [ ] 3. Copy status transition to `on_loan` on loan creation, with optional estimated return date _(Req 1.2)_
-- [ ] 4. `RegisterReturn` use case + `PATCH /loans/{id}/return` endpoint, reverting copy status to `available` _(Req 1.2)_
-- [ ] 5. Integration test confirming no endpoint under `/loans` ever accepts or returns a digital `file_ref` _(Req 1.3)_
+- [x] 1. Domain model: `Loan` entity with a hard constraint that `copy.type == physical` _(Req 1.1)_
+- [x] 2. `RegisterLoan` use case + `POST /copies/{id}/loans` endpoint, rejecting digital copies with a clear error _(Req 1.1, 1.3)_
+- [x] 3. Copy status transition to `on_loan` on loan creation, with optional estimated return date _(Req 1.2)_
+- [x] 4. `RegisterReturn` use case + `PATCH /loans/{id}/return` endpoint, reverting copy status to `available` _(Req 1.2)_
+- [x] 5. Integration test confirming no endpoint under `/loans` ever accepts or returns a digital `file_ref` _(Req 1.3)_
 
 ## Task Dependency Graph
 ```json

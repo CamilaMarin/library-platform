@@ -6,6 +6,27 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+## [M7] — Loans
+
+### Added
+- Loan domain entity with physical-only constraint (`LoanStatus` enum: active/returned)
+- `Loan.create()` factory method rejecting digital copies with `ValueError`
+- `RegisterLoan` use case: validates copy exists, is physical, and not already on loan
+- `RegisterReturn` use case: marks loan as returned, reverts copy status to `available` (idempotent)
+- `POST /copies/{id}/loans` endpoint — creates loan for physical copy (201)
+- `PATCH /loans/{id}/return` endpoint — marks loan as returned (200, idempotent)
+- `LoanRepository` and `CopyQuery` protocols (application layer abstractions)
+- `SqlLoanRepository` and `SqlCopyQuery` implementations (SQLAlchemy)
+- `LoanModel` ORM model for `loans` table
+- Alembic migration 0009: `loans` table with indexes
+- Loans router registered in `app/main.py`
+- 16 tests: 7 domain unit + 5 integration (loan cycle) + 4 ADR regression (no file_ref)
+
+### Security
+- Digital copies rejected with 422 `invalid_copy_type` — no file access via loans (ADR-0001, ADR-0009)
+- No endpoint in the loans module accepts or returns `file_ref` (Property 1, regression tested)
+- Concurrent loan prevention: 409 if copy already has active loan (Property 2)
+
 ### Added (M6.5 — Frontend Catchup)
 - Next.js 16 frontend project infrastructure with React 19, TypeScript, Tailwind CSS
 - TypeScript type definitions for all API contracts (`src/types/index.ts`)
