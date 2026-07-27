@@ -4,6 +4,8 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy import text
 
+from app.circulation.interface.loans_router import return_router as loans_return_router
+from app.circulation.interface.loans_router import router as loans_router
 from app.config import settings
 from app.database import engine
 from app.identity.interface.auth_router import router as auth_router
@@ -12,8 +14,6 @@ from app.identity.interface.users_router import router as users_router
 from app.library.interface.books_router import router as books_router
 from app.library.interface.copies_router import router as copies_router
 from app.reading_selection.interface.draws_router import router as draws_router
-from app.circulation.interface.loans_router import router as loans_router
-from app.circulation.interface.loans_router import return_router as loans_return_router
 from app.reviews.interface.reviews_router import books_reviews_router
 from app.reviews.interface.reviews_router import router as reviews_router
 
