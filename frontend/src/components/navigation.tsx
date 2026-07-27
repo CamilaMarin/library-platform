@@ -17,6 +17,7 @@ const desktopNavItems: NavItem[] = [
   { label: "Selección", href: "/selection", icon: "🎲" },
   { label: "Clubes", href: "/clubs", icon: "📖" },
   { label: "Reseñas", href: "/reviews", icon: "⭐" },
+  { label: "Préstamos", href: "/loans", icon: "🔄" },
   { label: "Configuración", href: "/settings", icon: "⚙️" },
 ];
 
@@ -25,6 +26,7 @@ const mobileNavItems: NavItem[] = [
   { label: "Biblioteca", href: "/library", icon: "📚" },
   { label: "Clubes", href: "/clubs", icon: "📖" },
   { label: "Reseñas", href: "/reviews", icon: "⭐" },
+  { label: "Préstamos", href: "/loans", icon: "🔄" },
   { label: "Ajustes", href: "/settings", icon: "⚙️" },
 ];
 

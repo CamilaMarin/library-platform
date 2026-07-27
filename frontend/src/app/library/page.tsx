@@ -6,9 +6,11 @@ import { Navigation } from "@/components/navigation";
 import { Skeleton } from "@/components/skeleton";
 import { InputField } from "@/components/input-field";
 import { SelectField } from "@/components/select-field";
+import { CopyStatusBadge } from "@/components/copy-status-badge";
+import { LoanForm } from "@/components/loan-form";
 import { useToast } from "@/context/toast-context";
 import { apiGet, apiPost, ApiError } from "@/lib/api-client";
-import type { Book, Copy } from "@/types";
+import type { Book, Copy, CopyWithLoanStatus, GroupMember, FamilyGroup } from "@/types";
 
 const PAGE_SIZE = 20;
 
@@ -44,6 +46,14 @@ export default function LibraryPage() {
   const [addCopySubmitting, setAddCopySubmitting] = useState(false);
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const { showToast } = useToast();
+
+  // Loan-related state
+  const [expandedBookId, setExpandedBookId] = useState<string | null>(null);
+  const [bookCopies, setBookCopies] = useState<Record<string, CopyWithLoanStatus[]>>({});
+  const [loadingCopies, setLoadingCopies] = useState<string | null>(null);
+  const [lendCopyId, setLendCopyId] = useState<string | null>(null);
+  const [groupMembers, setGroupMembers] = useState<GroupMember[]>([]);
+  const [loadingLendData, setLoadingLendData] = useState(false);
 
   const fetchBooks = useCallback(async (query?: string) => {
     setLoading(true);
@@ -169,11 +179,82 @@ export default function LibraryPage() {
       showToast("Copia agregada", "success");
       setAddCopyBookId(null);
       setAddCopyFormat("physical");
+      // Refresh copies if this book is expanded
+      if (expandedBookId === bookId) {
+        fetchCopiesForBook(bookId);
+      }
     } catch {
       showToast("Error al agregar copia", "error");
     } finally {
       setAddCopySubmitting(false);
     }
+  };
+
+  // Fetch copies with loan status for a book
+  const fetchCopiesForBook = useCallback(async (bookId: string) => {
+    setLoadingCopies(bookId);
+    try {
+      const copies = await apiGet<CopyWithLoanStatus[]>(
+        `/copies?book_id=${bookId}`
+      );
+      setBookCopies((prev) => ({ ...prev, [bookId]: copies }));
+    } catch {
+      setBookCopies((prev) => ({ ...prev, [bookId]: [] }));
+    } finally {
+      setLoadingCopies(null);
+    }
+  }, []);
+
+  // Toggle copies view for a book
+  const handleToggleCopies = (bookId: string) => {
+    if (expandedBookId === bookId) {
+      setExpandedBookId(null);
+      setLendCopyId(null);
+    } else {
+      setExpandedBookId(bookId);
+      setLendCopyId(null);
+      if (!bookCopies[bookId]) {
+        fetchCopiesForBook(bookId);
+      }
+    }
+  };
+
+  // Handle "Prestar" click — fetch group members and show form
+  const handleLendClick = async (copyId: string) => {
+    setLoadingLendData(true);
+    setLendCopyId(copyId);
+    try {
+      // Fetch user's groups, then members from first group
+      const groups = await apiGet<FamilyGroup[]>("/groups");
+      if (groups.length > 0) {
+        const members = await apiGet<GroupMember[]>(
+          `/groups/${groups[0].id}/members`
+        );
+        setGroupMembers(members);
+      } else {
+        setGroupMembers([]);
+      }
+    } catch {
+      setGroupMembers([]);
+    } finally {
+      setLoadingLendData(false);
+    }
+  };
+
+  // Handle successful loan creation
+  const handleLoanSuccess = () => {
+    setLendCopyId(null);
+    setGroupMembers([]);
+    // Refresh copies for the expanded book
+    if (expandedBookId) {
+      fetchCopiesForBook(expandedBookId);
+    }
+  };
+
+  // Handle loan form cancel
+  const handleLoanCancel = () => {
+    setLendCopyId(null);
+    setGroupMembers([]);
   };
 
   const visibleBooks = books.slice(0, visibleCount);
@@ -384,16 +465,114 @@ export default function LibraryPage() {
                           </button>
                         </div>
                       ) : (
-                        <button
-                          type="button"
-                          onClick={() => setAddCopyBookId(book.id)}
-                          className="rounded-md border border-gray-300 bg-white px-3 py-1.5 text-xs font-medium text-gray-700 hover:bg-gray-50 transition-colors"
-                        >
-                          Agregar copia
-                        </button>
+                        <>
+                          <button
+                            type="button"
+                            onClick={() => handleToggleCopies(book.id)}
+                            className="rounded-md border border-gray-300 bg-white px-3 py-1.5 text-xs font-medium text-gray-700 hover:bg-gray-50 transition-colors"
+                          >
+                            {expandedBookId === book.id ? "Ocultar copias" : "Ver copias"}
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => setAddCopyBookId(book.id)}
+                            className="rounded-md border border-gray-300 bg-white px-3 py-1.5 text-xs font-medium text-gray-700 hover:bg-gray-50 transition-colors"
+                          >
+                            Agregar copia
+                          </button>
+                        </>
                       )}
                     </div>
                   </div>
+
+                  {/* Copies Section */}
+                  {expandedBookId === book.id && (
+                    <div className="mt-4 border-t border-gray-100 pt-4">
+                      {loadingCopies === book.id && (
+                        <p className="text-sm text-gray-400">Cargando copias...</p>
+                      )}
+
+                      {loadingCopies !== book.id && bookCopies[book.id]?.length === 0 && (
+                        <p className="text-sm text-gray-500">
+                          No tienes copias de este libro.
+                        </p>
+                      )}
+
+                      {loadingCopies !== book.id && bookCopies[book.id]?.length > 0 && (
+                        <div className="space-y-3">
+                          {bookCopies[book.id].map((copy) => (
+                            <div
+                              key={copy.id}
+                              className="flex items-center justify-between rounded-md bg-gray-50 px-3 py-2"
+                            >
+                              <div className="flex items-center gap-3">
+                                <span className="text-xs font-medium text-gray-600 uppercase">
+                                  {copy.format === "physical" ? "Física" : "Digital"}
+                                </span>
+                                {copy.format === "physical" && (
+                                  <CopyStatusBadge
+                                    status={copy.loan_status}
+                                    borrowerName={copy.active_loan?.borrower_name}
+                                    loanDate={copy.active_loan?.loan_date}
+                                  />
+                                )}
+                              </div>
+
+                              <div>
+                                {copy.format === "physical" &&
+                                  copy.loan_status === "available" &&
+                                  lendCopyId !== copy.id && (
+                                    <button
+                                      type="button"
+                                      onClick={() => handleLendClick(copy.id)}
+                                      disabled={loadingLendData}
+                                      className="rounded-md bg-blue-600 px-3 py-1.5 text-xs font-medium text-white hover:bg-blue-700 disabled:opacity-50 transition-colors"
+                                    >
+                                      Prestar
+                                    </button>
+                                  )}
+                              </div>
+                            </div>
+                          ))}
+
+                          {/* Loan Form — shown inline below the copy list */}
+                          {lendCopyId &&
+                            bookCopies[book.id]?.some((c) => c.id === lendCopyId) && (
+                              <div className="mt-3 rounded-md border border-blue-200 bg-blue-50 p-4">
+                                <h3 className="text-sm font-semibold text-gray-900 mb-3">
+                                  Registrar préstamo
+                                </h3>
+                                {loadingLendData ? (
+                                  <p className="text-sm text-gray-500">
+                                    Cargando miembros del grupo...
+                                  </p>
+                                ) : groupMembers.length === 0 ? (
+                                  <div>
+                                    <p className="text-sm text-gray-500 mb-2">
+                                      No tienes miembros en tu grupo para prestar.
+                                    </p>
+                                    <button
+                                      type="button"
+                                      onClick={handleLoanCancel}
+                                      className="rounded-md border border-gray-300 px-3 py-1.5 text-xs font-medium text-gray-700 hover:bg-gray-50 transition-colors"
+                                    >
+                                      Cancelar
+                                    </button>
+                                  </div>
+                                ) : (
+                                  <LoanForm
+                                    copyId={lendCopyId}
+                                    groupMembers={groupMembers}
+                                    onSuccess={handleLoanSuccess}
+                                    onCancel={handleLoanCancel}
+                                  />
+                                )}
+                              </div>
+                            )}
+                        </div>
+                      )}
+                    </div>
+                  )}
                 </div>
               ))}
 

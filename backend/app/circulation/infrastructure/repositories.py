@@ -4,14 +4,32 @@ Implements protocols from application/protocols.py.
 Reference: ADR-0015, ADR-0017
 """
 
+from dataclasses import dataclass
+from datetime import datetime
 from uuid import UUID
 
 from sqlalchemy.orm import Session
 
 from app.circulation.domain.entities import Loan, LoanStatus
 from app.circulation.infrastructure.models import LoanModel
+from app.identity.infrastructure.models import UserModel
 from app.library.domain.entities import Copy, CopyStatus, CopyType
-from app.library.infrastructure.models import CopyModel
+from app.library.infrastructure.models import BookModel, CopyModel
+
+
+@dataclass
+class LoanWithDetails:
+    """Loan data with denormalized book title and borrower name."""
+
+    id: UUID
+    copy_id: UUID
+    borrower_user_id: UUID
+    loan_date: datetime
+    estimated_return_date: datetime | None
+    returned_date: datetime | None
+    status: str
+    book_title: str
+    borrower_name: str
 
 
 class SqlLoanRepository:
@@ -58,6 +76,52 @@ class SqlLoanRepository:
             model.estimated_return_date = loan.estimated_return_date
             self._session.flush()
         return loan
+
+    def find_by_owner_with_status(
+        self, owner_user_id: UUID, status: str | None = None
+    ) -> list[LoanWithDetails]:
+        """Find loans where the copy belongs to the owner, with book and borrower info.
+
+        Joins: loans → copies (owner filter) → books (title), loans → users (borrower name).
+        """
+        query = (
+            self._session.query(
+                LoanModel.id,
+                LoanModel.copy_id,
+                LoanModel.borrower_user_id,
+                LoanModel.loan_date,
+                LoanModel.estimated_return_date,
+                LoanModel.returned_date,
+                LoanModel.status,
+                BookModel.title,
+                UserModel.name,
+            )
+            .join(CopyModel, LoanModel.copy_id == CopyModel.id)
+            .join(BookModel, CopyModel.book_id == BookModel.id)
+            .join(UserModel, LoanModel.borrower_user_id == UserModel.id)
+            .filter(CopyModel.user_id == owner_user_id)
+        )
+
+        if status:
+            query = query.filter(LoanModel.status == status)
+
+        query = query.order_by(LoanModel.loan_date.desc())
+
+        rows = query.all()
+        return [
+            LoanWithDetails(
+                id=row[0],
+                copy_id=row[1],
+                borrower_user_id=row[2],
+                loan_date=row[3],
+                estimated_return_date=row[4],
+                returned_date=row[5],
+                status=row[6],
+                book_title=row[7],
+                borrower_name=row[8],
+            )
+            for row in rows
+        ]
 
     def _to_domain(self, model: LoanModel) -> Loan:
         return Loan(
