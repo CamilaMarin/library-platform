@@ -173,8 +173,11 @@ export default function RegisterPage() {
                 aria-describedby={errors.consent ? "error-consent" : undefined}
               />
               <span>
-                Acepto la política de privacidad y el tratamiento de mis datos
-                personales
+                Acepto la{" "}
+                <a href="/privacy" target="_blank" className="text-blue-600 hover:underline">
+                  política de privacidad
+                </a>{" "}
+                y el tratamiento de mis datos personales
               </span>
             </label>
             {errors.consent && (

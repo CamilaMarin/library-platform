@@ -82,7 +82,9 @@ class LoginUser:
             raise InvalidCredentialsError("invalid_credentials")
 
         # Generate Access Token (short-lived JWT)
-        access_token = create_access_token(user_id=str(user.id))
+        access_token = create_access_token(
+            user_id=str(user.id), name=user.name, email=user.email
+        )
 
         # Generate Refresh Token value (long-lived JWT)
         refresh_token_value = create_refresh_token_value(user_id=str(user.id))

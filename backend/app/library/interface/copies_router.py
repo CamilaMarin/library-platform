@@ -43,6 +43,12 @@ class CopyWithLoanStatusResponse(BaseModel):
     active_loan: ActiveLoanInfo | None = None
 
 
+class CreatePhysicalCopyBody(BaseModel):
+    """Request body for creating a physical copy."""
+
+    book_id: UUID
+
+
 @router.get("/", response_model=list[CopyWithLoanStatusResponse])
 def list_copies_with_loan_status(
     book_id: UUID | None = Query(default=None, description="Filter by book ID"),
@@ -60,7 +66,7 @@ def list_copies_with_loan_status(
     from app.identity.infrastructure.models import UserModel
     from app.library.infrastructure.models import CopyModel
 
-    query = db.query(CopyModel).filter(CopyModel.user_id == UUID(user_id))
+    query = db.query(CopyModel).filter(CopyModel.user_id == user_id)
 
     if book_id:
         query = query.filter(CopyModel.book_id == book_id)
@@ -107,8 +113,8 @@ def list_copies_with_loan_status(
 
 @router.post("/physical", response_model=CopyResponse, status_code=status.HTTP_201_CREATED)
 def create_physical_copy(
-    book_id: UUID = Form(...),
-    user_id: str = Depends(get_current_user_id),
+    body: CreatePhysicalCopyBody,
+    user_id: UUID = Depends(get_current_user_id),
     db: Session = Depends(get_db),
 ):
     """Create a physical copy (metadata + status only, no file)."""
@@ -119,7 +125,7 @@ def create_physical_copy(
 
     try:
         copy = use_case.create_physical(
-            CreatePhysicalCopyRequest(book_id=book_id, user_id=UUID(user_id))
+            CreatePhysicalCopyRequest(book_id=body.book_id, user_id=user_id)
         )
     except ValueError as e:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(e))
