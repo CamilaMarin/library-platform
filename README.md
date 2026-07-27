@@ -53,6 +53,7 @@ make down      # Stop all services
 - **Reviews:** Book reviews with explicit visibility control (private or shared with group/club), access-controlled listing, ARCO privacy integration
 - **Privacy Foundation:** DataConsent, AuditLog (high-value operations), configurable RetentionPolicy
 - **Frontend (M6.5):** Complete Next.js UI covering all backend features — login/register, dashboard, library management, groups, reading selection, clubs with comments, reviews with privacy-first visibility, settings with ARCO export and account deletion
+- **Loans Frontend (M7):** Loans page with active/returned tabs, library integration with copy status badges and "Prestar" action, inline loan form with group member selection
 
 ## Architecture
 

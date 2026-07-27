@@ -82,10 +82,11 @@ Last updated: 2025-07-26
 ### Circulation (Loans)
 - **Status:** Complete
 - **Milestone:** M7
-- **Spec:** `.kiro/specs/loans/`
-- **Completed tasks:** 5/5
+- **Spec:** `.kiro/specs/loans/`, `.kiro/specs/loans-frontend/`
+- **Completed tasks:** 5/5 (backend) + 10/10 (frontend)
 - **Remaining tasks:** 0
-- **Test coverage:** 16 tests (7 domain + 5 integration + 4 regression/ADR compliance)
+- **Test coverage:** 16 backend tests (7 domain + 5 integration + 4 regression) + 24 frontend tests
+- **Frontend pages:** `/loans` (active/returned tabs), library loan integration (copy status badges, "Prestar" button, inline LoanForm)
 - **Open issues:** None
 - **Blocking issues:** None
 

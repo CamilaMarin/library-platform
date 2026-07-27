@@ -15,17 +15,27 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 - `RegisterReturn` use case: marks loan as returned, reverts copy status to `available` (idempotent)
 - `POST /copies/{id}/loans` endpoint — creates loan for physical copy (201)
 - `PATCH /loans/{id}/return` endpoint — marks loan as returned (200, idempotent)
+- `GET /loans?status=active|returned` endpoint — lists user's loans with book title and borrower name
+- `GET /copies?book_id=X` endpoint — lists copies with loan status for library UI
+- `GET /groups/{id}/members` endpoint — lists group members for borrower selection
 - `LoanRepository` and `CopyQuery` protocols (application layer abstractions)
 - `SqlLoanRepository` and `SqlCopyQuery` implementations (SQLAlchemy)
 - `LoanModel` ORM model for `loans` table
 - Alembic migration 0009: `loans` table with indexes
 - Loans router registered in `app/main.py`
-- 16 tests: 7 domain unit + 5 integration (loan cycle) + 4 ADR regression (no file_ref)
+- Frontend `/loans` page with Active/Returned tabs, LoanCard components, return action
+- Frontend `LoanCard`, `LoanForm`, `CopyStatusBadge` components
+- Library page integration: "Ver copias" toggle, copy status badges, "Prestar" button with inline LoanForm
+- Navigation: "Préstamos" link added to desktop sidebar and mobile bottom bar
+- Frontend `Loan`, `LoanWithDetails`, `CreateLoanRequest`, `CopyWithLoanStatus`, `GroupMember` types
+- 16 backend tests: 7 domain unit + 5 integration (loan cycle) + 4 ADR regression (no file_ref)
 
 ### Security
 - Digital copies rejected with 422 `invalid_copy_type` — no file access via loans (ADR-0001, ADR-0009)
 - No endpoint in the loans module accepts or returns `file_ref` (Property 1, regression tested)
 - Concurrent loan prevention: 409 if copy already has active loan (Property 2)
+- "Prestar" button only visible for physical copies with available status (frontend Property 1)
+- No file references rendered in any loan UI component (frontend Property 3)
 
 ### Added (M6.5 — Frontend Catchup)
 - Next.js 16 frontend project infrastructure with React 19, TypeScript, Tailwind CSS
