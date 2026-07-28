@@ -43,6 +43,16 @@ make lint      # Run linters (Ruff + ESLint)
 make down      # Stop all services
 ```
 
+### Production Deployment
+
+```bash
+cp backend/.env.example .env  # Set production secrets
+docker compose -f docker-compose.prod.yml up --build -d
+docker compose -f docker-compose.prod.yml exec backend alembic upgrade head
+```
+
+See [docs/deployment.md](docs/deployment.md) for full guide.
+
 ## Features Implemented
 
 - **Authentication:** JWT (Access + Refresh tokens), registration with consent gating, token rotation/revocation
