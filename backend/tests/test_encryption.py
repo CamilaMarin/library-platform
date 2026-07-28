@@ -5,7 +5,11 @@ and handles edge cases properly.
 """
 
 import pytest
-from cryptography.fernet import Fernet, InvalidToken
+
+try:
+    from cryptography.fernet import Fernet, InvalidToken
+except ImportError:
+    pytest.skip("cryptography not installed", allow_module_level=True)
 
 from app.security.encryption import FieldEncryptor
 

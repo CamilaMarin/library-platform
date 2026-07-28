@@ -1,11 +1,11 @@
 # Implementation Status — EntreLíneas
 
-Last updated: 2025-07-28 (Deployment Prep)
+Last updated: 2025-07-28 (M9 Complete — Release Candidate)
 
 ## Overall Progress
 
 - Current milestone: **M9 (Release Candidate)**
-- Milestones completed: **11/12**
+- Milestones completed: **12/12**
 - Architecture frozen: **Yes**
 - Implementation started: **Yes**
 
@@ -24,7 +24,7 @@ Last updated: 2025-07-28 (Deployment Prep)
 | M6.5 | Frontend Catchup | ✅ Complete | 24 | 24/24 |
 | M7 | Loans | ✅ Complete | 5 | 5/5 |
 | M8 | Privacy Panel | ✅ Complete | 10 | 10/10 |
-| M9 | Release Candidate | In progress | 10 | 4/10 |
+| M9 | Release Candidate | ✅ Complete | 10 | 10/10 |
 
 ## Modules
 
@@ -184,10 +184,14 @@ Last updated: 2025-07-28 (Deployment Prep)
 | Automated retention worker | Operational, not domain | Was M8 |
 | Application-level encryption at rest | Key management complexity; infrastructure-level encryption sufficient pre-launch; gated by legal review (ADR-0018) | Was M8 (Task 6) |
 
-## Next Milestone
+## Milestone Complete
 
-**M9: Release Candidate**
+All 12 milestones have been completed. The project is at Release Candidate status.
 
-Goal: Final integration testing, performance validation, deployment preparation, and release readiness.
-
-Prerequisites: M8 complete ✅ (All privacy compliance in place)
+### Post-MVP backlog (deferred to v1):
+- Integrated Reader (EPUB/PDF)
+- Bookmarks & Notes
+- Metadata Import (Open Library)
+- Minor accounts / adult-minor linking
+- Lending to people outside the platform
+- Application-level encryption at rest

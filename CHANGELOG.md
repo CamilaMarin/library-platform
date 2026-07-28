@@ -6,6 +6,10 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+### Fixed (M9 — Final Cleanup)
+- test_encryption.py: graceful skip when cryptography module unavailable
+- ESLint config: properly ignores node_modules and .next directories
+
 ### Added (Reading Status + Shelf View)
 - `ReadingStatus` domain entity (`user_id`, `book_id`, `status`, `updated_at`) in Library bounded context — status is per-user/per-book, independent of copy count
 - `ReadingStatusValue` enum: `want_to_read` · `reading` · `read` · `dnf`
