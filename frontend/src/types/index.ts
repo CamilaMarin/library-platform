@@ -188,6 +188,7 @@ export type ReadingStatusValue = "want_to_read" | "reading" | "read" | "dnf";
 export interface BookReadingStatus {
   book_id: string;
   status: ReadingStatusValue;
+  current_page: number | null;
   updated_at: string;
 }
 

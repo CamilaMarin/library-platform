@@ -76,6 +76,7 @@ class ReadingStatusModel(Base):
         nullable=False,
     )
     status = Column(String(20), nullable=False)
+    current_page = Column(Integer, nullable=True)
     updated_at = Column(
         DateTime(timezone=True),
         nullable=False,

@@ -107,5 +107,6 @@ class ReadingStatus:
     user_id: UUID
     book_id: UUID
     status: ReadingStatusValue
+    current_page: int | None = None
     id: UUID = field(default_factory=uuid4)
     updated_at: datetime = field(default_factory=_utcnow)

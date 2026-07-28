@@ -77,6 +77,7 @@ class SetReadingStatusRequest(BaseModel):
     """Request body for PUT /books/{book_id}/status."""
 
     status: ReadingStatusValue
+    current_page: int | None = Field(default=None, ge=0)
 
 
 class ReadingStatusResponse(BaseModel):
@@ -84,6 +85,7 @@ class ReadingStatusResponse(BaseModel):
 
     book_id: UUID
     status: ReadingStatusValue
+    current_page: int | None = None
     updated_at: datetime
 
     model_config = {"from_attributes": True}

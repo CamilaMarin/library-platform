@@ -55,6 +55,7 @@ def get_reading_statuses(
         ReadingStatusResponse(
             book_id=r.book_id,
             status=r.status,
+            current_page=r.current_page,
             updated_at=r.updated_at,
         )
         for r in records
@@ -134,8 +135,8 @@ def search_books(
     repo = SqlBookRepository(db)
 
     if not query.strip():
-        # No query — list all user's books (copies + reading-status tagged)
-        books = repo.find_by_user_books(user_id)
+        # No query — list all user's books (only books where user owns a copy)
+        books = repo.find_by_user_copies(user_id)
     else:
         # Search with query term
         use_case = SearchBooks(book_repository=repo)
@@ -268,6 +269,7 @@ def set_reading_status(
                 user_id=user_id,
                 book_id=book_id,
                 status=request.status,
+                current_page=request.current_page,
             )
         )
     except ValueError as e:
@@ -277,6 +279,7 @@ def set_reading_status(
     return ReadingStatusResponse(
         book_id=record.book_id,
         status=record.status,
+        current_page=record.current_page,
         updated_at=record.updated_at,
     )
 
