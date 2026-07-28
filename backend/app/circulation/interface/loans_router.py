@@ -50,6 +50,7 @@ class LoanWithDetailsResponse(BaseModel):
     returned_date: datetime | None
     status: str
     book_title: str
+    book_id: UUID | None = None
     borrower_name: str
 
 
@@ -95,6 +96,11 @@ def create_loan(
             raise HTTPException(
                 status_code=status.HTTP_404_NOT_FOUND,
                 detail="Copy not found",
+            )
+        elif error_msg == "estimated_return_date_in_past":
+            raise HTTPException(
+                status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+                detail="estimated_return_date_in_past",
             )
         else:
             raise HTTPException(
@@ -147,6 +153,39 @@ def list_loans(
             returned_date=loan.returned_date,
             status=loan.status,
             book_title=loan.book_title,
+            book_id=loan.book_id,
+            borrower_name=loan.borrower_name,
+        )
+        for loan in loans
+    ]
+
+
+@return_router.get("/borrowed", response_model=list[LoanWithDetailsResponse])
+def list_borrowed_loans(
+    status: str | None = Query(default=None, description="Filter by status: active or returned"),
+    user_id: UUID = Depends(get_current_user_id),
+    db: Session = Depends(get_db),
+):
+    """List loans where the authenticated user is the borrower.
+
+    Returns loans borrowed from others with book_title and lender_name.
+    The borrower_name field contains the lender's name in this context.
+    """
+    loan_repository = SqlLoanRepository(db)
+    loans = loan_repository.find_by_borrower_with_status(
+        borrower_user_id=user_id, status=status
+    )
+    return [
+        LoanWithDetailsResponse(
+            id=loan.id,
+            copy_id=loan.copy_id,
+            borrower_user_id=loan.borrower_user_id,
+            loan_date=loan.loan_date,
+            estimated_return_date=loan.estimated_return_date,
+            returned_date=loan.returned_date,
+            status=loan.status,
+            book_title=loan.book_title,
+            book_id=loan.book_id,
             borrower_name=loan.borrower_name,
         )
         for loan in loans

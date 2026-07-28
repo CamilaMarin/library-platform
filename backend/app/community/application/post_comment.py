@@ -19,9 +19,7 @@ class PostComment:
     def __init__(self, comment_repository: CommentRepository):
         self._comment_repo = comment_repository
 
-    def execute(
-        self, turn_id: UUID, user_id: UUID, text: str, is_spoiler: bool = False
-    ) -> Comment:
+    def execute(self, turn_id: UUID, user_id: UUID, text: str, is_spoiler: bool = False) -> Comment:
         """Create and persist a comment."""
         comment = Comment(
             turn_id=turn_id,

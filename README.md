@@ -55,6 +55,7 @@ make down      # Stop all services
 - **Privacy Panel (M8):** Full ARCO rights (export, rectify, delete, oppose), configurable retention job, field-level encryption infrastructure, data purge on account deletion, breach notification playbook
 - **Frontend (M6.5):** Complete Next.js UI covering all backend features — login/register, dashboard, library management, groups, reading selection, clubs with comments, reviews with privacy-first visibility, settings with ARCO export and account deletion
 - **Loans Frontend (M7):** Loans page with active/returned tabs, library integration with copy status badges and "Prestar" action, inline loan form with group member selection
+- **M9 Integration Fixes:** Clubs REST API (8 endpoints), borrowed books view, shared reviews feed, multi-group support for clubs and loans, past-date validation on loans
 
 ## Architecture
 

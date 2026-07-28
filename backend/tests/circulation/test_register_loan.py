@@ -185,7 +185,7 @@ class TestRegisterLoanEndpoint:
             f"/copies/{copy_id}/loans",
             json={
                 "borrower_user_id": str(borrower_id),
-                "estimated_return_date": "2025-08-15T00:00:00Z",
+                "estimated_return_date": "2030-08-15T00:00:00Z",
             },
             headers=headers,
         )
@@ -193,4 +193,4 @@ class TestRegisterLoanEndpoint:
         assert response.status_code == 201
         data = response.json()
         assert data["estimated_return_date"] is not None
-        assert "2025-08-15" in data["estimated_return_date"]
+        assert "2030-08-15" in data["estimated_return_date"]

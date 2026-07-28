@@ -24,6 +24,9 @@ export function LoanForm({
   const [estimatedReturnDate, setEstimatedReturnDate] = useState("");
   const [submitting, setSubmitting] = useState(false);
 
+  // Minimum date: tomorrow (can't return in the past or today)
+  const today = new Date().toISOString().split("T")[0];
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
@@ -54,6 +57,8 @@ export function LoanForm({
           showToast("Esta copia ya está prestada.", "error");
         } else if (detail === "invalid_copy_type") {
           showToast("Solo se pueden prestar copias físicas.", "error");
+        } else if (detail === "estimated_return_date_in_past") {
+          showToast("La fecha de devolución no puede ser en el pasado.", "error");
         } else {
           showToast(detail, "error");
         }
@@ -93,6 +98,7 @@ export function LoanForm({
           name="estimatedReturnDate"
           value={estimatedReturnDate}
           onChange={(e) => setEstimatedReturnDate(e.target.value)}
+          min={today}
           className="rounded-md border border-gray-300 px-3 py-2 text-sm transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500"
         />
       </div>

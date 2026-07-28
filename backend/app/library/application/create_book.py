@@ -31,7 +31,11 @@ class CreateBook:
     Any authenticated user can create a book.
     """
 
-    def __init__(self, book_repository: BookRepository, copy_repository: CopyRepository | None = None):
+    def __init__(
+        self,
+        book_repository: BookRepository,
+        copy_repository: CopyRepository | None = None,
+    ):
         self._book_repo = book_repository
         self._copy_repo = copy_repository
 

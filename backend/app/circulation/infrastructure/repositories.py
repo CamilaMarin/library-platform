@@ -30,6 +30,7 @@ class LoanWithDetails:
     status: str
     book_title: str
     borrower_name: str
+    book_id: UUID | None = None
 
 
 class SqlLoanRepository:
@@ -94,6 +95,7 @@ class SqlLoanRepository:
                 LoanModel.returned_date,
                 LoanModel.status,
                 BookModel.title,
+                BookModel.id.label("book_id"),
                 UserModel.name,
             )
             .join(CopyModel, LoanModel.copy_id == CopyModel.id)
@@ -118,7 +120,56 @@ class SqlLoanRepository:
                 returned_date=row[5],
                 status=row[6],
                 book_title=row[7],
-                borrower_name=row[8],
+                book_id=row[8],
+                borrower_name=row[9],
+            )
+            for row in rows
+        ]
+
+    def find_by_borrower_with_status(
+        self, borrower_user_id: UUID, status: str | None = None
+    ) -> list[LoanWithDetails]:
+        """Find loans where the user is the borrower, with book and lender info.
+
+        Joins: loans → copies → books (title), copies → users (lender/owner name).
+        """
+        query = (
+            self._session.query(
+                LoanModel.id,
+                LoanModel.copy_id,
+                LoanModel.borrower_user_id,
+                LoanModel.loan_date,
+                LoanModel.estimated_return_date,
+                LoanModel.returned_date,
+                LoanModel.status,
+                BookModel.title,
+                BookModel.id.label("book_id"),
+                UserModel.name,
+            )
+            .join(CopyModel, LoanModel.copy_id == CopyModel.id)
+            .join(BookModel, CopyModel.book_id == BookModel.id)
+            .join(UserModel, CopyModel.user_id == UserModel.id)
+            .filter(LoanModel.borrower_user_id == borrower_user_id)
+        )
+
+        if status:
+            query = query.filter(LoanModel.status == status)
+
+        query = query.order_by(LoanModel.loan_date.desc())
+
+        rows = query.all()
+        return [
+            LoanWithDetails(
+                id=row[0],
+                copy_id=row[1],
+                borrower_user_id=row[2],
+                loan_date=row[3],
+                estimated_return_date=row[4],
+                returned_date=row[5],
+                status=row[6],
+                book_title=row[7],
+                book_id=row[8],
+                borrower_name=row[9],
             )
             for row in rows
         ]

@@ -24,6 +24,7 @@ interface ClubMember {
   id: string;
   user_id: string;
   club_id: string;
+  name: string;
   role: string;
   created_at: string;
 }
@@ -72,6 +73,9 @@ export default function ClubDetailPage() {
     new Set()
   );
 
+  // Active book title
+  const [activeBookTitle, setActiveBookTitle] = useState<string | null>(null);
+
   const fetchClubData = useCallback(async () => {
     try {
       const [clubData, membersData, commentsData] = await Promise.all([
@@ -82,6 +86,15 @@ export default function ClubDetailPage() {
       setClub(clubData);
       setMembers(membersData);
       setComments(commentsData);
+
+      if (clubData.active_book_id) {
+        try {
+          const book = await apiGet<{ id: string; title: string; author: string }>(`/books/${clubData.active_book_id}`);
+          setActiveBookTitle(`${book.title} — ${book.author}`);
+        } catch {
+          setActiveBookTitle(null);
+        }
+      }
     } catch {
       showToast("Error al cargar los datos del club", "error");
     } finally {
@@ -136,6 +149,11 @@ export default function ClubDetailPage() {
       setClub((prev) =>
         prev ? { ...prev, active_book_id: selectedBookId } : prev
       );
+      // Update the displayed book title from available books
+      const selectedBook = availableBooks.find((b) => b.id === selectedBookId);
+      if (selectedBook) {
+        setActiveBookTitle(`${selectedBook.title} — ${selectedBook.author}`);
+      }
       setShowSetBookForm(false);
       setSelectedBookId("");
       showToast("Libro activo actualizado", "success");
@@ -172,6 +190,11 @@ export default function ClubDetailPage() {
       }
       return next;
     });
+  };
+
+  const getMemberName = (userId: string): string => {
+    const member = members.find((m) => m.user_id === userId);
+    return member ? member.name : userId;
   };
 
   const formatDate = (dateStr: string) => {
@@ -219,8 +242,7 @@ export default function ClubDetailPage() {
 
                 {club.active_book_id ? (
                   <p className="text-sm text-gray-700">
-                    ID del libro activo:{" "}
-                    <span className="font-medium">{club.active_book_id}</span>
+                    {activeBookTitle || club.active_book_id}
                   </p>
                 ) : (
                   <p className="text-sm text-gray-500">
@@ -306,7 +328,7 @@ export default function ClubDetailPage() {
                         className="flex items-center justify-between rounded-md border border-gray-100 bg-gray-50 px-3 py-2"
                       >
                         <span className="text-sm text-gray-700">
-                          {member.user_id}
+                          {member.name}
                         </span>
                         {member.role === "owner" && (
                           <span className="text-xs font-medium text-blue-600 bg-blue-50 px-2 py-0.5 rounded">
@@ -342,7 +364,7 @@ export default function ClubDetailPage() {
                         >
                           <div className="flex items-center justify-between mb-1">
                             <span className="text-xs font-medium text-gray-600">
-                              {comment.user_id}
+                              {getMemberName(comment.user_id)}
                             </span>
                             <span className="text-xs text-gray-400">
                               {formatDate(comment.created_at)}

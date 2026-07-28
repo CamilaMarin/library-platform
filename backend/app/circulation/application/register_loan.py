@@ -48,6 +48,18 @@ class RegisterLoan:
         if active_loan is not None:
             raise ValueError("copy_already_on_loan")
 
+        # Validate estimated return date is not in the past
+        if estimated_return_date is not None:
+            from datetime import timezone
+
+            now = datetime.now(timezone.utc)
+            # Normalize: if naive datetime, assume UTC
+            compare_date = estimated_return_date
+            if compare_date.tzinfo is None:
+                compare_date = compare_date.replace(tzinfo=timezone.utc)
+            if compare_date < now:
+                raise ValueError("estimated_return_date_in_past")
+
         loan = Loan.create(
             copy_id=copy_id,
             copy_type=copy.type.value,

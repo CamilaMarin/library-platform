@@ -6,6 +6,7 @@ from sqlalchemy import text
 
 from app.circulation.interface.loans_router import return_router as loans_return_router
 from app.circulation.interface.loans_router import router as loans_router
+from app.community.interface.clubs_router import router as clubs_router
 from app.config import settings
 from app.database import engine
 from app.identity.interface.admin_router import router as admin_router
@@ -45,6 +46,7 @@ app.include_router(reviews_router)
 app.include_router(books_reviews_router)
 app.include_router(loans_router)
 app.include_router(loans_return_router)
+app.include_router(clubs_router)
 
 
 @app.get("/health")
