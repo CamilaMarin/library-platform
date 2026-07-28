@@ -26,8 +26,10 @@ from app.library.interface.schemas import (
     BookResponse,
     CreateBookRequest,
     ReadingStatusResponse,
-    SetReadingStatusRequest as SetReadingStatusSchema,
     UpdateBookRequest,
+)
+from app.library.interface.schemas import (
+    SetReadingStatusRequest as SetReadingStatusSchema,
 )
 
 router = APIRouter(prefix="/books", tags=["books"], redirect_slashes=False)

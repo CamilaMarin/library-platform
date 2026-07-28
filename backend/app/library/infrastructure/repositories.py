@@ -6,11 +6,18 @@ Reference: ADR-0017
 
 from uuid import UUID
 
-from sqlalchemy import or_
+from sqlalchemy import or_, union
 from sqlalchemy.dialects.postgresql import insert as pg_insert
 from sqlalchemy.orm import Session
 
-from app.library.domain.entities import Book, Copy, CopyStatus, CopyType, ReadingStatus, ReadingStatusValue
+from app.library.domain.entities import (
+    Book,
+    Copy,
+    CopyStatus,
+    CopyType,
+    ReadingStatus,
+    ReadingStatusValue,
+)
 from app.library.infrastructure.models import BookModel, CopyModel, ReadingStatusModel
 
 
@@ -48,25 +55,13 @@ class SqlBookRepository:
 
         This is the primary query for the library page.
         """
-        from app.library.infrastructure.models import ReadingStatusModel
-
-        # Books via copies
-        copy_book_ids = (
-            self._session.query(CopyModel.book_id)
-            .filter(CopyModel.user_id == user_id)
-            .subquery()
-        )
-        # Books via reading status (no copy required)
-        status_book_ids = (
-            self._session.query(ReadingStatusModel.book_id)
-            .filter(ReadingStatusModel.user_id == user_id)
-            .subquery()
-        )
-
-        from sqlalchemy import union
         combined = union(
-            self._session.query(CopyModel.book_id).filter(CopyModel.user_id == user_id),
-            self._session.query(ReadingStatusModel.book_id).filter(ReadingStatusModel.user_id == user_id),
+            self._session.query(CopyModel.book_id).filter(
+                CopyModel.user_id == user_id
+            ),
+            self._session.query(ReadingStatusModel.book_id).filter(
+                ReadingStatusModel.user_id == user_id
+            ),
         ).subquery()
 
         models = (
