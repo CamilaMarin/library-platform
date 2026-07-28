@@ -1,6 +1,6 @@
 # Implementation Status — EntreLíneas
 
-Last updated: 2025-07-28 (Reading Status + Shelf View)
+Last updated: 2025-07-28 (Deployment Prep)
 
 ## Overall Progress
 
@@ -24,7 +24,7 @@ Last updated: 2025-07-28 (Reading Status + Shelf View)
 | M6.5 | Frontend Catchup | ✅ Complete | 24 | 24/24 |
 | M7 | Loans | ✅ Complete | 5 | 5/5 |
 | M8 | Privacy Panel | ✅ Complete | 10 | 10/10 |
-| M9 | Release Candidate | In progress | 10 | 1/10 |
+| M9 | Release Candidate | In progress | 10 | 4/10 |
 
 ## Modules
 

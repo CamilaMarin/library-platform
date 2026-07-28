@@ -83,6 +83,27 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 - Loan borrower selection fetches members from all user groups
 - Error message when creating club without belonging to a group
 
+### Added (M9 — UX Polish)
+- Unified BookDetailModal: click any book (list or shelf) opens modal with edit, copies, lend, status, progress
+- Reading progress tracking: current_page field + progress bar + page counter
+- "Me prestaron" shelf view with separate "Prestados activos" and "Devueltos" shelves
+- Book editing from modal (title, author, pages, genres, ISBN, description)
+- Add copy and lend actions inside book modal
+- Mini progress bar in list view for books being read
+- Search empty state distinguishes "no results" from "empty library"
+
+### Added (M9 — Deployment)
+- Backend Dockerfile (multi-stage python:3.13-slim)
+- Frontend Dockerfile (3-stage node:20-alpine, Next.js standalone)
+- docker-compose.prod.yml (full production stack)
+- Deployment guide (docs/deployment.md)
+- GitHub Actions: frontend-build CI job
+- Next.js standalone output mode
+
+### Fixed (M9)
+- next build: useSearchParams wrapped in Suspense boundary
+- Library only shows books with owned copies (borrowed books no longer appear)
+
 ## [M8] — Privacy Panel
 
 ### Added
