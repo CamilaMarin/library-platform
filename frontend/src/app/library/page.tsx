@@ -229,13 +229,27 @@ export default function LibraryPage() {
     setLoadingLendData(true);
     setLendCopyId(copyId);
     try {
-      // Fetch user's groups, then members from first group
+      // Fetch user's groups, then members from all groups
       const groups = await apiGet<FamilyGroup[]>("/groups");
       if (groups.length > 0) {
-        const members = await apiGet<GroupMember[]>(
-          `/groups/${groups[0].id}/members`
+        // Fetch members from all groups in parallel
+        const memberPromises = groups.map((g) =>
+          apiGet<GroupMember[]>(`/groups/${g.id}/members`)
         );
-        setGroupMembers(members.filter((m) => m.user_id !== user?.id));
+        const allMemberArrays = await Promise.all(memberPromises);
+
+        // Combine and deduplicate, excluding self
+        const seen = new Set<string>();
+        const allMembers: GroupMember[] = [];
+        for (const members of allMemberArrays) {
+          for (const member of members) {
+            if (member.user_id !== user?.id && !seen.has(member.user_id)) {
+              seen.add(member.user_id);
+              allMembers.push(member);
+            }
+          }
+        }
+        setGroupMembers(allMembers);
       } else {
         setGroupMembers([]);
       }

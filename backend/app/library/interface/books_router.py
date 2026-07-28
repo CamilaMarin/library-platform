@@ -91,6 +91,30 @@ def search_books(
     ]
 
 
+@router.get("/{book_id}", response_model=BookResponse)
+def get_book(
+    book_id: UUID,
+    user_id: UUID = Depends(get_current_user_id),
+    db: Session = Depends(get_db),
+):
+    """Get a single book by ID. Metadata only, never file_ref."""
+    repo = SqlBookRepository(db)
+    book = repo.find_by_id(book_id)
+    if not book:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="book_not_found")
+
+    return BookResponse(
+        id=book.id,
+        title=book.title,
+        author=book.author,
+        genres=book.genres,
+        description=book.description,
+        pages=book.pages,
+        isbn=book.isbn,
+        created_at=book.created_at,
+    )
+
+
 @router.patch("/{book_id}", response_model=BookResponse)
 def update_book(
     book_id: UUID,

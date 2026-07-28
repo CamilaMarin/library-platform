@@ -62,6 +62,7 @@ export interface GroupMembership {
   user_id: string;
   status: "pending" | "accepted";
   created_at: string;
+  group_name?: string;
 }
 
 // === Reading Selection ===
@@ -147,6 +148,7 @@ export interface Loan {
 
 export interface LoanWithDetails extends Loan {
   book_title: string;
+  book_id: string | null;
   borrower_name: string;
 }
 

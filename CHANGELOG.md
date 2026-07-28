@@ -6,6 +6,31 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+### Added
+- Community/Clubs REST router: GET/POST /clubs, GET /clubs/{id}, /members, /comments, /active-book, /available-books (8 endpoints)
+- GET /reviews/ endpoint (list user's own reviews)
+- GET /reviews/shared endpoint (reviews shared with user's groups/clubs)
+- GET /books/{id} endpoint (single book detail)
+- GET /loans/borrowed endpoint (books others lent to you)
+- "Me prestaron" tab in loans page (borrower view)
+- Borrowed books appear in review book selector (can review books lent to you)
+- "Reseñas compartidas conmigo" section in reviews page
+- Group selector when creating clubs (multi-group users)
+- Alembic migration 0010: clubs.description column
+
+### Fixed
+- Group membership status filter (active → accepted) in clubs router
+- Frontend invite endpoint path (/invite → /invitations)
+- Frontend accept invitation path (needs group_id prefix)
+- Group name shown in pending invitations
+- Club members display names instead of UUIDs
+- Club comments display author names instead of UUIDs
+- Active book shows title instead of UUID
+- Loan estimated_return_date timezone offset (showed 1 day less)
+- Loan form prevents selecting past dates (frontend min + backend 422 validation)
+- Loan borrower selection fetches members from all user groups
+- Error message when creating club without belonging to a group
+
 ## [M8] — Privacy Panel
 
 ### Added

@@ -9,7 +9,7 @@ import { useToast } from "@/context/toast-context";
 import { apiGet, apiPatch, ApiError } from "@/lib/api-client";
 import type { LoanWithDetails } from "@/types";
 
-type TabStatus = "active" | "returned";
+type TabStatus = "active" | "returned" | "borrowed";
 
 export default function LoansPage() {
   const [activeTab, setActiveTab] = useState<TabStatus>("active");
@@ -21,7 +21,12 @@ export default function LoansPage() {
   const fetchLoans = useCallback(async (status: TabStatus) => {
     setLoading(true);
     try {
-      const data = await apiGet<LoanWithDetails[]>(`/loans?status=${status}`);
+      let data: LoanWithDetails[];
+      if (status === "borrowed") {
+        data = await apiGet<LoanWithDetails[]>("/loans/borrowed?status=active");
+      } else {
+        data = await apiGet<LoanWithDetails[]>(`/loans?status=${status}`);
+      }
       setLoans(data);
     } catch {
       setLoans([]);
@@ -87,6 +92,17 @@ export default function LoansPage() {
             >
               Historial
             </button>
+            <button
+              type="button"
+              onClick={() => handleTabChange("borrowed")}
+              className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${
+                activeTab === "borrowed"
+                  ? "bg-blue-600 text-white"
+                  : "border border-gray-300 text-gray-700 hover:bg-gray-100"
+              }`}
+            >
+              Me prestaron
+            </button>
           </div>
 
           {/* Content */}
@@ -96,7 +112,9 @@ export default function LoansPage() {
             <p className="text-gray-500 text-center py-8">
               {activeTab === "active"
                 ? "No tienes préstamos activos."
-                : "No tienes préstamos devueltos."}
+                : activeTab === "returned"
+                ? "No tienes préstamos devueltos."
+                : "No te han prestado libros."}
             </p>
           ) : (
             <div className="flex flex-col gap-4">
@@ -104,9 +122,10 @@ export default function LoansPage() {
                 <LoanCard
                   key={loan.id}
                   loan={loan}
-                  variant={activeTab}
+                  variant={activeTab === "borrowed" ? "active" : activeTab}
                   onReturn={activeTab === "active" ? handleReturn : undefined}
                   isReturning={returningLoanId === loan.id}
+                  isBorrowedView={activeTab === "borrowed"}
                 />
               ))}
             </div>

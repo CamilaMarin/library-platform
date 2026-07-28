@@ -25,6 +25,8 @@ export default function ReviewsPage() {
   const [groups, setGroups] = useState<FamilyGroup[]>([]);
   const [clubs, setClubs] = useState<Club[]>([]);
   const [loading, setLoading] = useState(true);
+  const [borrowedBooks, setBorrowedBooks] = useState<Book[]>([]);
+  const [sharedReviews, setSharedReviews] = useState<Review[]>([]);
 
   // Form state
   const [showForm, setShowForm] = useState(false);
@@ -45,16 +47,45 @@ export default function ReviewsPage() {
   useEffect(() => {
     async function loadData() {
       try {
-        const [reviewsData, booksData, groupsData, clubsData] = await Promise.all([
+        const [reviewsData, booksData, groupsData, clubsData, sharedData] = await Promise.all([
           apiGet<Review[]>("/reviews"),
           apiGet<Book[]>("/books"),
           apiGet<FamilyGroup[]>("/groups"),
           apiGet<Club[]>("/clubs"),
+          apiGet<Review[]>("/reviews/shared").catch(() => [] as Review[]),
         ]);
         setReviews(reviewsData);
         setBooks(booksData);
         setGroups(groupsData);
         setClubs(clubsData);
+        setSharedReviews(sharedData);
+
+        // Also fetch borrowed books to include in the book selector
+        try {
+          const borrowedLoans = await apiGet<{ book_id: string | null; book_title: string }[]>("/loans/borrowed?status=active");
+          const existingBookIds = new Set(booksData.map((b) => b.id));
+          const extraBooks: Book[] = [];
+          for (const loan of borrowedLoans) {
+            if (loan.book_id && !existingBookIds.has(loan.book_id)) {
+              existingBookIds.add(loan.book_id);
+              extraBooks.push({
+                id: loan.book_id,
+                title: loan.book_title,
+                author: "",
+                genres: [],
+                description: null,
+                pages: null,
+                isbn: null,
+                created_at: "",
+              });
+            }
+          }
+          if (extraBooks.length > 0) {
+            setBorrowedBooks(extraBooks);
+          }
+        } catch {
+          // Borrowed books fetch is optional
+        }
       } catch {
         // Partial failure is acceptable
       } finally {
@@ -178,7 +209,10 @@ export default function ReviewsPage() {
 
   const getBookTitle = (bookId: string): string => {
     const book = books.find((b) => b.id === bookId);
-    return book ? book.title : bookId;
+    if (book) return book.title;
+    const borrowed = borrowedBooks.find((b) => b.id === bookId);
+    if (borrowed) return borrowed.title;
+    return bookId;
   };
 
   const getVisibilityBadge = (review: Review) => {
@@ -210,11 +244,17 @@ export default function ReviewsPage() {
     ...clubs.map((c) => ({ value: `club:${c.id}`, label: `Club: ${c.name}` })),
   ];
 
-  // Build book options for the selector
-  const bookOptions = books.map((b) => ({
-    value: b.id,
-    label: `${b.title} — ${b.author}`,
-  }));
+  // Build book options for the selector (own + borrowed)
+  const bookOptions = [
+    ...books.map((b) => ({
+      value: b.id,
+      label: `${b.title} — ${b.author}`,
+    })),
+    ...borrowedBooks.map((b) => ({
+      value: b.id,
+      label: `${b.title} (prestado)`,
+    })),
+  ];
 
   return (
     <ProtectedRoute>
@@ -428,6 +468,38 @@ export default function ReviewsPage() {
                 </div>
               ))}
             </div>
+          )}
+
+          {/* Shared Reviews from Others */}
+          {!loading && sharedReviews.length > 0 && (
+            <section className="mt-8">
+              <h2 className="text-xl font-bold text-gray-900 mb-4">
+                Reseñas compartidas conmigo
+              </h2>
+              <div className="space-y-3">
+                {sharedReviews.map((review) => (
+                  <div
+                    key={review.id}
+                    className="rounded-lg border border-blue-100 bg-blue-50/50 px-5 py-4 shadow-sm"
+                  >
+                    <div className="flex-1 min-w-0">
+                      <h3 className="text-base font-semibold text-gray-900 truncate">
+                        {getBookTitle(review.book_id)}
+                      </h3>
+                      <div className="mt-1 flex items-center gap-3">
+                        <StarRating value={review.rating} readonly />
+                        {getVisibilityBadge(review)}
+                      </div>
+                      {review.text && (
+                        <p className="mt-2 text-sm text-gray-600 line-clamp-3">
+                          {review.text}
+                        </p>
+                      )}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </section>
           )}
         </div>
       </main>

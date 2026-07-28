@@ -7,6 +7,7 @@ from uuid import UUID
 
 from fastapi import APIRouter, Depends, status
 from fastapi.exceptions import HTTPException
+from sqlalchemy import or_
 from sqlalchemy.orm import Session
 
 from app.database import get_db
@@ -36,6 +37,112 @@ from app.reviews.interface.schemas import (
 
 router = APIRouter(prefix="/reviews", tags=["reviews"])
 books_reviews_router = APIRouter(prefix="/books", tags=["reviews"])
+
+
+@router.get("/", response_model=list[ReviewResponse])
+def list_my_reviews(
+    user_id: str = Depends(get_current_user_id),
+    db: Session = Depends(get_db),
+):
+    """List all reviews authored by the current user."""
+    repo = SqlReviewRepository(db)
+    reviews = repo.find_by_user_id(UUID(str(user_id)))
+    return [
+        ReviewResponse(
+            id=review.id,
+            user_id=review.user_id,
+            book_id=review.book_id,
+            rating=review.rating,
+            text=review.text,
+            visibility=review.visibility.value,
+            shared_with_type=(review.shared_with_type.value if review.shared_with_type else None),
+            shared_with_id=review.shared_with_id,
+            created_at=review.created_at,
+            updated_at=review.updated_at,
+        )
+        for review in reviews
+    ]
+
+
+@router.get("/shared", response_model=list[ReviewResponse])
+def list_shared_reviews(
+    user_id: str = Depends(get_current_user_id),
+    db: Session = Depends(get_db),
+):
+    """List reviews shared with groups/clubs the user belongs to (excluding own reviews).
+
+    Returns shared reviews from other users that target groups or clubs
+    the authenticated user is a member of.
+    """
+    from app.community.infrastructure.models import ClubModel
+    from app.identity.infrastructure.models import GroupMembershipModel
+    from app.reviews.infrastructure.models import ReviewModel
+
+    uid = UUID(str(user_id))
+
+    # Get user's group IDs
+    group_ids = [
+        m.group_id
+        for m in db.query(GroupMembershipModel.group_id)
+        .filter(
+            GroupMembershipModel.user_id == uid,
+            GroupMembershipModel.status == "accepted",
+        )
+        .all()
+    ]
+
+    # Get club IDs from user's groups
+    club_ids = []
+    if group_ids:
+        club_ids = [
+            c.id
+            for c in db.query(ClubModel.id)
+            .filter(ClubModel.group_id.in_(group_ids))
+            .all()
+        ]
+
+    # Query reviews shared with user's groups or clubs, excluding own
+    conditions = []
+    if group_ids:
+        conditions.append(
+            (ReviewModel.shared_with_type == "group")
+            & (ReviewModel.shared_with_id.in_(group_ids))
+        )
+    if club_ids:
+        conditions.append(
+            (ReviewModel.shared_with_type == "club")
+            & (ReviewModel.shared_with_id.in_(club_ids))
+        )
+
+    if not conditions:
+        return []
+
+    models = (
+        db.query(ReviewModel)
+        .filter(
+            ReviewModel.visibility == "shared",
+            ReviewModel.user_id != uid,
+            or_(*conditions),
+        )
+        .order_by(ReviewModel.created_at.desc())
+        .all()
+    )
+
+    return [
+        ReviewResponse(
+            id=m.id,
+            user_id=m.user_id,
+            book_id=m.book_id,
+            rating=m.rating,
+            text=m.text,
+            visibility=m.visibility,
+            shared_with_type=m.shared_with_type,
+            shared_with_id=m.shared_with_id,
+            created_at=m.created_at,
+            updated_at=m.updated_at,
+        )
+        for m in models
+    ]
 
 
 @router.post("/", response_model=ReviewResponse, status_code=status.HTTP_201_CREATED)
@@ -84,9 +191,7 @@ def create_review(
         rating=review.rating,
         text=review.text,
         visibility=review.visibility.value,
-        shared_with_type=(
-            review.shared_with_type.value if review.shared_with_type else None
-        ),
+        shared_with_type=(review.shared_with_type.value if review.shared_with_type else None),
         shared_with_id=review.shared_with_id,
         created_at=review.created_at,
         updated_at=review.updated_at,
@@ -146,9 +251,7 @@ def edit_review(
         rating=review.rating,
         text=review.text,
         visibility=review.visibility.value,
-        shared_with_type=(
-            review.shared_with_type.value if review.shared_with_type else None
-        ),
+        shared_with_type=(review.shared_with_type.value if review.shared_with_type else None),
         shared_with_id=review.shared_with_id,
         created_at=review.created_at,
         updated_at=review.updated_at,
@@ -231,9 +334,7 @@ def list_book_reviews(
             rating=review.rating,
             text=review.text,
             visibility=review.visibility.value,
-            shared_with_type=(
-                review.shared_with_type.value if review.shared_with_type else None
-            ),
+            shared_with_type=(review.shared_with_type.value if review.shared_with_type else None),
             shared_with_id=review.shared_with_id,
             created_at=review.created_at,
             updated_at=review.updated_at,

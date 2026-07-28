@@ -1,6 +1,6 @@
 # Implementation Status — EntreLíneas
 
-Last updated: 2025-07-26
+Last updated: 2025-07-27
 
 ## Overall Progress
 
@@ -24,7 +24,7 @@ Last updated: 2025-07-26
 | M6.5 | Frontend Catchup | ✅ Complete | 24 | 24/24 |
 | M7 | Loans | ✅ Complete | 5 | 5/5 |
 | M8 | Privacy Panel | ✅ Complete | 10 | 10/10 |
-| M9 | Release Candidate | Not started | 10 | 0/10 |
+| M9 | Release Candidate | In progress | 10 | 1/10 |
 
 ## Modules
 
@@ -66,6 +66,7 @@ Last updated: 2025-07-26
 - **Completed tasks:** 6/6
 - **Remaining tasks:** 0
 - **Test coverage:** 17 tests (8 domain + 9 integration)
+- **REST endpoints:** 8 endpoints (list, create, detail, members, comments, active-book, available-books)
 - **Open issues:** None
 - **Blocking issues:** None
 

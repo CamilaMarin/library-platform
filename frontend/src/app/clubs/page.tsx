@@ -6,8 +6,10 @@ import { ProtectedRoute } from "@/components/protected-route";
 import { Navigation } from "@/components/navigation";
 import { Skeleton } from "@/components/skeleton";
 import { InputField } from "@/components/input-field";
+import { SelectField } from "@/components/select-field";
 import { useToast } from "@/context/toast-context";
 import { apiGet, apiPost, ApiError } from "@/lib/api-client";
+import type { FamilyGroup } from "@/types";
 
 interface Club {
   id: string;
@@ -25,20 +27,31 @@ export default function ClubsPage() {
   const [description, setDescription] = useState("");
   const [nameError, setNameError] = useState("");
   const [submitting, setSubmitting] = useState(false);
+  const [groups, setGroups] = useState<FamilyGroup[]>([]);
+  const [selectedGroupId, setSelectedGroupId] = useState("");
   const { showToast } = useToast();
 
   useEffect(() => {
-    async function fetchClubs() {
+    async function fetchData() {
       try {
-        const data = await apiGet<Club[]>("/clubs");
-        setClubs(data);
+        const [clubsData, groupsData] = await Promise.all([
+          apiGet<Club[]>("/clubs"),
+          apiGet<FamilyGroup[]>("/groups"),
+        ]);
+        setClubs(clubsData);
+        setGroups(groupsData);
+        // Auto-select if only one group
+        if (groupsData.length === 1) {
+          setSelectedGroupId(groupsData[0].id);
+        }
       } catch {
         setClubs([]);
+        setGroups([]);
       } finally {
         setLoading(false);
       }
     }
-    fetchClubs();
+    fetchData();
   }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -46,6 +59,11 @@ export default function ClubsPage() {
 
     if (!name.trim()) {
       setNameError("El nombre es obligatorio");
+      return;
+    }
+
+    if (groups.length > 1 && !selectedGroupId) {
+      setNameError("Debes seleccionar un grupo familiar");
       return;
     }
 
@@ -57,6 +75,9 @@ export default function ClubsPage() {
       if (description.trim()) {
         body.description = description.trim();
       }
+      if (selectedGroupId) {
+        body.group_id = selectedGroupId;
+      }
 
       const newClub = await apiPost<Club>("/clubs", body);
       setClubs((prev) => [newClub, ...prev]);
@@ -64,9 +85,20 @@ export default function ClubsPage() {
       setDescription("");
       setShowForm(false);
       showToast("Club creado", "success");
+      setSelectedGroupId(groups.length === 1 ? groups[0].id : "");
     } catch (err) {
-      if (err instanceof ApiError && typeof err.detail === "string") {
-        setNameError(err.detail);
+      if (err instanceof ApiError) {
+        const detail =
+          typeof err.detail === "string"
+            ? err.detail
+            : (err.detail as Record<string, string>).detail || JSON.stringify(err.detail);
+        if (detail === "user_has_no_group") {
+          setNameError("Debes pertenecer a un grupo familiar para crear un club.");
+        } else if (detail === "not_member_of_group") {
+          setNameError("No eres miembro del grupo seleccionado.");
+        } else {
+          setNameError(detail);
+        }
       } else {
         showToast("Error al crear el club", "error");
       }
@@ -133,6 +165,18 @@ export default function ClubsPage() {
                 />
               </div>
 
+              {groups.length > 1 && (
+                <SelectField
+                  label="Grupo familiar"
+                  name="club-group"
+                  options={groups.map((g) => ({ value: g.id, label: g.name }))}
+                  value={selectedGroupId}
+                  onChange={(e) => setSelectedGroupId(e.target.value)}
+                  required
+                  placeholder="Selecciona un grupo"
+                />
+              )}
+
               <div className="flex justify-end gap-3">
                 <button
                   type="button"
@@ -141,6 +185,7 @@ export default function ClubsPage() {
                     setName("");
                     setDescription("");
                     setNameError("");
+                    setSelectedGroupId(groups.length === 1 ? groups[0].id : "");
                   }}
                   className="rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors"
                 >

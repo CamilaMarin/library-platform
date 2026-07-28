@@ -99,7 +99,7 @@ export default function GroupsPage() {
 
     setInvitingGroupId(groupId);
     try {
-      await apiPost(`/groups/${groupId}/invite`, { email });
+      await apiPost(`/groups/${groupId}/invitations`, { email });
       setInviteEmail((prev) => ({ ...prev, [groupId]: "" }));
       setShowInviteForm(null);
       showToast("Invitación enviada", "success");
@@ -113,7 +113,7 @@ export default function GroupsPage() {
   // Accept invitation
   const handleAcceptInvitation = async (invitation: GroupMembership) => {
     try {
-      await apiPost(`/groups/invitations/${invitation.id}/accept`);
+      await apiPost(`/groups/${invitation.group_id}/invitations/${invitation.id}/accept`);
       setInvitations((prev) =>
         prev.filter((inv) => inv.id !== invitation.id)
       );
@@ -213,7 +213,7 @@ export default function GroupsPage() {
                     <div className="flex items-center justify-between">
                       <div>
                         <p className="text-sm font-medium text-gray-900">
-                          Invitación al grupo
+                          Invitación al grupo{invitation.group_name ? `: ${invitation.group_name}` : ""}
                         </p>
                         <p className="text-xs text-gray-500 mt-0.5">
                           {formatDate(invitation.created_at)}

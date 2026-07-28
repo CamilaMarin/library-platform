@@ -23,6 +23,7 @@ class Club:
     id: UUID = field(default_factory=uuid4)
     group_id: UUID = field(default_factory=uuid4)
     name: str = ""
+    description: str | None = None
     active_book_id: UUID | None = None
     discussion_date: datetime | None = None
     created_at: datetime = field(default_factory=_utcnow)

@@ -8,10 +8,21 @@ interface LoanCardProps {
   variant: "active" | "returned";
   onReturn?: (loanId: string) => Promise<void>;
   isReturning?: boolean;
+  isBorrowedView?: boolean;
 }
 
 function formatDate(dateStr: string): string {
-  const date = new Date(dateStr);
+  // Parse the date treating it as a local date to avoid timezone offset issues.
+  // If the string contains "T00:00:00" (date-only stored as midnight UTC),
+  // extract just the date part to prevent timezone shift.
+  let date: Date;
+  if (dateStr.includes("T00:00:00") || dateStr.length === 10) {
+    // Date-only: parse as local (YYYY-MM-DD)
+    const parts = dateStr.split("T")[0].split("-");
+    date = new Date(Number(parts[0]), Number(parts[1]) - 1, Number(parts[2]));
+  } else {
+    date = new Date(dateStr);
+  }
   return date.toLocaleDateString("es-ES", {
     day: "numeric",
     month: "short",
@@ -24,6 +35,7 @@ export function LoanCard({
   variant,
   onReturn,
   isReturning = false,
+  isBorrowedView = false,
 }: LoanCardProps) {
   return (
     <article
@@ -32,7 +44,7 @@ export function LoanCard({
     >
       <h3 className="text-base font-bold text-gray-900">{loan.book_title}</h3>
       <p className="mt-1 text-sm text-gray-600">
-        Prestado a: {loan.borrower_name}
+        {isBorrowedView ? "Prestado por:" : "Prestado a:"} {loan.borrower_name}
       </p>
       <p className="mt-1 text-sm text-gray-500">
         Fecha de préstamo: {formatDate(loan.loan_date)}
