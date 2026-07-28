@@ -90,7 +90,8 @@ class CreateGroupResponse(BaseModel):
 class InviteRequest(BaseModel):
     """Request body for POST /groups/{group_id}/invitations."""
 
-    user_id: UUID
+    user_id: UUID | None = None
+    email: str | None = None
 
 
 class InvitationResponse(BaseModel):

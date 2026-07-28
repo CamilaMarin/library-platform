@@ -15,7 +15,7 @@ from app.library.application.create_book import CreateBookRequest as CreateBookI
 from app.library.application.delete_book import BookHasCopiesError, DeleteBook
 from app.library.application.edit_book import EditBook, EditBookRequest
 from app.library.application.search_books import SearchBooks
-from app.library.infrastructure.repositories import SqlBookRepository
+from app.library.infrastructure.repositories import SqlBookRepository, SqlCopyRepository
 from app.library.interface.schemas import BookResponse, CreateBookRequest, UpdateBookRequest
 
 router = APIRouter(prefix="/books", tags=["books"])
@@ -29,7 +29,8 @@ def create_book(
 ):
     """Create a new book (metadata only, no copy). Requires authentication."""
     repo = SqlBookRepository(db)
-    use_case = CreateBook(book_repository=repo)
+    copy_repo = SqlCopyRepository(db)
+    use_case = CreateBook(book_repository=repo, copy_repository=copy_repo)
 
     book = use_case.execute(
         request=CreateBookInput(
@@ -39,6 +40,7 @@ def create_book(
             description=request.description,
             pages=request.pages,
             isbn=request.isbn,
+            initial_copy_format=request.initial_copy_format,
         ),
         user_id=user_id,
     )
@@ -65,11 +67,14 @@ def search_books(
 ):
     """Search books in personal and group library. Metadata only, never file_ref."""
     repo = SqlBookRepository(db)
-    use_case = SearchBooks(book_repository=repo)
 
-    # TODO: get group member IDs from user's groups for shared library search
-    # For now, search personal library only
-    books = use_case.execute(query=query, user_id=user_id)
+    if not query.strip():
+        # No query — list all user's books (that have copies)
+        books = repo.find_by_user_copies(user_id)
+    else:
+        # Search with query term
+        use_case = SearchBooks(book_repository=repo)
+        books = use_case.execute(query=query, user_id=user_id)
 
     return [
         BookResponse(

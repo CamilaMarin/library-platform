@@ -7,7 +7,7 @@ import { Skeleton } from "@/components/skeleton";
 import { InputField } from "@/components/input-field";
 import { useToast } from "@/context/toast-context";
 import { apiGet, apiPost } from "@/lib/api-client";
-import type { FamilyGroup, GroupMembership } from "@/types";
+import type { FamilyGroup, GroupMembership, GroupMember } from "@/types";
 
 export default function GroupsPage() {
   const { showToast } = useToast();
@@ -20,7 +20,7 @@ export default function GroupsPage() {
   const [newGroupName, setNewGroupName] = useState("");
   const [creatingGroup, setCreatingGroup] = useState(false);
   const [expandedGroupId, setExpandedGroupId] = useState<string | null>(null);
-  const [members, setMembers] = useState<Record<string, GroupMembership[]>>({});
+  const [members, setMembers] = useState<Record<string, GroupMember[]>>({});
   const [inviteEmail, setInviteEmail] = useState<Record<string, string>>({});
   const [invitingGroupId, setInvitingGroupId] = useState<string | null>(null);
   const [showInviteForm, setShowInviteForm] = useState<string | null>(null);
@@ -50,7 +50,7 @@ export default function GroupsPage() {
   // Fetch members for a group
   const fetchMembers = useCallback(async (groupId: string) => {
     try {
-      const data = await apiGet<GroupMembership[]>(
+      const data = await apiGet<GroupMember[]>(
         `/groups/${groupId}/members`
       );
       setMembers((prev) => ({ ...prev, [groupId]: data }));
@@ -308,24 +308,13 @@ export default function GroupsPage() {
                           <ul className="space-y-1">
                             {members[group.id].map((member) => (
                               <li
-                                key={member.id}
+                                key={member.user_id}
                                 className="flex items-center gap-2 text-sm text-gray-700"
                               >
                                 <span
-                                  className={`inline-block h-2 w-2 rounded-full ${
-                                    member.status === "accepted"
-                                      ? "bg-green-500"
-                                      : "bg-yellow-500"
-                                  }`}
+                                  className="inline-block h-2 w-2 rounded-full bg-green-500"
                                 />
-                                <span>{member.user_id}</span>
-                                <span className="text-xs text-gray-400">
-                                  (
-                                  {member.status === "accepted"
-                                    ? "activo"
-                                    : "pendiente"}
-                                  )
-                                </span>
+                                <span>{member.name}</span>
                               </li>
                             ))}
                           </ul>

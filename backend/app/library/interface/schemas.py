@@ -17,6 +17,7 @@ class CreateBookRequest(BaseModel):
     description: str = ""
     pages: int | None = Field(default=None, ge=1)
     isbn: str | None = Field(default=None, max_length=20)
+    initial_copy_format: str | None = Field(default=None)
 
 
 class UpdateBookRequest(BaseModel):
