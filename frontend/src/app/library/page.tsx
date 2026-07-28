@@ -9,6 +9,7 @@ import { SelectField } from "@/components/select-field";
 import { CopyStatusBadge } from "@/components/copy-status-badge";
 import { LoanForm } from "@/components/loan-form";
 import { useToast } from "@/context/toast-context";
+import { useAuth } from "@/context/auth-context";
 import { apiGet, apiPost, ApiError } from "@/lib/api-client";
 import type { Book, Copy, CopyWithLoanStatus, GroupMember, FamilyGroup } from "@/types";
 
@@ -21,6 +22,7 @@ interface AddBookFormState {
   genres: string;
   description: string;
   pages: string;
+  initialCopyFormat: string;
 }
 
 const initialFormState: AddBookFormState = {
@@ -30,6 +32,7 @@ const initialFormState: AddBookFormState = {
   genres: "",
   description: "",
   pages: "",
+  initialCopyFormat: "physical",
 };
 
 export default function LibraryPage() {
@@ -46,6 +49,7 @@ export default function LibraryPage() {
   const [addCopySubmitting, setAddCopySubmitting] = useState(false);
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const { showToast } = useToast();
+  const { user } = useAuth();
 
   // Loan-related state
   const [expandedBookId, setExpandedBookId] = useState<string | null>(null);
@@ -155,6 +159,7 @@ export default function LibraryPage() {
       if (addBookForm.pages.trim()) {
         body.pages = Number(addBookForm.pages);
       }
+      body.initial_copy_format = addBookForm.initialCopyFormat;
 
       const newBook = await apiPost<Book>("/books", body);
       setBooks((prev) => [newBook, ...prev]);
@@ -230,7 +235,7 @@ export default function LibraryPage() {
         const members = await apiGet<GroupMember[]>(
           `/groups/${groups[0].id}/members`
         );
-        setGroupMembers(members);
+        setGroupMembers(members.filter((m) => m.user_id !== user?.id));
       } else {
         setGroupMembers([]);
       }
@@ -341,6 +346,15 @@ export default function LibraryPage() {
                   error={addBookErrors.pages}
                   placeholder="Número de páginas"
                 />
+                <SelectField
+                  label="Formato de copia"
+                  name="initialCopyFormat"
+                  value={addBookForm.initialCopyFormat}
+                  onChange={(e) => setAddBookForm((prev) => ({ ...prev, initialCopyFormat: e.target.value }))}
+                  options={[
+                    { value: "physical", label: "Física" },
+                  ]}
+                />
               </div>
 
               <div className="flex flex-col gap-1">
@@ -442,7 +456,6 @@ export default function LibraryPage() {
                             onChange={(e) => setAddCopyFormat(e.target.value)}
                             options={[
                               { value: "physical", label: "Física" },
-                              { value: "digital", label: "Digital" },
                             ]}
                           />
                           <button

@@ -14,12 +14,19 @@ import jwt
 from app.config import settings
 
 
-def create_access_token(user_id: str, expires_delta: timedelta | None = None) -> str:
+def create_access_token(
+    user_id: str,
+    name: str = "",
+    email: str = "",
+    expires_delta: timedelta | None = None,
+) -> str:
     """Issue a JWT access token for the given user_id."""
     now = datetime.now(timezone.utc)
     expire = now + (expires_delta or timedelta(minutes=settings.access_token_expire_minutes))
     payload = {
         "sub": user_id,
+        "name": name,
+        "email": email,
         "exp": expire,
         "iat": now,
         "type": "access",

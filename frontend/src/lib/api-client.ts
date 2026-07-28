@@ -112,8 +112,9 @@ async function request<T>(
     throw new ApiError(0, "No se pudo conectar al servidor.");
   }
 
-  // 401 — attempt refresh and retry once
-  if (res.status === 401 && !isRetry) {
+  // 401 — attempt refresh and retry once (skip for auth endpoints)
+  const isAuthEndpoint = path.startsWith("/auth/");
+  if (res.status === 401 && !isRetry && !isAuthEndpoint) {
     const refreshed = await attemptTokenRefresh();
     if (refreshed) {
       return request<T>(path, options, true);
@@ -121,11 +122,11 @@ async function request<T>(
     handleRefreshFailure();
   }
 
-  if (res.status === 401 && isRetry) {
+  if (res.status === 401 && isRetry && !isAuthEndpoint) {
     handleRefreshFailure();
   }
 
-  // 4xx (non-401) — throw ApiError with parsed body
+  // 4xx (including 401 for auth endpoints) — throw ApiError with parsed body
   if (res.status >= 400 && res.status < 500) {
     let detail: string | Record<string, string>;
     try {

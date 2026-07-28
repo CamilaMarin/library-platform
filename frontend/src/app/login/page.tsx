@@ -64,15 +64,12 @@ export default function LoginPage() {
       router.push(redirect);
     } catch (err) {
       if (err instanceof ApiError) {
-        if (typeof err.detail === "string") {
-          // Map known error codes to Spanish messages
-          const message =
-            ERROR_MESSAGES[err.detail] ?? err.detail;
-          setFormError(message);
-        } else if (typeof err.detail === "object") {
-          // Field-level errors from backend
-          setErrors(err.detail as Record<string, string>);
-        }
+        // Backend returns {detail: "error_code"} — extract the detail string
+        const detail = typeof err.detail === "object" && err.detail !== null
+          ? (err.detail as Record<string, string>).detail ?? JSON.stringify(err.detail)
+          : String(err.detail);
+        const message = ERROR_MESSAGES[detail] ?? detail;
+        setFormError(message);
       } else {
         setFormError("Ocurrió un error inesperado. Intenta de nuevo.");
       }

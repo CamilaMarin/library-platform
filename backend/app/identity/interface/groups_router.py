@@ -48,6 +48,82 @@ class GroupMemberResponse(BaseModel):
     name: str
 
 
+class GroupListResponse(BaseModel):
+    """Response body for listing user's groups."""
+
+    id: UUID
+    name: str
+    created_at: str
+
+
+@router.get("/", response_model=list[GroupListResponse])
+def list_user_groups(
+    current_user_id: UUID = Depends(get_current_user_id),
+    db: Session = Depends(get_db),
+):
+    """List all groups the authenticated user is an accepted member of."""
+    from app.identity.infrastructure.models import FamilyGroupModel, GroupMembershipModel
+
+    groups = (
+        db.query(FamilyGroupModel)
+        .join(
+            GroupMembershipModel,
+            GroupMembershipModel.group_id == FamilyGroupModel.id,
+        )
+        .filter(
+            GroupMembershipModel.user_id == current_user_id,
+            GroupMembershipModel.status == "accepted",
+        )
+        .all()
+    )
+
+    return [
+        GroupListResponse(id=g.id, name=g.name, created_at=g.created_at.isoformat())
+        for g in groups
+    ]
+
+
+@router.get("/invitations", response_model=list[dict])
+def list_pending_invitations(
+    current_user_id: UUID = Depends(get_current_user_id),
+    db: Session = Depends(get_db),
+):
+    """List pending invitations for the authenticated user with group name."""
+    from app.identity.infrastructure.models import FamilyGroupModel, GroupMembershipModel
+
+    invitations = (
+        db.query(
+            GroupMembershipModel.id,
+            GroupMembershipModel.group_id,
+            GroupMembershipModel.user_id,
+            GroupMembershipModel.status,
+            GroupMembershipModel.created_at,
+            FamilyGroupModel.name.label("group_name"),
+        )
+        .join(
+            FamilyGroupModel,
+            GroupMembershipModel.group_id == FamilyGroupModel.id,
+        )
+        .filter(
+            GroupMembershipModel.user_id == current_user_id,
+            GroupMembershipModel.status == "invited",
+        )
+        .all()
+    )
+
+    return [
+        {
+            "id": inv.id,
+            "group_id": inv.group_id,
+            "user_id": inv.user_id,
+            "status": inv.status,
+            "created_at": inv.created_at,
+            "group_name": inv.group_name,
+        }
+        for inv in invitations
+    ]
+
+
 @router.get("/{group_id}/members", response_model=list[GroupMemberResponse])
 def list_group_members(
     group_id: UUID,
@@ -136,9 +212,28 @@ def invite_member(
     current_user_id: UUID = Depends(get_current_user_id),
     db: Session = Depends(get_db),
 ):
-    """Invite a user to a family group. The inviter must be an accepted member."""
+    """Invite a user to a family group by user_id or email."""
+    from app.identity.infrastructure.models import UserModel
+
     group_repo = SqlFamilyGroupRepository(db)
     membership_repo = SqlGroupMembershipRepository(db)
+
+    # Resolve invitee: by user_id or by email lookup
+    invitee_user_id = request.user_id
+    if not invitee_user_id and request.email:
+        user = db.query(UserModel).filter(UserModel.email == request.email).first()
+        if not user:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="user_not_found",
+            )
+        invitee_user_id = user.id
+
+    if not invitee_user_id:
+        raise HTTPException(
+            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+            detail="user_id or email required",
+        )
 
     use_case = InviteGroupMember(
         family_group_repository=group_repo,
@@ -147,7 +242,7 @@ def invite_member(
 
     input_dto = InviteGroupMemberInput(
         group_id=group_id,
-        invitee_user_id=request.user_id,
+        invitee_user_id=invitee_user_id,
         inviter_user_id=current_user_id,
     )
 
