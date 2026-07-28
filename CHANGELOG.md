@@ -6,6 +6,8 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+## [1.0.0-rc.1] — 2025-07-28
+
 ### Fixed (M9 — Final Cleanup)
 - test_encryption.py: graceful skip when cryptography module unavailable
 - ESLint config: properly ignores node_modules and .next directories
