@@ -6,7 +6,59 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
-### Added
+### Added (Reading Status + Shelf View)
+- `ReadingStatus` domain entity (`user_id`, `book_id`, `status`, `updated_at`) in Library bounded context — status is per-user/per-book, independent of copy count
+- `ReadingStatusValue` enum: `want_to_read` · `reading` · `read` · `dnf`
+- `ReadingStatusModel` (SQLAlchemy) with `UNIQUE(user_id, book_id)` constraint; `ON DELETE CASCADE` on both FKs covers ARCO cancellation automatically
+- `SqlReadingStatusRepository` with PostgreSQL upsert (`INSERT … ON CONFLICT DO UPDATE`)
+- `ReadingStatusRepository` protocol in application layer (ADR-0017)
+- `SetReadingStatus` use case (upsert, validates book exists)
+- `GetReadingStatuses` use case (user-scoped, Property 3)
+- Alembic migration `0011_reading_status`
+- API endpoints (all require authentication):
+  - `GET /books/statuses` — all `(book_id, status)` pairs for authenticated user
+  - `PUT /books/{book_id}/status` — upsert status (`want_to_read | reading | read | dnf`)
+  - `DELETE /books/{book_id}/status` — remove status (idempotent, 204)
+- `apiPut<T>()` helper added to frontend API client (`src/lib/api-client.ts`)
+- `ReadingStatusValue`, `BookReadingStatus`, `StatusMap`, `READING_STATUS_LABELS`, `SHELF_ORDER` types/constants in `src/types/index.ts`
+- `BookSpine` component — vertical book spine with rotated title, status-based color palette, hover elevation effect, accessible status popover (click to change/remove status)
+- `BookShelf` component — horizontal shelf row with teak table line, drag-to-scroll on desktop
+- Spec: `.kiro/specs/reading-status/` (requirements, design, tasks)
+
+### Changed (Reading Status + Shelf View)
+- Library page (`/library`): toggle between list view and shelf view (Lucide `LayoutList`/`Rows3` icons); preference persisted in `localStorage`
+- Shelf view groups books into labeled shelves by status + "Sin clasificar" for unassigned books; statuses fetched in parallel with books on mount
+- List view: inline status selector (dropdown) per book row with color dot indicator
+- `POST /books`: when `initial_copy_format` is `none`, creates book without a copy and auto-assigns `want_to_read` status — book appears immediately in the "Quiero leer" shelf
+- Add book form: new "Sin copia (solo registrar)" option as default; "Copia física" remains available
+- `GET /books` (no query): now returns books via `find_by_user_books()` — union of books with copies AND books with a reading status — so copy-free "want to read" books appear in results
+- Optimistic update on status change; reverts on error
+- New book created without copy immediately reflects `want_to_read` in local `statusMap` (no page refresh needed)
+- Router declaration order fixed: `GET /books/statuses` moved before `GET /books/{book_id}` to prevent FastAPI route shadowing (was causing 422)
+- `POST /books`: `user_id` dependency type changed from `str` to `UUID` for consistency
+- `APIRouter` for books: `redirect_slashes=False` to prevent 307 redirect on `GET /books`
+
+### Added (Visual Identity — "Sala de lectura")
+- Design token system: full palette defined in `tailwind.config.ts` (walnut, mahogany, teak, brass, parchment, cream, ink, reading, leather) and mirrored as CSS custom properties in `globals.css`
+- Global base styles: parchment background, Playfair Display for headings, Inter for UI, warm focus ring (brass), custom scrollbar (teak)
+- Utility classes in `globals.css`: `.card-biblioteca`, `.btn-primary`, `.btn-brass`, `.badge-reading/read/pending/dnf`
+- Playfair Display (normal + italic) and Inter loaded via `next/font/google` in root layout
+- Custom box shadows: `spine` (book spine), `shelf`, `card`, `modal`
+- Custom border radius: `book` (book-spine shape: straight left, rounded right)
+
+### Changed (Visual Identity — migration of all pages and components)
+- Navigation (`navigation.tsx`): sidebar walnut + brass active state fully migrated (was already done); mobile bottom bar reduced to 5 items (Inicio, Biblioteca, Clubes, Reseñas, Ajustes) to prevent overflow on small screens
+- Dashboard (`dashboard/page.tsx`): emojis replaced with Lucide icons (BookMarked, Users, Shuffle, BookOpen, Star, Settings) in teak color; cards use cream/border/walnut tokens
+- Login / Register pages: parchment background, cream card, Playfair logo, walnut primary button, leather error states
+- Library, Loans, Reviews, Groups, Selection, Clubs, Club Detail, Settings, Privacy pages: all gray/blue Tailwind classes replaced with CSS variable tokens
+- Shared components fully migrated: `InputField`, `SelectField`, `ConfirmDialog`, `LoanCard`, `LoanForm`, `Skeleton`, `StarRating`, `ToastContainer`, `CopyStatusBadge`, `ProtectedRoute`
+- Root loading spinner (`page.tsx`, `protected-route.tsx`): replaced `border-t-blue-600` with `teak`/`aged` tokens
+- `star-rating.tsx`: filled stars use `brass` instead of `yellow-400`
+- `toast.tsx`: success=`reading` green, error=`leather`, info=`walnut`
+- `copy-status-badge.tsx`: available=soft reading green, on_loan=leather/teak warm tones
+- Zero gray/blue Tailwind tokens remain across all pages and components (verified with grep)
+
+### Added (Community/Clubs REST router — previous unreleased)
 - Community/Clubs REST router: GET/POST /clubs, GET /clubs/{id}, /members, /comments, /active-book, /available-books (8 endpoints)
 - GET /reviews/ endpoint (list user's own reviews)
 - GET /reviews/shared endpoint (reviews shared with user's groups/clubs)

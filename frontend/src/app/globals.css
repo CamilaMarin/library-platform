@@ -1,3 +1,120 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+/*
+ * Variables CSS globales de EntreLíneas.
+ * Úsalas cuando Tailwind no alcance (ej: dentro de iframes,
+ * SVGs generados dinámicamente, o librerías de terceros).
+ */
+:root {
+  /* Maderas */
+  --color-walnut:    #2C1F14;
+  --color-mahogany:  #4A2E1A;
+  --color-teak:      #8B5E3C;
+
+  /* Metales */
+  --color-brass:     #B8892A;
+  --color-brass-lt:  #D4A853;
+
+  /* Papeles */
+  --color-parchment: #F5EDD8;
+  --color-cream:     #FBF6EC;
+  --color-aged:      #E0D0AE;
+
+  /* Tintas */
+  --color-ink:       #1E140A;
+  --color-ink-soft:  #5C4A36;
+  --color-ink-faint: #9C8670;
+
+  /* Estados */
+  --color-reading:   #2E5C3E;
+  --color-leather:   #6B3A2A;
+
+  /* Borde cálido por defecto */
+  --color-border:    #D6C9AE;
+}
+
+@layer base {
+  html {
+    @apply scroll-smooth;
+  }
+
+  body {
+    /* Reemplaza el bg-gray-50 del layout.tsx */
+    background-color: var(--color-parchment);
+    color: var(--color-ink);
+    font-family: var(--font-inter), system-ui, sans-serif;
+    @apply antialiased;
+  }
+
+  /* Headings usan la serif editorial por defecto */
+  h1, h2, h3, h4 {
+    font-family: var(--font-playfair), Georgia, serif;
+    color: var(--color-walnut);
+  }
+
+  /* Focus ring visible y cálido */
+  :focus-visible {
+    outline: 2px solid var(--color-brass);
+    outline-offset: 2px;
+    border-radius: 3px;
+  }
+
+  /* Scrollbar sutil */
+  ::-webkit-scrollbar        { width: 6px; height: 6px; }
+  ::-webkit-scrollbar-track  { background: var(--color-parchment); }
+  ::-webkit-scrollbar-thumb  { background: var(--color-teak); border-radius: 3px; }
+  ::-webkit-scrollbar-thumb:hover { background: var(--color-mahogany); }
+}
+
+/*
+ * Clases utilitarias de EntreLíneas.
+ * Complementan las clases de Tailwind para casos frecuentes
+ * que no tienen una clase directa en la config.
+ */
+@layer components {
+  /* Tarjeta estándar sobre fondo parchment */
+  .card-biblioteca {
+    background-color: var(--color-cream);
+    border: 0.5px solid var(--color-border);
+    border-radius: 10px;
+    box-shadow: 0 1px 3px rgba(28, 16, 8, 0.08);
+  }
+
+  /* Botón primario — walnut oscuro */
+  .btn-primary {
+    @apply rounded-full px-5 py-2.5 text-sm font-medium;
+    background-color: var(--color-walnut);
+    color: var(--color-cream);
+    transition: background-color 0.15s;
+  }
+  .btn-primary:hover {
+    background-color: var(--color-mahogany);
+  }
+
+  /* Botón acento — brass dorado (para "Sorpréndeme", CTAs especiales) */
+  .btn-brass {
+    @apply rounded-full px-5 py-2.5 text-sm font-medium;
+    background-color: var(--color-brass);
+    color: var(--color-cream);
+    transition: background-color 0.15s;
+  }
+  .btn-brass:hover {
+    background-color: var(--color-brass-lt);
+  }
+
+  /* Badge de estado de lectura */
+  .badge-reading  { @apply rounded-full px-2.5 py-0.5 text-xs font-medium; background-color: #2E5C3E; color: #E8DCC4; }
+  .badge-read     { @apply rounded-full px-2.5 py-0.5 text-xs font-medium; background-color: #B8892A; color: #FBF6EC; }
+  .badge-pending  { @apply rounded-full px-2.5 py-0.5 text-xs font-medium; background-color: #E0D0AE; color: #5C4A36; }
+  .badge-dnf      { @apply rounded-full px-2.5 py-0.5 text-xs font-medium; background-color: #4A2E1A; color: #D6C9AE; }
+}
+
+/* Reduce movimiento si el usuario lo prefiere */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}

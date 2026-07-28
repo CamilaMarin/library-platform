@@ -16,7 +16,8 @@ export function CopyStatusBadge({
   if (status === "available") {
     return (
       <span
-        className="inline-flex items-center rounded-full bg-green-100 px-2.5 py-0.5 text-xs font-medium text-green-800"
+        className="inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium"
+        style={{ background: "#D8EDE1", color: "var(--color-reading)" }}
         aria-label="Estado: Disponible"
       >
         Disponible
@@ -34,12 +35,18 @@ export function CopyStatusBadge({
 
   return (
     <span
-      className="inline-flex flex-col items-start rounded-full bg-orange-100 px-2.5 py-0.5 text-xs font-medium text-orange-800"
+      className="inline-flex flex-col items-start rounded-full px-2.5 py-0.5 text-xs font-medium"
+      style={{ background: "#FAF0E8", color: "var(--color-leather)" }}
       aria-label={`Estado: Prestado a ${borrowerName ?? "desconocido"}`}
     >
       <span>Prestado a {borrowerName ?? "desconocido"}</span>
       {formattedDate && (
-        <span className="text-[10px] text-orange-600">{formattedDate}</span>
+        <span
+          className="text-[10px]"
+          style={{ color: "var(--color-teak)" }}
+        >
+          {formattedDate}
+        </span>
       )}
     </span>
   );

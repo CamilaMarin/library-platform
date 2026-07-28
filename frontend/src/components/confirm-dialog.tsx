@@ -72,7 +72,8 @@ export function ConfirmDialog({
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black/50"
+      className="fixed inset-0 z-50 flex items-center justify-center"
+      style={{ background: "rgba(28, 16, 8, 0.55)" }}
       aria-hidden="true"
       onClick={onCancel}
     >
@@ -82,18 +83,28 @@ export function ConfirmDialog({
         aria-modal="true"
         aria-labelledby="confirm-dialog-title"
         aria-describedby="confirm-dialog-message"
-        className="mx-4 w-full max-w-md rounded-lg bg-white p-6 shadow-xl"
+        className="mx-4 w-full max-w-md rounded-lg p-6"
+        style={{
+          background: "var(--color-cream)",
+          border: "1px solid var(--color-border)",
+          boxShadow: "0 8px 32px -4px rgba(28, 16, 8, 0.22)",
+        }}
         onClick={(e) => e.stopPropagation()}
       >
         <h2
           id="confirm-dialog-title"
-          className="text-lg font-semibold text-gray-900"
+          className="text-lg font-semibold"
+          style={{
+            fontFamily: "var(--font-playfair), Georgia, serif",
+            color: "var(--color-walnut)",
+          }}
         >
           {title}
         </h2>
         <p
           id="confirm-dialog-message"
-          className="mt-2 text-sm text-gray-600"
+          className="mt-2 text-sm"
+          style={{ color: "var(--color-ink-soft)" }}
         >
           {message}
         </p>
@@ -102,18 +113,46 @@ export function ConfirmDialog({
             ref={cancelButtonRef}
             type="button"
             onClick={onCancel}
-            className="rounded-md border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-1"
+            className="rounded-md border px-4 py-2 text-sm font-medium transition-colors focus:outline-none"
+            style={{
+              borderColor: "var(--color-border)",
+              color: "var(--color-ink-soft)",
+              background: "transparent",
+            }}
+            onMouseEnter={(e) => {
+              (e.currentTarget as HTMLButtonElement).style.background =
+                "var(--color-parchment)";
+            }}
+            onMouseLeave={(e) => {
+              (e.currentTarget as HTMLButtonElement).style.background =
+                "transparent";
+            }}
           >
             {cancelText}
           </button>
           <button
             type="button"
             onClick={onConfirm}
-            className={`rounded-md px-4 py-2 text-sm font-medium text-white transition-colors focus:outline-none focus:ring-2 focus:ring-offset-1 ${
+            className="rounded-md px-4 py-2 text-sm font-medium transition-colors focus:outline-none"
+            style={
               destructive
-                ? "bg-red-600 hover:bg-red-700 focus:ring-red-500"
-                : "bg-blue-600 hover:bg-blue-700 focus:ring-blue-500"
-            }`}
+                ? {
+                    background: "var(--color-leather)",
+                    color: "var(--color-cream)",
+                  }
+                : {
+                    background: "var(--color-walnut)",
+                    color: "var(--color-cream)",
+                  }
+            }
+            onMouseEnter={(e) => {
+              (e.currentTarget as HTMLButtonElement).style.background =
+                destructive ? "#8A3A2A" : "var(--color-mahogany)";
+            }}
+            onMouseLeave={(e) => {
+              (e.currentTarget as HTMLButtonElement).style.background =
+                destructive ? "var(--color-leather)" : "var(--color-walnut)";
+            }}
           >
             {confirmText}
           </button>

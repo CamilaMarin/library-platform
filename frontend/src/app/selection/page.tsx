@@ -20,6 +20,12 @@ interface GroupDrawState {
   loadingDraws: boolean;
 }
 
+const inputStyle: React.CSSProperties = {
+  borderColor: "var(--color-border)",
+  background: "var(--color-cream)",
+  color: "var(--color-ink)",
+};
+
 export default function SelectionPage() {
   const [groups, setGroups] = useState<FamilyGroup[]>([]);
   const [loadingGroups, setLoadingGroups] = useState(true);
@@ -30,7 +36,6 @@ export default function SelectionPage() {
   const [drawResult, setDrawResult] = useState<{ groupId: string; book: Book } | null>(null);
   const [noMatchError, setNoMatchError] = useState<string | null>(null);
 
-  // Fetch groups
   const fetchGroups = useCallback(async () => {
     setLoadingGroups(true);
     try {
@@ -43,7 +48,6 @@ export default function SelectionPage() {
     }
   }, []);
 
-  // Fetch next picker for a group
   const fetchNextPicker = useCallback(async (groupId: string) => {
     setGroupStates((prev) => ({
       ...prev,
@@ -63,7 +67,6 @@ export default function SelectionPage() {
     }
   }, []);
 
-  // Fetch draw history for a group
   const fetchDrawHistory = useCallback(async (groupId: string) => {
     setGroupStates((prev) => ({
       ...prev,
@@ -87,20 +90,13 @@ export default function SelectionPage() {
     fetchGroups();
   }, [fetchGroups]);
 
-  // When groups are loaded, fetch next picker and draw history for each
   useEffect(() => {
     if (groups.length > 0) {
       const initial: Record<string, GroupDrawState> = {};
       groups.forEach((g) => {
-        initial[g.id] = {
-          nextPicker: null,
-          draws: [],
-          loadingPicker: true,
-          loadingDraws: true,
-        };
+        initial[g.id] = { nextPicker: null, draws: [], loadingPicker: true, loadingDraws: true };
       });
       setGroupStates(initial);
-
       groups.forEach((g) => {
         fetchNextPicker(g.id);
         fetchDrawHistory(g.id);
@@ -108,7 +104,6 @@ export default function SelectionPage() {
     }
   }, [groups, fetchNextPicker, fetchDrawHistory]);
 
-  // Handle draw trigger
   const handleDraw = async (groupId: string) => {
     setDrawingGroupId(groupId);
     setDrawResult(null);
@@ -143,14 +138,14 @@ export default function SelectionPage() {
         }
       }
 
-      // Refresh draw history and picker
       fetchDrawHistory(groupId);
       fetchNextPicker(groupId);
       setActiveDrawForm(null);
       setFilters({ genre: "", max_pages: "", unread_only: false });
     } catch (err) {
       if (err instanceof ApiError) {
-        const detail = typeof err.detail === "string" ? err.detail : JSON.stringify(err.detail);
+        const detail =
+          typeof err.detail === "string" ? err.detail : JSON.stringify(err.detail);
         if (
           detail.toLowerCase().includes("no matching") ||
           detail.toLowerCase().includes("no books") ||
@@ -164,18 +159,15 @@ export default function SelectionPage() {
     }
   };
 
-  // Format date
-  const formatDate = (dateStr: string) => {
-    return new Date(dateStr).toLocaleDateString("es-ES", {
+  const formatDate = (dateStr: string) =>
+    new Date(dateStr).toLocaleDateString("es-ES", {
       year: "numeric",
       month: "short",
       day: "numeric",
       hour: "2-digit",
       minute: "2-digit",
     });
-  };
 
-  // Format filters for display
   const formatFilters = (drawFilters: Record<string, unknown>) => {
     const parts: string[] = [];
     if (drawFilters.genre) parts.push(`Género: ${drawFilters.genre}`);
@@ -187,26 +179,34 @@ export default function SelectionPage() {
   return (
     <ProtectedRoute>
       <Navigation />
-      <main className="md:ml-64 pb-20 md:pb-0 min-h-screen bg-gray-50">
+      <main
+        className="md:ml-64 pb-20 md:pb-0 min-h-screen"
+        style={{ background: "var(--color-parchment)" }}
+      >
         <div className="max-w-4xl mx-auto px-4 py-8">
-          {/* Header */}
-          <h1 className="text-2xl font-bold text-gray-900 mb-6">
+          <h1
+            className="text-2xl font-bold mb-6"
+            style={{
+              fontFamily: "var(--font-playfair), Georgia, serif",
+              color: "var(--color-walnut)",
+            }}
+          >
             Selección de Lectura
           </h1>
 
-          {/* Loading State */}
           {loadingGroups && <Skeleton variant="card" count={2} />}
 
-          {/* Empty State - No groups */}
           {!loadingGroups && groups.length === 0 && (
-            <div className="rounded-lg border border-gray-200 bg-white p-8 text-center">
-              <p className="text-lg font-medium text-gray-900 mb-2">
+            <div
+              className="rounded-lg p-8 text-center"
+              style={{ background: "var(--color-cream)", border: "1px solid var(--color-border)" }}
+            >
+              <p className="text-base font-medium" style={{ color: "var(--color-walnut)" }}>
                 Únete a un grupo para comenzar a sortear.
               </p>
             </div>
           )}
 
-          {/* Groups with draw functionality */}
           {!loadingGroups && groups.length > 0 && (
             <div className="space-y-6">
               {groups.map((group) => {
@@ -216,26 +216,38 @@ export default function SelectionPage() {
                 return (
                   <section
                     key={group.id}
-                    className="rounded-lg border border-gray-200 bg-white shadow-sm"
+                    className="rounded-lg overflow-hidden"
+                    style={{
+                      background: "var(--color-cream)",
+                      border: "1px solid var(--color-border)",
+                      boxShadow: "0 1px 3px rgba(28,16,8,0.08)",
+                    }}
                   >
                     {/* Group Header */}
-                    <div className="px-5 py-4 border-b border-gray-100">
-                      <h2 className="text-lg font-semibold text-gray-900">
+                    <div
+                      className="px-5 py-4"
+                      style={{ borderBottom: "1px solid var(--color-border)" }}
+                    >
+                      <h2
+                        className="text-lg font-semibold"
+                        style={{
+                          fontFamily: "var(--font-playfair), Georgia, serif",
+                          color: "var(--color-walnut)",
+                        }}
+                      >
                         {group.name}
                       </h2>
 
-                      {/* Next Picker */}
                       {state.loadingPicker ? (
                         <Skeleton variant="text" count={1} />
                       ) : (
-                        <p className="text-sm text-gray-600 mt-1">
+                        <p className="text-sm mt-1" style={{ color: "var(--color-ink-faint)" }}>
                           {state.nextPicker?.next_picker_user_id
                             ? `Próximo turno: ${state.nextPicker.next_picker_user_id}`
                             : "Sin turno asignado"}
                         </p>
                       )}
 
-                      {/* New Draw Button */}
                       <button
                         type="button"
                         onClick={() => {
@@ -244,23 +256,42 @@ export default function SelectionPage() {
                           setNoMatchError(null);
                           setFilters({ genre: "", max_pages: "", unread_only: false });
                         }}
-                        className="mt-3 rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700 transition-colors"
+                        className="mt-3 rounded-full px-4 py-2 text-sm font-medium transition-colors"
+                        style={{ background: "var(--color-brass)", color: "var(--color-cream)" }}
+                        onMouseEnter={(e) =>
+                          ((e.currentTarget as HTMLButtonElement).style.background =
+                            "var(--color-brass-lt)")
+                        }
+                        onMouseLeave={(e) =>
+                          ((e.currentTarget as HTMLButtonElement).style.background =
+                            "var(--color-brass)")
+                        }
                       >
-                        Nuevo sorteo
+                        ✦ Nuevo sorteo
                       </button>
                     </div>
 
                     {/* Draw Form */}
                     {activeDrawForm === group.id && (
-                      <div className="px-5 py-4 border-b border-gray-100 bg-gray-50">
-                        <h3 className="text-sm font-medium text-gray-700 mb-3">
+                      <div
+                        className="px-5 py-4"
+                        style={{
+                          background: "var(--color-parchment)",
+                          borderBottom: "1px solid var(--color-border)",
+                        }}
+                      >
+                        <h3
+                          className="text-sm font-medium mb-3"
+                          style={{ color: "var(--color-ink-soft)" }}
+                        >
                           Filtros (opcionales)
                         </h3>
                         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-4">
                           <div className="flex flex-col gap-1">
                             <label
                               htmlFor={`genre-${group.id}`}
-                              className="text-sm font-medium text-gray-700"
+                              className="text-sm font-medium"
+                              style={{ color: "var(--color-ink-soft)" }}
                             >
                               Género
                             </label>
@@ -272,13 +303,15 @@ export default function SelectionPage() {
                                 setFilters((prev) => ({ ...prev, genre: e.target.value }))
                               }
                               placeholder="Ej: Ficción"
-                              className="rounded-md border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                              className="rounded-md border px-3 py-2 text-sm focus:outline-none"
+                              style={inputStyle}
                             />
                           </div>
                           <div className="flex flex-col gap-1">
                             <label
                               htmlFor={`max-pages-${group.id}`}
-                              className="text-sm font-medium text-gray-700"
+                              className="text-sm font-medium"
+                              style={{ color: "var(--color-ink-soft)" }}
                             >
                               Máx. páginas
                             </label>
@@ -291,7 +324,8 @@ export default function SelectionPage() {
                               }
                               placeholder="Ej: 300"
                               min="1"
-                              className="rounded-md border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                              className="rounded-md border px-3 py-2 text-sm focus:outline-none"
+                              style={inputStyle}
                             />
                           </div>
                           <div className="flex items-end gap-2 pb-1">
@@ -302,11 +336,13 @@ export default function SelectionPage() {
                               onChange={(e) =>
                                 setFilters((prev) => ({ ...prev, unread_only: e.target.checked }))
                               }
-                              className="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                              className="h-4 w-4 rounded"
+                              style={{ accentColor: "var(--color-teak)" }}
                             />
                             <label
                               htmlFor={`unread-${group.id}`}
-                              className="text-sm font-medium text-gray-700"
+                              className="text-sm font-medium"
+                              style={{ color: "var(--color-ink-soft)" }}
                             >
                               Solo no leídos
                             </label>
@@ -317,25 +353,42 @@ export default function SelectionPage() {
                             type="button"
                             onClick={() => handleDraw(group.id)}
                             disabled={drawingGroupId === group.id}
-                            className="rounded-lg bg-green-600 px-4 py-2 text-sm font-medium text-white hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                            className="rounded-full px-4 py-2 text-sm font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                            style={{ background: "var(--color-reading)", color: "var(--color-cream)" }}
                           >
                             {drawingGroupId === group.id ? "Sorteando..." : "Sortear"}
                           </button>
                           <button
                             type="button"
-                            onClick={() => {
-                              setActiveDrawForm(null);
-                              setNoMatchError(null);
+                            onClick={() => { setActiveDrawForm(null); setNoMatchError(null); }}
+                            className="rounded-full px-4 py-2 text-sm font-medium transition-colors"
+                            style={{
+                              border: "1px solid var(--color-border)",
+                              color: "var(--color-ink-soft)",
+                              background: "transparent",
                             }}
-                            className="rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors"
+                            onMouseEnter={(e) =>
+                              ((e.currentTarget as HTMLButtonElement).style.background =
+                                "var(--color-cream)")
+                            }
+                            onMouseLeave={(e) =>
+                              ((e.currentTarget as HTMLButtonElement).style.background =
+                                "transparent")
+                            }
                           >
                             Cancelar
                           </button>
                         </div>
 
-                        {/* No match error */}
                         {noMatchError && (
-                          <p className="mt-3 text-sm text-amber-700 bg-amber-50 border border-amber-200 rounded-md px-3 py-2">
+                          <p
+                            className="mt-3 text-sm rounded-md px-3 py-2"
+                            style={{
+                              color: "var(--color-brass-dark, #8A6620)",
+                              background: "#FDF6E3",
+                              border: "1px solid var(--color-brass)",
+                            }}
+                          >
                             {noMatchError}
                           </p>
                         )}
@@ -344,45 +397,82 @@ export default function SelectionPage() {
 
                     {/* Draw Result */}
                     {drawResult && drawResult.groupId === group.id && (
-                      <div className="px-5 py-4 border-b border-gray-100 bg-green-50">
-                        <p className="text-sm font-medium text-green-800">
-                          Libro seleccionado: {drawResult.book.title} por {drawResult.book.author}
+                      <div
+                        className="px-5 py-4"
+                        style={{
+                          background: "#EDF7F0",
+                          borderBottom: "1px solid var(--color-border)",
+                        }}
+                      >
+                        <p
+                          className="text-sm font-medium"
+                          style={{ color: "var(--color-reading)" }}
+                        >
+                          ✓ Libro seleccionado:{" "}
+                          <span
+                            style={{
+                              fontFamily: "var(--font-playfair), Georgia, serif",
+                              color: "var(--color-walnut)",
+                            }}
+                          >
+                            {drawResult.book.title}
+                          </span>{" "}
+                          por {drawResult.book.author}
                         </p>
                       </div>
                     )}
 
                     {/* Draw History */}
                     <div className="px-5 py-4">
-                      <h3 className="text-sm font-medium text-gray-700 mb-3">
+                      <h3
+                        className="text-sm font-medium mb-3"
+                        style={{ color: "var(--color-ink-soft)" }}
+                      >
                         Historial de sorteos
                       </h3>
                       {state.loadingDraws ? (
                         <Skeleton variant="list" count={3} />
                       ) : state.draws.length === 0 ? (
-                        <p className="text-sm text-gray-500">No hay sorteos previos</p>
+                        <p className="text-sm" style={{ color: "var(--color-ink-faint)" }}>
+                          No hay sorteos previos
+                        </p>
                       ) : (
                         <ul className="space-y-2">
                           {[...state.draws]
                             .sort(
                               (a, b) =>
-                                new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime()
+                                new Date(b.timestamp).getTime() -
+                                new Date(a.timestamp).getTime()
                             )
                             .map((draw) => (
                               <li
                                 key={draw.id}
-                                className="rounded-md border border-gray-100 bg-gray-50 px-4 py-3"
+                                className="rounded-md px-4 py-3"
+                                style={{
+                                  background: "var(--color-parchment)",
+                                  border: "1px solid var(--color-border)",
+                                }}
                               >
                                 <div className="flex items-center justify-between">
-                                  <span className="text-sm text-gray-900">
+                                  <span
+                                    className="text-sm"
+                                    style={{ color: "var(--color-ink)" }}
+                                  >
                                     {formatDate(draw.timestamp)}
                                   </span>
                                   {draw.result_book_id && (
-                                    <span className="text-xs text-gray-500">
+                                    <span
+                                      className="text-xs"
+                                      style={{ color: "var(--color-ink-faint)" }}
+                                    >
                                       Libro: {draw.result_book_id.slice(0, 8)}…
                                     </span>
                                   )}
                                 </div>
-                                <p className="text-xs text-gray-500 mt-1">
+                                <p
+                                  className="text-xs mt-1"
+                                  style={{ color: "var(--color-ink-faint)" }}
+                                >
                                   {formatFilters(draw.filters)}
                                 </p>
                               </li>

@@ -17,7 +17,6 @@ function formatDate(dateStr: string): string {
   // extract just the date part to prevent timezone shift.
   let date: Date;
   if (dateStr.includes("T00:00:00") || dateStr.length === 10) {
-    // Date-only: parse as local (YYYY-MM-DD)
     const parts = dateStr.split("T")[0].split("-");
     date = new Date(Number(parts[0]), Number(parts[1]) - 1, Number(parts[2]));
   } else {
@@ -39,26 +38,49 @@ export function LoanCard({
 }: LoanCardProps) {
   return (
     <article
-      className="rounded-lg border border-gray-200 bg-white p-4 shadow-sm"
+      className="rounded-lg p-4"
+      style={{
+        background: "var(--color-cream)",
+        border: "1px solid var(--color-border)",
+        boxShadow: "0 1px 3px rgba(28, 16, 8, 0.08)",
+      }}
       aria-label={`Préstamo: ${loan.book_title}`}
     >
-      <h3 className="text-base font-bold text-gray-900">{loan.book_title}</h3>
-      <p className="mt-1 text-sm text-gray-600">
-        {isBorrowedView ? "Prestado por:" : "Prestado a:"} {loan.borrower_name}
+      <h3
+        className="text-base font-semibold"
+        style={{
+          fontFamily: "var(--font-playfair), Georgia, serif",
+          color: "var(--color-walnut)",
+        }}
+      >
+        {loan.book_title}
+      </h3>
+      <p className="mt-1 text-sm" style={{ color: "var(--color-ink-soft)" }}>
+        {isBorrowedView ? "Prestado por:" : "Prestado a:"}{" "}
+        <span style={{ color: "var(--color-ink)" }}>{loan.borrower_name}</span>
       </p>
-      <p className="mt-1 text-sm text-gray-500">
-        Fecha de préstamo: {formatDate(loan.loan_date)}
+      <p className="mt-1 text-sm" style={{ color: "var(--color-ink-faint)" }}>
+        Fecha de préstamo:{" "}
+        <span style={{ color: "var(--color-ink-soft)" }}>
+          {formatDate(loan.loan_date)}
+        </span>
       </p>
 
       {variant === "active" && loan.estimated_return_date && (
-        <p className="mt-1 text-sm text-gray-500">
-          Devolución estimada: {formatDate(loan.estimated_return_date)}
+        <p className="mt-1 text-sm" style={{ color: "var(--color-ink-faint)" }}>
+          Devolución estimada:{" "}
+          <span style={{ color: "var(--color-ink-soft)" }}>
+            {formatDate(loan.estimated_return_date)}
+          </span>
         </p>
       )}
 
       {variant === "returned" && loan.returned_date && (
-        <p className="mt-1 text-sm text-gray-500">
-          Devuelto el: {formatDate(loan.returned_date)}
+        <p className="mt-1 text-sm" style={{ color: "var(--color-ink-faint)" }}>
+          Devuelto el:{" "}
+          <span style={{ color: "var(--color-ink-soft)" }}>
+            {formatDate(loan.returned_date)}
+          </span>
         </p>
       )}
 
@@ -67,7 +89,21 @@ export function LoanCard({
           type="button"
           onClick={() => onReturn(loan.id)}
           disabled={isReturning}
-          className="mt-3 rounded-md bg-blue-600 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-1 disabled:cursor-not-allowed disabled:opacity-50"
+          className="mt-3 rounded-md px-4 py-2 text-sm font-medium transition-colors focus:outline-none disabled:cursor-not-allowed disabled:opacity-50"
+          style={{
+            background: "var(--color-walnut)",
+            color: "var(--color-cream)",
+          }}
+          onMouseEnter={(e) => {
+            if (!isReturning)
+              (e.currentTarget as HTMLButtonElement).style.background =
+                "var(--color-mahogany)";
+          }}
+          onMouseLeave={(e) => {
+            if (!isReturning)
+              (e.currentTarget as HTMLButtonElement).style.background =
+                "var(--color-walnut)";
+          }}
         >
           {isReturning ? "Devolviendo..." : "Marcar devuelto"}
         </button>

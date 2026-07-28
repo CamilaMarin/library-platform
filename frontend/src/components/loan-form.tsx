@@ -24,12 +24,10 @@ export function LoanForm({
   const [estimatedReturnDate, setEstimatedReturnDate] = useState("");
   const [submitting, setSubmitting] = useState(false);
 
-  // Minimum date: tomorrow (can't return in the past or today)
   const today = new Date().toISOString().split("T")[0];
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-
     if (!selectedBorrowerId) return;
 
     setSubmitting(true);
@@ -37,7 +35,6 @@ export function LoanForm({
     const payload: CreateLoanRequest = {
       borrower_user_id: selectedBorrowerId,
     };
-
     if (estimatedReturnDate) {
       payload.estimated_return_date = estimatedReturnDate;
     }
@@ -88,7 +85,8 @@ export function LoanForm({
       <div className="flex flex-col gap-1">
         <label
           htmlFor="estimated-return-date"
-          className="text-sm font-medium text-gray-700"
+          className="text-sm font-medium"
+          style={{ color: "var(--color-ink-soft)" }}
         >
           Fecha estimada de devolución
         </label>
@@ -99,7 +97,12 @@ export function LoanForm({
           value={estimatedReturnDate}
           onChange={(e) => setEstimatedReturnDate(e.target.value)}
           min={today}
-          className="rounded-md border border-gray-300 px-3 py-2 text-sm transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500"
+          className="rounded-md border px-3 py-2 text-sm transition-colors focus:outline-none"
+          style={{
+            borderColor: "var(--color-border)",
+            background: "var(--color-cream)",
+            color: "var(--color-ink)",
+          }}
         />
       </div>
 
@@ -107,14 +110,38 @@ export function LoanForm({
         <button
           type="submit"
           disabled={submitting || !selectedBorrowerId}
-          className="rounded-md bg-blue-600 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-50"
+          className="rounded-full px-4 py-2 text-sm font-medium transition-colors disabled:cursor-not-allowed disabled:opacity-50"
+          style={{ background: "var(--color-walnut)", color: "var(--color-cream)" }}
+          onMouseEnter={(e) => {
+            if (!submitting && selectedBorrowerId)
+              (e.currentTarget as HTMLButtonElement).style.background =
+                "var(--color-mahogany)";
+          }}
+          onMouseLeave={(e) => {
+            if (!submitting && selectedBorrowerId)
+              (e.currentTarget as HTMLButtonElement).style.background =
+                "var(--color-walnut)";
+          }}
         >
           {submitting ? "Registrando..." : "Registrar préstamo"}
         </button>
         <button
           type="button"
           onClick={onCancel}
-          className="rounded-md border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-50"
+          className="rounded-full px-4 py-2 text-sm font-medium transition-colors"
+          style={{
+            border: "1px solid var(--color-border)",
+            color: "var(--color-ink-soft)",
+            background: "transparent",
+          }}
+          onMouseEnter={(e) =>
+            ((e.currentTarget as HTMLButtonElement).style.background =
+              "var(--color-parchment)")
+          }
+          onMouseLeave={(e) =>
+            ((e.currentTarget as HTMLButtonElement).style.background =
+              "transparent")
+          }
         >
           Cancelar
         </button>

@@ -9,10 +9,20 @@ import { useToast } from "@/context/toast-context";
 import { apiGet, apiPost } from "@/lib/api-client";
 import type { FamilyGroup, GroupMembership, GroupMember } from "@/types";
 
+// Shared button style helpers
+const btnPrimary: React.CSSProperties = {
+  background: "var(--color-walnut)",
+  color: "var(--color-cream)",
+};
+const btnOutline: React.CSSProperties = {
+  background: "transparent",
+  border: "1px solid var(--color-border)",
+  color: "var(--color-ink-soft)",
+};
+
 export default function GroupsPage() {
   const { showToast } = useToast();
 
-  // State
   const [groups, setGroups] = useState<FamilyGroup[]>([]);
   const [invitations, setInvitations] = useState<GroupMembership[]>([]);
   const [loading, setLoading] = useState(true);
@@ -25,7 +35,6 @@ export default function GroupsPage() {
   const [invitingGroupId, setInvitingGroupId] = useState<string | null>(null);
   const [showInviteForm, setShowInviteForm] = useState<string | null>(null);
 
-  // Fetch groups and invitations
   const fetchGroups = useCallback(async () => {
     setLoading(true);
     try {
@@ -47,31 +56,24 @@ export default function GroupsPage() {
     fetchGroups();
   }, [fetchGroups]);
 
-  // Fetch members for a group
   const fetchMembers = useCallback(async (groupId: string) => {
     try {
-      const data = await apiGet<GroupMember[]>(
-        `/groups/${groupId}/members`
-      );
+      const data = await apiGet<GroupMember[]>(`/groups/${groupId}/members`);
       setMembers((prev) => ({ ...prev, [groupId]: data }));
     } catch {
       setMembers((prev) => ({ ...prev, [groupId]: [] }));
     }
   }, []);
 
-  // Toggle expand group
   const handleToggleGroup = (groupId: string) => {
     if (expandedGroupId === groupId) {
       setExpandedGroupId(null);
     } else {
       setExpandedGroupId(groupId);
-      if (!members[groupId]) {
-        fetchMembers(groupId);
-      }
+      if (!members[groupId]) fetchMembers(groupId);
     }
   };
 
-  // Create group
   const handleCreateGroup = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!newGroupName.trim()) return;
@@ -86,13 +88,12 @@ export default function GroupsPage() {
       setShowCreateForm(false);
       showToast("Grupo creado", "success");
     } catch {
-      // Error handled by api-client toast handler
+      // handled by api-client
     } finally {
       setCreatingGroup(false);
     }
   };
 
-  // Invite member
   const handleInviteMember = async (groupId: string) => {
     const email = inviteEmail[groupId]?.trim();
     if (!email) return;
@@ -104,59 +105,73 @@ export default function GroupsPage() {
       setShowInviteForm(null);
       showToast("Invitación enviada", "success");
     } catch {
-      // Error handled by api-client toast handler
+      // handled by api-client
     } finally {
       setInvitingGroupId(null);
     }
   };
 
-  // Accept invitation
   const handleAcceptInvitation = async (invitation: GroupMembership) => {
     try {
-      await apiPost(`/groups/${invitation.group_id}/invitations/${invitation.id}/accept`);
-      setInvitations((prev) =>
-        prev.filter((inv) => inv.id !== invitation.id)
+      await apiPost(
+        `/groups/${invitation.group_id}/invitations/${invitation.id}/accept`
       );
+      setInvitations((prev) => prev.filter((inv) => inv.id !== invitation.id));
       showToast("Invitación aceptada", "success");
       fetchGroups();
     } catch {
-      // Error handled by api-client toast handler
+      // handled by api-client
     }
   };
 
-  // Decline invitation
   const handleDeclineInvitation = async (invitation: GroupMembership) => {
     try {
       await apiPost(`/groups/invitations/${invitation.id}/decline`);
-      setInvitations((prev) =>
-        prev.filter((inv) => inv.id !== invitation.id)
-      );
+      setInvitations((prev) => prev.filter((inv) => inv.id !== invitation.id));
     } catch {
-      // Error handled by api-client toast handler
+      // handled by api-client
     }
   };
 
-  // Format date
-  const formatDate = (dateStr: string) => {
-    return new Date(dateStr).toLocaleDateString("es-ES", {
+  const formatDate = (dateStr: string) =>
+    new Date(dateStr).toLocaleDateString("es-ES", {
       year: "numeric",
       month: "short",
       day: "numeric",
     });
-  };
 
   return (
     <ProtectedRoute>
       <Navigation />
-      <main className="md:ml-64 pb-20 md:pb-0 min-h-screen bg-gray-50">
+      <main
+        className="md:ml-64 pb-20 md:pb-0 min-h-screen"
+        style={{ background: "var(--color-parchment)" }}
+      >
         <div className="max-w-4xl mx-auto px-4 py-8">
           {/* Header */}
           <div className="flex items-center justify-between mb-6">
-            <h1 className="text-2xl font-bold text-gray-900">Mis Grupos</h1>
+            <h1
+              className="text-2xl font-bold"
+              style={{
+                fontFamily: "var(--font-playfair), Georgia, serif",
+                color: "var(--color-walnut)",
+              }}
+            >
+              Mis Grupos
+            </h1>
             <button
               type="button"
               onClick={() => setShowCreateForm(!showCreateForm)}
-              className="rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700 transition-colors"
+              className="rounded-full px-4 py-2 text-sm font-medium transition-colors"
+              style={btnPrimary}
+              onMouseEnter={(e) =>
+                ((e.currentTarget as HTMLButtonElement).style.background =
+                  "var(--color-mahogany)")
+              }
+              onMouseLeave={(e) =>
+                ((e.currentTarget as HTMLButtonElement).style.background =
+                  "var(--color-walnut)")
+              }
             >
               Crear grupo
             </button>
@@ -166,7 +181,12 @@ export default function GroupsPage() {
           {showCreateForm && (
             <form
               onSubmit={handleCreateGroup}
-              className="mb-6 rounded-lg border border-gray-200 bg-white p-5 shadow-sm"
+              className="mb-6 rounded-lg p-5 space-y-4"
+              style={{
+                background: "var(--color-cream)",
+                border: "1px solid var(--color-border)",
+                boxShadow: "0 1px 3px rgba(28,16,8,0.08)",
+              }}
             >
               <InputField
                 label="Nombre del grupo"
@@ -176,11 +196,22 @@ export default function GroupsPage() {
                 placeholder="Ej: Familia García"
                 required
               />
-              <div className="mt-4 flex gap-3">
+              <div className="flex gap-3">
                 <button
                   type="submit"
                   disabled={creatingGroup || !newGroupName.trim()}
-                  className="rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                  className="rounded-full px-4 py-2 text-sm font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                  style={btnPrimary}
+                  onMouseEnter={(e) => {
+                    if (!creatingGroup)
+                      (e.currentTarget as HTMLButtonElement).style.background =
+                        "var(--color-mahogany)";
+                  }}
+                  onMouseLeave={(e) => {
+                    if (!creatingGroup)
+                      (e.currentTarget as HTMLButtonElement).style.background =
+                        "var(--color-walnut)";
+                  }}
                 >
                   {creatingGroup ? "Creando..." : "Crear"}
                 </button>
@@ -190,7 +221,16 @@ export default function GroupsPage() {
                     setShowCreateForm(false);
                     setNewGroupName("");
                   }}
-                  className="rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors"
+                  className="rounded-full px-4 py-2 text-sm font-medium transition-colors"
+                  style={btnOutline}
+                  onMouseEnter={(e) =>
+                    ((e.currentTarget as HTMLButtonElement).style.background =
+                      "var(--color-parchment)")
+                  }
+                  onMouseLeave={(e) =>
+                    ((e.currentTarget as HTMLButtonElement).style.background =
+                      "transparent")
+                  }
                 >
                   Cancelar
                 </button>
@@ -201,21 +241,38 @@ export default function GroupsPage() {
           {/* Pending Invitations */}
           {!loading && invitations.length > 0 && (
             <section className="mb-8">
-              <h2 className="text-lg font-semibold text-gray-900 mb-3">
+              <h2
+                className="text-base font-semibold mb-3"
+                style={{ color: "var(--color-walnut)" }}
+              >
                 Invitaciones pendientes
               </h2>
               <div className="space-y-3">
                 {invitations.map((invitation) => (
                   <div
                     key={invitation.id}
-                    className="rounded-lg border border-yellow-200 bg-yellow-50 px-5 py-4 shadow-sm"
+                    className="rounded-lg px-5 py-4"
+                    style={{
+                      background: "#FDF6E3",
+                      border: "1px solid var(--color-brass)",
+                      boxShadow: "0 1px 3px rgba(28,16,8,0.06)",
+                    }}
                   >
                     <div className="flex items-center justify-between">
                       <div>
-                        <p className="text-sm font-medium text-gray-900">
-                          Invitación al grupo{invitation.group_name ? `: ${invitation.group_name}` : ""}
+                        <p
+                          className="text-sm font-medium"
+                          style={{ color: "var(--color-walnut)" }}
+                        >
+                          Invitación al grupo
+                          {invitation.group_name
+                            ? `: ${invitation.group_name}`
+                            : ""}
                         </p>
-                        <p className="text-xs text-gray-500 mt-0.5">
+                        <p
+                          className="text-xs mt-0.5"
+                          style={{ color: "var(--color-ink-faint)" }}
+                        >
                           {formatDate(invitation.created_at)}
                         </p>
                       </div>
@@ -223,14 +280,27 @@ export default function GroupsPage() {
                         <button
                           type="button"
                           onClick={() => handleAcceptInvitation(invitation)}
-                          className="rounded-lg bg-green-600 px-3 py-1.5 text-xs font-medium text-white hover:bg-green-700 transition-colors"
+                          className="rounded-full px-3 py-1.5 text-xs font-medium transition-colors"
+                          style={{
+                            background: "var(--color-reading)",
+                            color: "var(--color-cream)",
+                          }}
                         >
                           Aceptar
                         </button>
                         <button
                           type="button"
                           onClick={() => handleDeclineInvitation(invitation)}
-                          className="rounded-lg border border-gray-300 bg-white px-3 py-1.5 text-xs font-medium text-gray-700 hover:bg-gray-50 transition-colors"
+                          className="rounded-full px-3 py-1.5 text-xs font-medium transition-colors"
+                          style={btnOutline}
+                          onMouseEnter={(e) =>
+                            ((e.currentTarget as HTMLButtonElement).style.background =
+                              "var(--color-parchment)")
+                          }
+                          onMouseLeave={(e) =>
+                            ((e.currentTarget as HTMLButtonElement).style.background =
+                              "transparent")
+                          }
                         >
                           Rechazar
                         </button>
@@ -242,16 +312,25 @@ export default function GroupsPage() {
             </section>
           )}
 
-          {/* Loading State */}
+          {/* Loading */}
           {loading && <Skeleton variant="list" count={4} />}
 
-          {/* Empty State */}
+          {/* Empty */}
           {!loading && groups.length === 0 && invitations.length === 0 && (
-            <div className="rounded-lg border border-gray-200 bg-white p-8 text-center">
-              <p className="text-lg font-medium text-gray-900 mb-2">
+            <div
+              className="rounded-lg p-8 text-center"
+              style={{
+                background: "var(--color-cream)",
+                border: "1px solid var(--color-border)",
+              }}
+            >
+              <p
+                className="text-base font-medium mb-2"
+                style={{ color: "var(--color-walnut)" }}
+              >
                 No perteneces a ningún grupo aún.
               </p>
-              <p className="text-sm text-gray-500">
+              <p className="text-sm" style={{ color: "var(--color-ink-faint)" }}>
                 Crea un grupo familiar para compartir tu biblioteca con otros
                 miembros.
               </p>
@@ -264,26 +343,59 @@ export default function GroupsPage() {
               {groups.map((group) => (
                 <div
                   key={group.id}
-                  className="rounded-lg border border-gray-200 bg-white shadow-sm"
+                  className="rounded-lg overflow-hidden"
+                  style={{
+                    background: "var(--color-cream)",
+                    border: "1px solid var(--color-border)",
+                    boxShadow: "0 1px 3px rgba(28,16,8,0.08)",
+                  }}
                 >
                   {/* Group Header */}
                   <button
                     type="button"
                     onClick={() => handleToggleGroup(group.id)}
-                    className="w-full px-5 py-4 flex items-center justify-between text-left hover:bg-gray-50 transition-colors rounded-lg"
+                    className="w-full px-5 py-4 flex items-center justify-between text-left transition-colors"
+                    style={{
+                      background:
+                        expandedGroupId === group.id
+                          ? "var(--color-parchment)"
+                          : "transparent",
+                    }}
+                    onMouseEnter={(e) => {
+                      if (expandedGroupId !== group.id)
+                        (e.currentTarget as HTMLButtonElement).style.background =
+                          "var(--color-parchment)";
+                    }}
+                    onMouseLeave={(e) => {
+                      if (expandedGroupId !== group.id)
+                        (e.currentTarget as HTMLButtonElement).style.background =
+                          "transparent";
+                    }}
                   >
                     <div>
-                      <h3 className="text-base font-semibold text-gray-900">
+                      <h3
+                        className="text-base font-semibold"
+                        style={{ color: "var(--color-walnut)" }}
+                      >
                         {group.name}
                       </h3>
-                      <p className="text-xs text-gray-500 mt-0.5">
+                      <p
+                        className="text-xs mt-0.5"
+                        style={{ color: "var(--color-ink-faint)" }}
+                      >
                         Creado el {formatDate(group.created_at)}
                       </p>
                     </div>
                     <span
-                      className={`text-gray-400 transition-transform ${
-                        expandedGroupId === group.id ? "rotate-180" : ""
-                      }`}
+                      className="transition-transform"
+                      style={{
+                        color: "var(--color-ink-faint)",
+                        transform:
+                          expandedGroupId === group.id
+                            ? "rotate(180deg)"
+                            : "rotate(0deg)",
+                        display: "inline-block",
+                      }}
                       aria-hidden="true"
                     >
                       ▼
@@ -292,16 +404,25 @@ export default function GroupsPage() {
 
                   {/* Expanded Content */}
                   {expandedGroupId === group.id && (
-                    <div className="border-t border-gray-100 px-5 py-4">
+                    <div
+                      className="px-5 py-4"
+                      style={{ borderTop: "1px solid var(--color-border)" }}
+                    >
                       {/* Members List */}
                       <div className="mb-4">
-                        <h4 className="text-sm font-medium text-gray-700 mb-2">
+                        <h4
+                          className="text-sm font-medium mb-2"
+                          style={{ color: "var(--color-ink-soft)" }}
+                        >
                           Miembros
                         </h4>
                         {!members[group.id] ? (
                           <Skeleton variant="text" count={2} />
                         ) : members[group.id].length === 0 ? (
-                          <p className="text-sm text-gray-500">
+                          <p
+                            className="text-sm"
+                            style={{ color: "var(--color-ink-faint)" }}
+                          >
                             Sin miembros adicionales.
                           </p>
                         ) : (
@@ -309,10 +430,12 @@ export default function GroupsPage() {
                             {members[group.id].map((member) => (
                               <li
                                 key={member.user_id}
-                                className="flex items-center gap-2 text-sm text-gray-700"
+                                className="flex items-center gap-2 text-sm"
+                                style={{ color: "var(--color-ink-soft)" }}
                               >
                                 <span
-                                  className="inline-block h-2 w-2 rounded-full bg-green-500"
+                                  className="inline-block h-2 w-2 rounded-full"
+                                  style={{ background: "var(--color-reading)" }}
                                 />
                                 <span>{member.name}</span>
                               </li>
@@ -346,7 +469,18 @@ export default function GroupsPage() {
                               invitingGroupId === group.id ||
                               !inviteEmail[group.id]?.trim()
                             }
-                            className="rounded-lg bg-blue-600 px-3 py-2 text-sm font-medium text-white hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                            className="rounded-full px-3 py-2 text-sm font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                            style={btnPrimary}
+                            onMouseEnter={(e) => {
+                              if (invitingGroupId !== group.id)
+                                (e.currentTarget as HTMLButtonElement).style.background =
+                                  "var(--color-mahogany)";
+                            }}
+                            onMouseLeave={(e) => {
+                              if (invitingGroupId !== group.id)
+                                (e.currentTarget as HTMLButtonElement).style.background =
+                                  "var(--color-walnut)";
+                            }}
                           >
                             {invitingGroupId === group.id
                               ? "Enviando..."
@@ -355,7 +489,16 @@ export default function GroupsPage() {
                           <button
                             type="button"
                             onClick={() => setShowInviteForm(null)}
-                            className="rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors"
+                            className="rounded-full px-3 py-2 text-sm font-medium transition-colors"
+                            style={btnOutline}
+                            onMouseEnter={(e) =>
+                              ((e.currentTarget as HTMLButtonElement).style.background =
+                                "var(--color-parchment)")
+                            }
+                            onMouseLeave={(e) =>
+                              ((e.currentTarget as HTMLButtonElement).style.background =
+                                "transparent")
+                            }
                           >
                             Cancelar
                           </button>
@@ -364,9 +507,18 @@ export default function GroupsPage() {
                         <button
                           type="button"
                           onClick={() => setShowInviteForm(group.id)}
-                          className="text-sm font-medium text-blue-600 hover:text-blue-700 transition-colors"
+                          className="text-sm font-medium transition-colors"
+                          style={{ color: "var(--color-teak)" }}
+                          onMouseEnter={(e) =>
+                            ((e.currentTarget as HTMLButtonElement).style.color =
+                              "var(--color-mahogany)")
+                          }
+                          onMouseLeave={(e) =>
+                            ((e.currentTarget as HTMLButtonElement).style.color =
+                              "var(--color-teak)")
+                          }
                         >
-                          Invitar miembro
+                          + Invitar miembro
                         </button>
                       )}
                     </div>

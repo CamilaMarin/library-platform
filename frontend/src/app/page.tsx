@@ -19,8 +19,17 @@ export default function Home() {
   }, [isAuthenticated, isLoading, router]);
 
   return (
-    <main className="flex min-h-screen items-center justify-center">
-      <div className="h-8 w-8 animate-spin rounded-full border-4 border-gray-300 border-t-blue-600" />
+    <main
+      className="flex min-h-screen items-center justify-center"
+      style={{ background: "var(--color-parchment)" }}
+    >
+      <div
+        className="h-8 w-8 animate-spin rounded-full border-4"
+        style={{
+          borderColor: "var(--color-aged)",
+          borderTopColor: "var(--color-teak)",
+        }}
+      />
     </main>
   );
 }

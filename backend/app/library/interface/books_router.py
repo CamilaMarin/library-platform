@@ -14,23 +14,73 @@ from app.library.application.create_book import CreateBook
 from app.library.application.create_book import CreateBookRequest as CreateBookInput
 from app.library.application.delete_book import BookHasCopiesError, DeleteBook
 from app.library.application.edit_book import EditBook, EditBookRequest
+from app.library.application.get_reading_statuses import GetReadingStatuses
 from app.library.application.search_books import SearchBooks
-from app.library.infrastructure.repositories import SqlBookRepository, SqlCopyRepository
-from app.library.interface.schemas import BookResponse, CreateBookRequest, UpdateBookRequest
+from app.library.application.set_reading_status import SetReadingStatus, SetReadingStatusRequest
+from app.library.infrastructure.repositories import (
+    SqlBookRepository,
+    SqlCopyRepository,
+    SqlReadingStatusRepository,
+)
+from app.library.interface.schemas import (
+    BookResponse,
+    CreateBookRequest,
+    ReadingStatusResponse,
+    UpdateBookRequest,
+)
+from app.library.interface.schemas import (
+    SetReadingStatusRequest as SetReadingStatusSchema,
+)
 
-router = APIRouter(prefix="/books", tags=["books"])
+router = APIRouter(prefix="/books", tags=["books"], redirect_slashes=False)
+
+
+# ── Reading Status endpoints — MUST be declared before /{book_id} routes ─────
+# FastAPI matches routes in declaration order. /statuses would be captured by
+# /{book_id} as a UUID if declared after it, causing 422 (ADR pattern).
+
+@router.get("/statuses", response_model=list[ReadingStatusResponse])
+def get_reading_statuses(
+    user_id: UUID = Depends(get_current_user_id),
+    db: Session = Depends(get_db),
+):
+    """Return all (book_id, status) pairs for the authenticated user.
+
+    Property 3: only returns records where user_id == caller (never another user's).
+    """
+    repo = SqlReadingStatusRepository(db)
+    use_case = GetReadingStatuses(reading_status_repository=repo)
+    records = use_case.execute(user_id=user_id)
+    return [
+        ReadingStatusResponse(
+            book_id=r.book_id,
+            status=r.status,
+            updated_at=r.updated_at,
+        )
+        for r in records
+    ]
 
 
 @router.post("/", response_model=BookResponse, status_code=status.HTTP_201_CREATED)
 def create_book(
     request: CreateBookRequest,
-    user_id: str = Depends(get_current_user_id),
+    user_id: UUID = Depends(get_current_user_id),
     db: Session = Depends(get_db),
 ):
-    """Create a new book (metadata only, no copy). Requires authentication."""
+    """Create a new book (metadata only, no copy). Requires authentication.
+
+    If initial_copy_format is None or 'none', creates the book without a copy
+    and automatically sets reading status to 'want_to_read' so it appears
+    in the library shelf view.
+    """
     repo = SqlBookRepository(db)
     copy_repo = SqlCopyRepository(db)
     use_case = CreateBook(book_repository=repo, copy_repository=copy_repo)
+
+    # Treat explicit "none" the same as no copy
+    copy_format = request.initial_copy_format
+    if copy_format == "none":
+        copy_format = None
 
     book = use_case.execute(
         request=CreateBookInput(
@@ -40,10 +90,25 @@ def create_book(
             description=request.description,
             pages=request.pages,
             isbn=request.isbn,
-            initial_copy_format=request.initial_copy_format,
+            initial_copy_format=copy_format,
         ),
         user_id=user_id,
     )
+
+    # If created without a copy, auto-tag as want_to_read so it appears in library
+    if not copy_format:
+        from app.library.domain.entities import ReadingStatusValue
+        status_repo = SqlReadingStatusRepository(db)
+        SetReadingStatus(
+            reading_status_repository=status_repo,
+            book_repository=repo,
+        ).execute(
+            SetReadingStatusRequest(
+                user_id=user_id,
+                book_id=book.id,
+                status=ReadingStatusValue.WANT_TO_READ,
+            )
+        )
 
     db.commit()
 
@@ -69,8 +134,8 @@ def search_books(
     repo = SqlBookRepository(db)
 
     if not query.strip():
-        # No query — list all user's books (that have copies)
-        books = repo.find_by_user_copies(user_id)
+        # No query — list all user's books (copies + reading-status tagged)
+        books = repo.find_by_user_books(user_id)
     else:
         # Search with query term
         use_case = SearchBooks(book_repository=repo)
@@ -172,4 +237,60 @@ def delete_book(
     except BookHasCopiesError as e:
         raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail=str(e))
 
+    db.commit()
+
+
+# ── Reading Status endpoints (PUT / DELETE) ───────────────────────────────────
+
+
+@router.put("/{book_id}/status", response_model=ReadingStatusResponse)
+def set_reading_status(
+    book_id: UUID,
+    request: SetReadingStatusSchema,
+    user_id: UUID = Depends(get_current_user_id),
+    db: Session = Depends(get_db),
+):
+    """Upsert reading status for a book.
+
+    Accepts: want_to_read | reading | read | dnf
+    Property 2: only affects the record for the authenticated user.
+    """
+    book_repo = SqlBookRepository(db)
+    status_repo = SqlReadingStatusRepository(db)
+    use_case = SetReadingStatus(
+        reading_status_repository=status_repo,
+        book_repository=book_repo,
+    )
+
+    try:
+        record = use_case.execute(
+            SetReadingStatusRequest(
+                user_id=user_id,
+                book_id=book_id,
+                status=request.status,
+            )
+        )
+    except ValueError as e:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(e))
+
+    db.commit()
+    return ReadingStatusResponse(
+        book_id=record.book_id,
+        status=record.status,
+        updated_at=record.updated_at,
+    )
+
+
+@router.delete("/{book_id}/status", status_code=status.HTTP_204_NO_CONTENT)
+def delete_reading_status(
+    book_id: UUID,
+    user_id: UUID = Depends(get_current_user_id),
+    db: Session = Depends(get_db),
+):
+    """Remove reading status for a book. Idempotent — 204 even if not set.
+
+    Property 2: only deletes the record for the authenticated user.
+    """
+    repo = SqlReadingStatusRepository(db)
+    repo.delete(user_id=user_id, book_id=book_id)
     db.commit()

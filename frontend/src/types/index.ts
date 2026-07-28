@@ -181,3 +181,30 @@ export interface ApiError {
   status: number;
   detail: string | Record<string, string>;
 }
+
+// === Reading Status ===
+export type ReadingStatusValue = "want_to_read" | "reading" | "read" | "dnf";
+
+export interface BookReadingStatus {
+  book_id: string;
+  status: ReadingStatusValue;
+  updated_at: string;
+}
+
+/** Map of book_id → status for O(1) lookup in shelf view */
+export type StatusMap = Record<string, ReadingStatusValue>;
+
+export const READING_STATUS_LABELS: Record<ReadingStatusValue, string> = {
+  reading:      "Leyendo ahora",
+  want_to_read: "Quiero leer",
+  read:         "Leídos",
+  dnf:          "No terminados",
+};
+
+/** Ordered list of statuses for shelf rendering */
+export const SHELF_ORDER: ReadingStatusValue[] = [
+  "reading",
+  "want_to_read",
+  "read",
+  "dnf",
+];

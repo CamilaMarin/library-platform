@@ -17,9 +17,9 @@ A web platform for managing personal libraries (physical and digital) and foster
 | M6.5 Frontend Catchup | ✅ Complete |
 | M7 Loans | ✅ Complete |
 | M8 Privacy Panel | ✅ Complete |
-| M9 Release Candidate | Next |
+| M9 Release Candidate | In progress |
 
-**11/12 milestones complete** · Architecture frozen · 17 ADRs · 9 specs
+**11/12 milestones complete** · Architecture frozen · 17 ADRs · 10 specs
 
 ## Quick Start
 
@@ -27,8 +27,8 @@ A web platform for managing personal libraries (physical and digital) and foster
 docker compose up -d   # Start PostgreSQL + MinIO
 cd backend
 pip install -e ".[dev]"
-alembic upgrade head   # Run migrations
-uvicorn app.main:app --host 0.0.0.0 --port 8000  # Start backend
+alembic upgrade head   # Run migrations (currently at 0011)
+uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
 
 cd frontend
 npm install
@@ -47,15 +47,17 @@ make down      # Stop all services
 
 - **Authentication:** JWT (Access + Refresh tokens), registration with consent gating, token rotation/revocation
 - **Groups:** Family groups with invitation-based membership
-- **Library:** Books + Copies (physical/digital), file upload with per-user isolation, search
+- **Library:** Books + Copies (physical/digital), file upload with per-user isolation, search. Books can be created without copies (tagged as "want to read" automatically)
+- **Reading Status:** Personal reading status per book (`want_to_read · reading · read · dnf`). One status per user/book pair — independent of copy count
+- **Shelf View:** Library toggles between list view and bookshelf view. Shelf groups books by status as vertical spines on teak shelves. Preference persisted in `localStorage`
 - **Reading Selection:** Filtered random draw + pick-by-turn with availability validation
 - **Clubs:** Book clubs with active book, reading turns (ownership validated), spoiler-safe comments
 - **Reviews:** Book reviews with explicit visibility control (private or shared with group/club), access-controlled listing, ARCO privacy integration
 - **Privacy Foundation:** DataConsent, AuditLog (high-value operations), configurable RetentionPolicy
 - **Privacy Panel (M8):** Full ARCO rights (export, rectify, delete, oppose), configurable retention job, field-level encryption infrastructure, data purge on account deletion, breach notification playbook
-- **Frontend (M6.5):** Complete Next.js UI covering all backend features — login/register, dashboard, library management, groups, reading selection, clubs with comments, reviews with privacy-first visibility, settings with ARCO export and account deletion
-- **Loans Frontend (M7):** Loans page with active/returned tabs, library integration with copy status badges and "Prestar" action, inline loan form with group member selection
-- **M9 Integration Fixes:** Clubs REST API (8 endpoints), borrowed books view, shared reviews feed, multi-group support for clubs and loans, past-date validation on loans
+- **Visual Identity:** "Sala de lectura" design system — Walnut/Brass/Parchment palette, Playfair Display + Inter typography, CSS custom properties throughout
+- **Frontend:** Complete Next.js UI — login/register, dashboard, library with shelf/list toggle, groups, reading selection, clubs, reviews, loans, settings (ARCO), privacy policy
+- **Loans:** Loans page with active/returned tabs, library integration with copy status badges and inline loan form
 
 ## Architecture
 
@@ -84,12 +86,18 @@ Key decisions: [17 ADRs](docs/adr/) · Cloud agnostic · Ley 21.719 compliance f
 backend/           FastAPI + SQLAlchemy + Alembic
   app/
     identity/      Authentication, users, groups
-    library/       Books, copies, file storage
+    library/       Books, copies, reading status, file storage
     community/     Clubs, reading turns, comments
     reviews/       Book reviews with visibility control
     reading_selection/  Draw, pick-by-turn
+    circulation/   Loans
     auth/          JWT utilities
 frontend/          Next.js + React + TypeScript + Tailwind
+  src/
+    app/           Pages (library, loans, reviews, groups, clubs, settings…)
+    components/    Shared components (BookSpine, BookShelf, Navigation…)
+    lib/           API client, token storage
+    types/         TypeScript contracts
 docs/              Project documentation
 .kiro/             Specifications + steering rules
 ```
@@ -103,7 +111,7 @@ See `docs/ai/DEVELOPMENT_WORKFLOW.md` for contribution workflow.
 ## Tech Stack
 
 - **Backend:** FastAPI, SQLAlchemy, Alembic, PyJWT, bcrypt
-- **Frontend:** Next.js 16, React 19, TypeScript, Tailwind
+- **Frontend:** Next.js 16, React 19, TypeScript, Tailwind, Lucide icons
 - **Database:** PostgreSQL 16
 - **Storage:** MinIO (S3-compatible, per-user isolation)
 - **CI:** GitHub Actions (Ruff + Pytest + ESLint)

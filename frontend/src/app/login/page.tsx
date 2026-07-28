@@ -7,14 +7,10 @@ import { useAuth } from "@/context/auth-context";
 import { InputField } from "@/components/input-field";
 import { ApiError } from "@/lib/api-client";
 
-// === Error message mapping (Spanish) ===
-
 const ERROR_MESSAGES: Record<string, string> = {
   invalid_credentials: "Email o contraseña incorrectos.",
   email_already_exists: "Este email ya está registrado.",
 };
-
-// === Simple email regex ===
 
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
@@ -23,7 +19,6 @@ export default function LoginPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
 
-  // Form state
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [errors, setErrors] = useState<Record<string, string>>({});
@@ -58,16 +53,14 @@ export default function LoginPage() {
 
     try {
       await login(email.trim(), password);
-
-      // On success: redirect to intended destination or dashboard
       const redirect = searchParams.get("redirect") || "/dashboard";
       router.push(redirect);
     } catch (err) {
       if (err instanceof ApiError) {
-        // Backend returns {detail: "error_code"} — extract the detail string
-        const detail = typeof err.detail === "object" && err.detail !== null
-          ? (err.detail as Record<string, string>).detail ?? JSON.stringify(err.detail)
-          : String(err.detail);
+        const detail =
+          typeof err.detail === "object" && err.detail !== null
+            ? (err.detail as Record<string, string>).detail ?? JSON.stringify(err.detail)
+            : String(err.detail);
         const message = ERROR_MESSAGES[detail] ?? detail;
         setFormError(message);
       } else {
@@ -79,23 +72,55 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-gray-50 px-4">
-      <div className="w-full max-w-md rounded-lg bg-white p-8 shadow-md">
-        {/* Logo / App name */}
-        <div className="mb-6 text-center">
-          <h1 className="text-3xl font-bold text-blue-700">EntreLíneas</h1>
+    <div
+      className="flex min-h-screen items-center justify-center px-4"
+      style={{ background: "var(--color-parchment)" }}
+    >
+      <div
+        className="w-full max-w-md rounded-xl p-8"
+        style={{
+          background: "var(--color-cream)",
+          border: "1px solid var(--color-border)",
+          boxShadow: "0 4px 24px -4px rgba(28, 16, 8, 0.14)",
+        }}
+      >
+        {/* Logo */}
+        <div className="mb-8 text-center">
+          <h1
+            className="text-3xl font-bold tracking-tight"
+            style={{
+              fontFamily: "var(--font-playfair), Georgia, serif",
+              color: "var(--color-walnut)",
+            }}
+          >
+            EntreLíneas
+          </h1>
+          <p
+            className="mt-1 text-[11px] tracking-widest uppercase"
+            style={{ color: "var(--color-brass)" }}
+          >
+            biblioteca familiar
+          </p>
         </div>
 
         {/* Heading */}
-        <h2 className="mb-6 text-center text-xl font-semibold text-gray-800">
+        <h2
+          className="mb-6 text-center text-lg font-semibold"
+          style={{ color: "var(--color-walnut)" }}
+        >
           Iniciar sesión
         </h2>
 
-        {/* Form-level error banner */}
+        {/* Form-level error */}
         {formError && (
           <div
-            className="mb-4 rounded-md bg-red-50 border border-red-200 px-4 py-3 text-sm text-red-700"
+            className="mb-4 rounded-md px-4 py-3 text-sm"
             role="alert"
+            style={{
+              background: "#FAF0E8",
+              border: "1px solid var(--color-leather)",
+              color: "var(--color-leather)",
+            }}
           >
             {formError}
           </div>
@@ -129,18 +154,43 @@ export default function LoginPage() {
           <button
             type="submit"
             disabled={isSubmitting}
-            className="mt-2 w-full rounded-md bg-blue-600 px-4 py-2.5 text-sm font-medium text-white transition-colors hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-60"
+            className="mt-2 w-full rounded-full px-4 py-2.5 text-sm font-medium transition-colors focus:outline-none disabled:cursor-not-allowed disabled:opacity-60"
+            style={{
+              background: "var(--color-walnut)",
+              color: "var(--color-cream)",
+            }}
+            onMouseEnter={(e) => {
+              if (!isSubmitting)
+                (e.currentTarget as HTMLButtonElement).style.background =
+                  "var(--color-mahogany)";
+            }}
+            onMouseLeave={(e) => {
+              if (!isSubmitting)
+                (e.currentTarget as HTMLButtonElement).style.background =
+                  "var(--color-walnut)";
+            }}
           >
             {isSubmitting ? "Entrando..." : "Entrar"}
           </button>
         </form>
 
-        {/* Register link */}
-        <p className="mt-6 text-center text-sm text-gray-600">
+        <p
+          className="mt-6 text-center text-sm"
+          style={{ color: "var(--color-ink-faint)" }}
+        >
           ¿No tienes cuenta?{" "}
           <Link
             href="/register"
-            className="font-medium text-blue-600 hover:text-blue-700 hover:underline"
+            className="font-medium transition-colors"
+            style={{ color: "var(--color-teak)" }}
+            onMouseEnter={(e) =>
+              ((e.currentTarget as HTMLAnchorElement).style.color =
+                "var(--color-mahogany)")
+            }
+            onMouseLeave={(e) =>
+              ((e.currentTarget as HTMLAnchorElement).style.color =
+                "var(--color-teak)")
+            }
           >
             Regístrate
           </Link>

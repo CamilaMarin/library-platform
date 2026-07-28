@@ -1,6 +1,6 @@
 # Implementation Status — EntreLíneas
 
-Last updated: 2025-07-27
+Last updated: 2025-07-28 (Reading Status + Shelf View)
 
 ## Overall Progress
 
@@ -38,13 +38,21 @@ Last updated: 2025-07-27
 - **Open issues:** None
 - **Blocking issues:** None
 
-### Library (Books, Copies, Search)
+### Library (Books, Copies, Search, Reading Status)
 - **Status:** Complete
-- **Milestone:** M3
-- **Spec:** `.kiro/specs/library/`
-- **Completed tasks:** 6/7 (task 5 Import deferred to v1)
-- **Remaining tasks:** 0 (task 5 deferred)
+- **Milestone:** M3 + M9 (Reading Status)
+- **Spec:** `.kiro/specs/library/`, `.kiro/specs/reading-status/`
+- **Completed tasks:** 6/7 (task 5 Import deferred to v1) + 9/9 Reading Status tasks
+- **Remaining tasks:** 0
 - **Test coverage:** 26 tests (11 domain + 15 integration)
+- **Reading Status additions:**
+  - `ReadingStatus` entity + `ReadingStatusValue` enum in domain
+  - `reading_statuses` table (migration 0011) with `UNIQUE(user_id, book_id)`, ON DELETE CASCADE
+  - `SqlReadingStatusRepository` with PostgreSQL upsert
+  - `SetReadingStatus` + `GetReadingStatuses` use cases
+  - `GET /books/statuses`, `PUT /books/{id}/status`, `DELETE /books/{id}/status` endpoints
+  - Books can be created without copies (auto-tagged `want_to_read`)
+  - `GET /books` returns books with copies OR books with reading status (UNION query)
 - **Open issues:** None
 - **Blocking issues:** None
 
@@ -109,15 +117,28 @@ Last updated: 2025-07-27
   - Club Detail (`/clubs/[id]`) — active book, comments with spoiler toggle, members
   - Reviews (`/reviews`) — create/edit/delete, star rating, privacy-first visibility
   - Settings (`/settings`) — ARCO data export, account deletion with email confirmation
+  - Privacy (`/privacy`) — Ley 21.719 policy page
 - **Infrastructure:**
   - API client (Bearer token, 401 refresh/retry, error propagation, toast integration)
   - Token storage (localStorage, JWT decode)
   - Auth context (login, register, logout, session persistence)
   - Toast system (auto-dismiss, stacked, responsive)
   - ProtectedRoute (redirect preservation)
-  - Navigation (desktop sidebar + mobile bottom bar)
-  - Shared components (InputField, SelectField, StarRating, ConfirmDialog, Skeleton)
+  - Navigation (desktop sidebar + mobile bottom bar — 5 items on mobile)
+  - Shared components (InputField, SelectField, StarRating, ConfirmDialog, Skeleton, LoanCard, LoanForm, CopyStatusBadge)
   - Testing infra (Vitest, React Testing Library, MSW, fast-check)
+- **Visual identity (sala de lectura):**
+  - Design tokens: walnut/mahogany/teak/brass/parchment/cream/ink/reading/leather
+  - Typography: Playfair Display (editorial) + Inter (UI)
+  - All pages and components migrated — zero gray/blue Tailwind tokens remaining
+  - Lucide icons used throughout (no emojis in UI chrome)
+- **Reading Status + Shelf View:**
+  - Toggle list ↔ shelf view in library page (preference in localStorage)
+  - Shelf view: books grouped by status in labeled horizontal shelves
+  - `BookSpine` component with status color palette and interactive status popover
+  - `BookShelf` component with teak table line and drag-to-scroll
+  - Inline status selector in list view
+  - Books creatable without copies (appear in "Quiero leer" shelf immediately)
 - **Open issues:** None
 - **Blocking issues:** None
 
