@@ -7,7 +7,7 @@ Reference: ADR-0017 (cloud agnostic — all dependencies behind abstractions)
 from typing import Protocol
 from uuid import UUID
 
-from app.library.domain.entities import Book, Copy
+from app.library.domain.entities import Book, Copy, ReadingStatus
 
 
 class BookRepository(Protocol):
@@ -66,3 +66,20 @@ class FileStorage(Protocol):
     def delete(self, file_ref: str) -> None:
         """Delete a file by its reference."""
         ...
+
+
+class ReadingStatusRepository(Protocol):
+    """Persistence interface for ReadingStatus.
+
+    Reference: .kiro/specs/reading-status/design.md — Property 1, 2, 3
+    """
+
+    def upsert(self, reading_status: ReadingStatus) -> ReadingStatus: ...
+
+    def find_by_user(self, user_id: UUID) -> list[ReadingStatus]: ...
+
+    def find_by_user_and_book(
+        self, user_id: UUID, book_id: UUID
+    ) -> ReadingStatus | None: ...
+
+    def delete(self, user_id: UUID, book_id: UUID) -> None: ...

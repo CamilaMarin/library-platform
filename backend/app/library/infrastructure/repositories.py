@@ -7,10 +7,11 @@ Reference: ADR-0017
 from uuid import UUID
 
 from sqlalchemy import or_
+from sqlalchemy.dialects.postgresql import insert as pg_insert
 from sqlalchemy.orm import Session
 
-from app.library.domain.entities import Book, Copy, CopyStatus, CopyType
-from app.library.infrastructure.models import BookModel, CopyModel
+from app.library.domain.entities import Book, Copy, CopyStatus, CopyType, ReadingStatus, ReadingStatusValue
+from app.library.infrastructure.models import BookModel, CopyModel, ReadingStatusModel
 
 
 class SqlBookRepository:
@@ -40,8 +41,46 @@ class SqlBookRepository:
             return None
         return self._to_domain(model)
 
+    def find_by_user_books(self, user_id: UUID) -> list[Book]:
+        """Find all books the user has access to: books with copies OR books
+        the user has tagged with a reading status (e.g. want_to_read without
+        owning a copy yet).
+
+        This is the primary query for the library page.
+        """
+        from app.library.infrastructure.models import ReadingStatusModel
+
+        # Books via copies
+        copy_book_ids = (
+            self._session.query(CopyModel.book_id)
+            .filter(CopyModel.user_id == user_id)
+            .subquery()
+        )
+        # Books via reading status (no copy required)
+        status_book_ids = (
+            self._session.query(ReadingStatusModel.book_id)
+            .filter(ReadingStatusModel.user_id == user_id)
+            .subquery()
+        )
+
+        from sqlalchemy import union
+        combined = union(
+            self._session.query(CopyModel.book_id).filter(CopyModel.user_id == user_id),
+            self._session.query(ReadingStatusModel.book_id).filter(ReadingStatusModel.user_id == user_id),
+        ).subquery()
+
+        models = (
+            self._session.query(BookModel)
+            .filter(BookModel.id.in_(self._session.query(combined)))
+            .order_by(BookModel.created_at.desc())
+            .all()
+        )
+        return [self._to_domain(m) for m in models]
+
     def find_by_user_copies(self, user_id: UUID) -> list[Book]:
-        """Find all books that the user owns a copy of."""
+        """Find all books that the user owns a copy of.
+        Kept for backward compatibility (draw availability checks).
+        """
         models = (
             self._session.query(BookModel)
             .join(CopyModel, CopyModel.book_id == BookModel.id)
@@ -194,4 +233,75 @@ class SqlCopyRepository:
             file_ref=model.file_ref,
             status=CopyStatus(model.status),
             created_at=model.created_at,
+        )
+
+
+class SqlReadingStatusRepository:
+    """SQLAlchemy implementation of ReadingStatusRepository.
+
+    Uses PostgreSQL INSERT ... ON CONFLICT DO UPDATE (upsert) to enforce
+    the UNIQUE(user_id, book_id) constraint cleanly (Property 1).
+    """
+
+    def __init__(self, session: Session):
+        self._session = session
+
+    def upsert(self, reading_status: ReadingStatus) -> ReadingStatus:
+        """Insert or update the status for a (user_id, book_id) pair."""
+        stmt = (
+            pg_insert(ReadingStatusModel)
+            .values(
+                id=reading_status.id,
+                user_id=reading_status.user_id,
+                book_id=reading_status.book_id,
+                status=reading_status.status.value,
+                updated_at=reading_status.updated_at,
+            )
+            .on_conflict_do_update(
+                constraint="uq_reading_status_user_book",
+                set_={
+                    "status": reading_status.status.value,
+                    "updated_at": reading_status.updated_at,
+                },
+            )
+        )
+        self._session.execute(stmt)
+        self._session.flush()
+        return reading_status
+
+    def find_by_user(self, user_id: UUID) -> list[ReadingStatus]:
+        """Return all reading statuses for a user (Property 3 — user-scoped)."""
+        models = (
+            self._session.query(ReadingStatusModel)
+            .filter(ReadingStatusModel.user_id == user_id)
+            .all()
+        )
+        return [self._to_domain(m) for m in models]
+
+    def find_by_user_and_book(self, user_id: UUID, book_id: UUID) -> ReadingStatus | None:
+        model = (
+            self._session.query(ReadingStatusModel)
+            .filter(
+                ReadingStatusModel.user_id == user_id,
+                ReadingStatusModel.book_id == book_id,
+            )
+            .first()
+        )
+        return self._to_domain(model) if model else None
+
+    def delete(self, user_id: UUID, book_id: UUID) -> None:
+        """Remove status. Idempotent — no error if not found (Req 1.4)."""
+        self._session.query(ReadingStatusModel).filter(
+            ReadingStatusModel.user_id == user_id,
+            ReadingStatusModel.book_id == book_id,
+        ).delete(synchronize_session=False)
+        self._session.flush()
+
+    def _to_domain(self, model: ReadingStatusModel) -> ReadingStatus:
+        return ReadingStatus(
+            id=model.id,
+            user_id=model.user_id,
+            book_id=model.book_id,
+            status=ReadingStatusValue(model.status),
+            updated_at=model.updated_at,
         )

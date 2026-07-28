@@ -184,6 +184,14 @@ export async function apiPatch<T>(path: string, body?: unknown): Promise<T> {
   });
 }
 
+export async function apiPut<T>(path: string, body?: unknown): Promise<T> {
+  return request<T>(path, {
+    method: "PUT",
+    headers: { "Content-Type": "application/json" },
+    body: body !== undefined ? JSON.stringify(body) : undefined,
+  });
+}
+
 export async function apiDelete(path: string): Promise<void> {
   return request<void>(path, {
     method: "DELETE",

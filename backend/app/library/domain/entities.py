@@ -28,6 +28,19 @@ class CopyStatus(str, Enum):
     ON_LOAN = "on_loan"
 
 
+class ReadingStatusValue(str, Enum):
+    """Personal reading status a user assigns to a book.
+
+    Belongs to the (user, book) pair — independent of copy count.
+    Reference: .kiro/specs/reading-status/design.md
+    """
+
+    WANT_TO_READ = "want_to_read"
+    READING = "reading"
+    READ = "read"
+    DNF = "dnf"
+
+
 @dataclass
 class Book:
     """Catalog entity representing an intellectual work.
@@ -78,3 +91,21 @@ class Copy:
             raise ValueError("Physical copy cannot have a file_ref")
         if self.type == CopyType.DIGITAL and not self.file_ref:
             raise ValueError("Digital copy requires a file_ref")
+
+
+@dataclass
+class ReadingStatus:
+    """Personal reading status for a (user, book) pair.
+
+    Key invariant: at most one record per (user_id, book_id) — enforced at DB level
+    via UNIQUE constraint. See Property 1 in spec.
+
+    This entity belongs to the Library bounded context.
+    Privacy: included in ARCO export; deleted via ON DELETE CASCADE on user_id.
+    """
+
+    user_id: UUID
+    book_id: UUID
+    status: ReadingStatusValue
+    id: UUID = field(default_factory=uuid4)
+    updated_at: datetime = field(default_factory=_utcnow)

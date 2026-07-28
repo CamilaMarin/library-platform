@@ -5,7 +5,7 @@ from uuid import UUID
 
 from pydantic import BaseModel, Field
 
-from app.library.domain.entities import Copy
+from app.library.domain.entities import Copy, ReadingStatusValue
 
 
 class CreateBookRequest(BaseModel):
@@ -71,3 +71,19 @@ class CopyResponse(BaseModel):
             status=copy.status.value,
             created_at=copy.created_at,
         )
+
+
+class SetReadingStatusRequest(BaseModel):
+    """Request body for PUT /books/{book_id}/status."""
+
+    status: ReadingStatusValue
+
+
+class ReadingStatusResponse(BaseModel):
+    """Response item for GET /books/statuses."""
+
+    book_id: UUID
+    status: ReadingStatusValue
+    updated_at: datetime
+
+    model_config = {"from_attributes": True}
