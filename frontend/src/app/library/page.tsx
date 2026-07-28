@@ -7,9 +7,8 @@ import { Navigation } from "@/components/navigation";
 import { Skeleton } from "@/components/skeleton";
 import { InputField } from "@/components/input-field";
 import { SelectField } from "@/components/select-field";
-import { CopyStatusBadge } from "@/components/copy-status-badge";
-import { LoanForm } from "@/components/loan-form";
 import { BookShelf } from "@/components/book-shelf";
+import { BookDetailModal } from "@/components/book-detail-modal";
 import { useToast } from "@/context/toast-context";
 import { useAuth } from "@/context/auth-context";
 import { apiGet, apiPost, apiDelete, apiPut, ApiError } from "@/lib/api-client";
@@ -78,6 +77,15 @@ export default function LibraryPage() {
   // Reading statuses map: book_id → status
   const [statusMap, setStatusMap] = useState<StatusMap>({});
 
+  // Reading progress map: book_id → current_page
+  const [progressMap, setProgressMap] = useState<Record<string, number | null>>({});
+
+  // Book detail modal state (shelf view)
+  const [detailBook, setDetailBook] = useState<Book | null>(null);
+  const [detailCopies, setDetailCopies] = useState<CopyWithLoanStatus[]>([]);
+  const [detailOpen, setDetailOpen] = useState(false);
+  const [detailLoadingCopies, setDetailLoadingCopies] = useState(false);
+
   // ── Load view preference from localStorage ──────────────────────────────
   useEffect(() => {
     const saved = localStorage.getItem(VIEW_MODE_KEY);
@@ -101,8 +109,13 @@ export default function LibraryPage() {
       ]);
       setBooks(booksData);
       const map: StatusMap = {};
-      statusesData.forEach((s) => { map[s.book_id] = s.status; });
+      const pMap: Record<string, number | null> = {};
+      statusesData.forEach((s) => {
+        map[s.book_id] = s.status;
+        pMap[s.book_id] = s.current_page;
+      });
       setStatusMap(map);
+      setProgressMap(pMap);
       setVisibleCount(PAGE_SIZE);
     } catch {
       setBooks([]);
@@ -251,6 +264,28 @@ export default function LibraryPage() {
     if (expandedBookId) fetchCopiesForBook(expandedBookId);
   };
 
+  // ── Book detail modal handler (shelf view) ───────────────────────────────
+  const handleBookDetailClick = useCallback(async (book: Book) => {
+    setDetailBook(book);
+    setDetailOpen(true);
+    setDetailLoadingCopies(true);
+    setDetailCopies([]);
+    try {
+      const copies = await apiGet<CopyWithLoanStatus[]>(`/copies?book_id=${book.id}`);
+      setDetailCopies(copies);
+    } catch {
+      setDetailCopies([]);
+    } finally {
+      setDetailLoadingCopies(false);
+    }
+  }, []);
+
+  const handleDetailClose = useCallback(() => {
+    setDetailOpen(false);
+    setDetailBook(null);
+    setDetailCopies([]);
+  }, []);
+
   const visibleBooks = books.slice(0, visibleCount);
   const hasMore = visibleCount < books.length;
 
@@ -376,8 +411,19 @@ export default function LibraryPage() {
 
           {!loading && books.length === 0 && (
             <div className="rounded-lg p-8 text-center" style={{ background: "var(--color-cream)", border: "1px solid var(--color-border)" }}>
-              <p className="text-base font-medium mb-2" style={{ color: "var(--color-walnut)" }}>Tu biblioteca está vacía</p>
-              <p className="text-sm" style={{ color: "var(--color-ink-faint)" }}>Agrega tu primer libro usando el botón &quot;Agregar libro&quot;.</p>
+              {searchTerm ? (
+                <>
+                  <p className="text-base font-medium mb-2" style={{ color: "var(--color-walnut)" }}>
+                    No se encontraron resultados para &ldquo;{searchTerm}&rdquo;
+                  </p>
+                  <p className="text-sm" style={{ color: "var(--color-ink-faint)" }}>Intenta con otro término de búsqueda.</p>
+                </>
+              ) : (
+                <>
+                  <p className="text-base font-medium mb-2" style={{ color: "var(--color-walnut)" }}>No tienes libros en tu biblioteca aún</p>
+                  <p className="text-sm" style={{ color: "var(--color-ink-faint)" }}>Agrega tu primer libro usando el botón &quot;Agregar libro&quot;.</p>
+                </>
+              )}
             </div>
           )}
 
@@ -394,7 +440,7 @@ export default function LibraryPage() {
                   books={shelfBooks}
                   statusMap={statusMap}
                   shelfStatus={status}
-                  onStatusChange={handleStatusChange}
+                  onBookClick={handleBookDetailClick}
                 />
               ))}
               {/* Unclassified shelf */}
@@ -403,7 +449,7 @@ export default function LibraryPage() {
                 books={unclassified}
                 statusMap={statusMap}
                 shelfStatus={null}
-                onStatusChange={handleStatusChange}
+                onBookClick={handleBookDetailClick}
               />
             </div>
           )}
@@ -426,137 +472,57 @@ export default function LibraryPage() {
                 {visibleBooks.map((book) => {
                   const bookStatus = statusMap[book.id] ?? null;
                   return (
-                    <div key={book.id} className="rounded-lg px-5 py-4 transition-shadow"
+                    <button
+                      key={book.id}
+                      type="button"
+                      onClick={() => handleBookDetailClick(book)}
+                      className="w-full text-left rounded-lg px-5 py-4 transition-shadow"
                       style={{ background: "var(--color-cream)", border: "1px solid var(--color-border)", boxShadow: "0 1px 3px rgba(28,16,8,0.08)" }}
-                      onMouseEnter={(e) => ((e.currentTarget as HTMLDivElement).style.boxShadow = "0 4px 12px -2px rgba(28,16,8,0.16)")}
-                      onMouseLeave={(e) => ((e.currentTarget as HTMLDivElement).style.boxShadow = "0 1px 3px rgba(28,16,8,0.08)")}>
-
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-3 min-w-0">
-                          {/* Status dot */}
-                          <span aria-hidden="true" style={{
-                            width: 8, height: 8, borderRadius: "50%", flexShrink: 0,
-                            background: bookStatus ? STATUS_DOT[bookStatus] : "var(--color-aged)",
-                          }} />
-                          <div className="min-w-0">
-                            <h2 className="text-base font-semibold truncate"
-                              style={{ fontFamily: "var(--font-playfair), Georgia, serif", color: "var(--color-walnut)" }}>
-                              {book.title}
-                            </h2>
-                            <p className="text-sm mt-0.5" style={{ color: "var(--color-ink-faint)" }}>{book.author}</p>
-                          </div>
-                        </div>
-
-                        <div className="flex items-center gap-2 ml-3 flex-shrink-0">
-                          {/* Inline status selector */}
-                          <select
-                            aria-label={`Estado de ${book.title}`}
-                            value={bookStatus ?? "none"}
-                            onChange={(e) => {
-                              const v = e.target.value;
-                              handleStatusChange(book.id, v === "none" ? null : v as ReadingStatusValue);
-                            }}
-                            className="rounded-full text-xs px-2 py-1 focus:outline-none transition-colors"
-                            style={{ borderColor: "var(--color-border)", background: "var(--color-parchment)", color: "var(--color-ink-soft)", border: "1px solid var(--color-border)" }}>
-                            <option value="none">Sin estado</option>
-                            <option value="reading">Leyendo</option>
-                            <option value="want_to_read">Quiero leer</option>
-                            <option value="read">Leído</option>
-                            <option value="dnf">No terminado</option>
-                          </select>
-
-                          {addCopyBookId === book.id ? (
-                            <div className="flex items-center gap-2">
-                              <SelectField label="" name={`copy-format-${book.id}`} value={addCopyFormat}
-                                onChange={(e) => setAddCopyFormat(e.target.value)}
-                                options={[{ value: "physical", label: "Física" }]} />
-                              <button type="button" disabled={addCopySubmitting} onClick={() => handleAddCopySubmit(book.id)}
-                                className="rounded-full px-3 py-1.5 text-xs font-medium transition-colors disabled:opacity-50"
-                                style={{ background: "var(--color-reading)", color: "var(--color-cream)" }}>
-                                {addCopySubmitting ? "..." : "Confirmar"}
-                              </button>
-                              <button type="button" onClick={() => { setAddCopyBookId(null); setAddCopyFormat("physical"); }}
-                                className="rounded-full px-3 py-1.5 text-xs font-medium transition-colors"
-                                style={{ border: "1px solid var(--color-border)", color: "var(--color-ink-soft)", background: "transparent" }}>
-                                Cancelar
-                              </button>
+                      onMouseEnter={(e) => ((e.currentTarget as HTMLButtonElement).style.boxShadow = "0 4px 12px -2px rgba(28,16,8,0.16)")}
+                      onMouseLeave={(e) => ((e.currentTarget as HTMLButtonElement).style.boxShadow = "0 1px 3px rgba(28,16,8,0.08)")}
+                    >
+                      <div className="flex items-center gap-3">
+                        {/* Status dot */}
+                        <span aria-hidden="true" style={{
+                          width: 8, height: 8, borderRadius: "50%", flexShrink: 0,
+                          background: bookStatus ? STATUS_DOT[bookStatus] : "var(--color-aged)",
+                        }} />
+                        <div className="min-w-0 flex-1">
+                          <h2 className="text-base font-semibold truncate"
+                            style={{ fontFamily: "var(--font-playfair), Georgia, serif", color: "var(--color-walnut)" }}>
+                            {book.title}
+                          </h2>
+                          <p className="text-sm mt-0.5" style={{ color: "var(--color-ink-faint)" }}>{book.author}</p>
+                          {/* Reading progress preview */}
+                          {bookStatus === "reading" && progressMap[book.id] && (
+                            <div className="flex items-center gap-2 mt-1.5">
+                              <div
+                                className="flex-1 h-1.5 rounded-full overflow-hidden max-w-[120px]"
+                                style={{ background: "var(--color-aged)" }}
+                              >
+                                <div
+                                  className="h-full rounded-full"
+                                  style={{
+                                    width: `${Math.min(100, book.pages ? Math.round((progressMap[book.id]! / book.pages) * 100) : 0)}%`,
+                                    background: "var(--color-reading)",
+                                  }}
+                                />
+                              </div>
+                              <span className="text-[10px] font-medium" style={{ color: "var(--color-ink-faint)" }}>
+                                {progressMap[book.id]}{book.pages ? ` / ${book.pages}` : ""}
+                              </span>
                             </div>
-                          ) : (
-                            <>
-                              <button type="button" onClick={() => handleToggleCopies(book.id)}
-                                className="rounded-full px-3 py-1.5 text-xs font-medium transition-colors"
-                                style={{ border: "1px solid var(--color-border)", color: "var(--color-ink-soft)", background: "transparent" }}
-                                onMouseEnter={(e) => ((e.currentTarget as HTMLButtonElement).style.background = "var(--color-parchment)")}
-                                onMouseLeave={(e) => ((e.currentTarget as HTMLButtonElement).style.background = "transparent")}>
-                                {expandedBookId === book.id ? "Ocultar copias" : "Ver copias"}
-                              </button>
-                              <button type="button" onClick={() => setAddCopyBookId(book.id)}
-                                className="rounded-full px-3 py-1.5 text-xs font-medium transition-colors"
-                                style={{ border: "1px solid var(--color-border)", color: "var(--color-ink-soft)", background: "transparent" }}
-                                onMouseEnter={(e) => ((e.currentTarget as HTMLButtonElement).style.background = "var(--color-parchment)")}
-                                onMouseLeave={(e) => ((e.currentTarget as HTMLButtonElement).style.background = "transparent")}>
-                                Agregar copia
-                              </button>
-                            </>
                           )}
                         </div>
+                        {/* Status label */}
+                        {bookStatus && (
+                          <span className="rounded-full px-2.5 py-0.5 text-[10px] font-medium flex-shrink-0"
+                            style={{ background: STATUS_DOT[bookStatus], color: "var(--color-cream)", opacity: 0.9 }}>
+                            {READING_STATUS_LABELS[bookStatus]}
+                          </span>
+                        )}
                       </div>
-
-                      {/* Copies section */}
-                      {expandedBookId === book.id && (
-                        <div className="mt-4 pt-4" style={{ borderTop: "1px solid var(--color-border)" }}>
-                          {loadingCopies === book.id && <p className="text-sm" style={{ color: "var(--color-ink-faint)" }}>Cargando copias...</p>}
-                          {loadingCopies !== book.id && bookCopies[book.id]?.length === 0 && (
-                            <p className="text-sm" style={{ color: "var(--color-ink-faint)" }}>No tienes copias de este libro.</p>
-                          )}
-                          {loadingCopies !== book.id && bookCopies[book.id]?.length > 0 && (
-                            <div className="space-y-3">
-                              {bookCopies[book.id].map((copy) => (
-                                <div key={copy.id} className="flex items-center justify-between rounded-md px-3 py-2"
-                                  style={{ background: "var(--color-parchment)" }}>
-                                  <div className="flex items-center gap-3">
-                                    <span className="text-xs font-medium uppercase" style={{ color: "var(--color-ink-soft)" }}>
-                                      {copy.format === "physical" ? "Física" : "Digital"}
-                                    </span>
-                                    {copy.format === "physical" && (
-                                      <CopyStatusBadge status={copy.loan_status} borrowerName={copy.active_loan?.borrower_name} loanDate={copy.active_loan?.loan_date} />
-                                    )}
-                                  </div>
-                                  {copy.format === "physical" && copy.loan_status === "available" && lendCopyId !== copy.id && (
-                                    <button type="button" onClick={() => handleLendClick(copy.id)} disabled={loadingLendData}
-                                      className="rounded-full px-3 py-1.5 text-xs font-medium transition-colors disabled:opacity-50"
-                                      style={{ background: "var(--color-teak)", color: "var(--color-cream)" }}
-                                      onMouseEnter={(e) => ((e.currentTarget as HTMLButtonElement).style.background = "var(--color-mahogany)")}
-                                      onMouseLeave={(e) => ((e.currentTarget as HTMLButtonElement).style.background = "var(--color-teak)")}>
-                                      Prestar
-                                    </button>
-                                  )}
-                                </div>
-                              ))}
-                              {lendCopyId && bookCopies[book.id]?.some((c) => c.id === lendCopyId) && (
-                                <div className="mt-3 rounded-md p-4" style={{ background: "#EDF7F0", border: "1px solid var(--color-reading)" }}>
-                                  <h3 className="text-sm font-semibold mb-3" style={{ color: "var(--color-walnut)" }}>Registrar préstamo</h3>
-                                  {loadingLendData ? (
-                                    <p className="text-sm" style={{ color: "var(--color-ink-faint)" }}>Cargando miembros del grupo...</p>
-                                  ) : groupMembers.length === 0 ? (
-                                    <div>
-                                      <p className="text-sm mb-2" style={{ color: "var(--color-ink-soft)" }}>No tienes miembros en tu grupo para prestar.</p>
-                                      <button type="button" onClick={() => { setLendCopyId(null); setGroupMembers([]); }}
-                                        className="rounded-full px-3 py-1.5 text-xs font-medium"
-                                        style={{ border: "1px solid var(--color-border)", color: "var(--color-ink-soft)", background: "transparent" }}>
-                                        Cancelar
-                                      </button>
-                                    </div>
-                                  ) : (
-                                    <LoanForm copyId={lendCopyId} groupMembers={groupMembers} onSuccess={handleLoanSuccess} onCancel={() => { setLendCopyId(null); setGroupMembers([]); }} />
-                                  )}
-                                </div>
-                              )}
-                            </div>
-                          )}
-                        </div>
-                      )}
-                    </div>
+                    </button>
                   );
                 })}
 
@@ -575,6 +541,28 @@ export default function LibraryPage() {
             </div>
           )}
         </div>
+
+        {/* ── Book Detail Modal (shared between list & shelf view) ── */}
+        <BookDetailModal
+          book={detailBook}
+          copies={detailCopies}
+          open={detailOpen}
+          loadingCopies={detailLoadingCopies}
+          onClose={handleDetailClose}
+          readingStatus={
+            detailBook
+              ? { status: statusMap[detailBook.id] ?? "", current_page: progressMap[detailBook.id] ?? null }
+              : null
+          }
+          onProgressUpdate={() => { fetchBooks(searchTerm || undefined); if (detailBook) handleBookDetailClick(detailBook); }}
+          onStatusChange={handleStatusChange}
+          onBookUpdate={(updatedBook) => {
+            setBooks((prev) => prev.map((b) => b.id === updatedBook.id ? updatedBook : b));
+            setDetailBook(updatedBook);
+          }}
+          onCopyAdded={() => { if (detailBook) handleBookDetailClick(detailBook); fetchBooks(searchTerm || undefined); }}
+          onLoanCreated={() => { if (detailBook) handleBookDetailClick(detailBook); fetchBooks(searchTerm || undefined); }}
+        />
       </main>
     </ProtectedRoute>
   );

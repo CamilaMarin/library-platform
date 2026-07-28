@@ -16,6 +16,7 @@ class SetReadingStatusRequest:
     user_id: UUID
     book_id: UUID
     status: ReadingStatusValue
+    current_page: int | None = None
 
 
 class SetReadingStatus:
@@ -42,5 +43,6 @@ class SetReadingStatus:
             user_id=request.user_id,
             book_id=request.book_id,
             status=request.status,
+            current_page=request.current_page,
         )
         return self._statuses.upsert(record)

@@ -250,12 +250,14 @@ class SqlReadingStatusRepository:
                 user_id=reading_status.user_id,
                 book_id=reading_status.book_id,
                 status=reading_status.status.value,
+                current_page=reading_status.current_page,
                 updated_at=reading_status.updated_at,
             )
             .on_conflict_do_update(
                 constraint="uq_reading_status_user_book",
                 set_={
                     "status": reading_status.status.value,
+                    "current_page": reading_status.current_page,
                     "updated_at": reading_status.updated_at,
                 },
             )
@@ -298,5 +300,6 @@ class SqlReadingStatusRepository:
             user_id=model.user_id,
             book_id=model.book_id,
             status=ReadingStatusValue(model.status),
+            current_page=model.current_page,
             updated_at=model.updated_at,
         )

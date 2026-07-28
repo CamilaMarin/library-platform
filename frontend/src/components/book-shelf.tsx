@@ -12,7 +12,8 @@ interface BookShelfProps {
   statusMap: Record<string, ReadingStatusValue>;
   /** The status all books on this shelf share (null = unclassified shelf) */
   shelfStatus: ReadingStatusValue | null;
-  onStatusChange: (bookId: string, status: ReadingStatusValue | null) => void;
+  /** Called when a book spine is clicked */
+  onBookClick?: (book: Book) => void;
 }
 
 export function BookShelf({
@@ -20,7 +21,7 @@ export function BookShelf({
   books,
   statusMap,
   shelfStatus,
-  onStatusChange,
+  onBookClick,
 }: BookShelfProps) {
   const scrollRef = useRef<HTMLDivElement>(null);
   const [isDragging, setIsDragging] = useState(false);
@@ -89,7 +90,7 @@ export function BookShelf({
               key={book.id}
               book={book}
               status={statusMap[book.id] ?? shelfStatus}
-              onStatusChange={onStatusChange}
+              onBookClick={onBookClick}
               height={120}
             />
           ))}
