@@ -11,6 +11,12 @@ import type { LoanWithDetails } from "@/types";
 
 type TabStatus = "active" | "returned" | "borrowed";
 
+const TABS: { id: TabStatus; label: string }[] = [
+  { id: "active",   label: "Activos" },
+  { id: "returned", label: "Historial" },
+  { id: "borrowed", label: "Me prestaron" },
+];
+
 export default function LoansPage() {
   const [activeTab, setActiveTab] = useState<TabStatus>("active");
   const [loans, setLoans] = useState<LoanWithDetails[]>([]);
@@ -39,10 +45,6 @@ export default function LoansPage() {
     fetchLoans(activeTab);
   }, [activeTab, fetchLoans]);
 
-  const handleTabChange = (tab: TabStatus) => {
-    setActiveTab(tab);
-  };
-
   const handleReturn = async (loanId: string) => {
     setReturningLoanId(loanId);
     try {
@@ -61,61 +63,73 @@ export default function LoansPage() {
   return (
     <ProtectedRoute>
       <Navigation />
-      <main className="md:ml-64 pb-20 md:pb-0 min-h-screen bg-gray-50">
+      <main
+        className="md:ml-64 pb-20 md:pb-0 min-h-screen"
+        style={{ background: "var(--color-parchment)" }}
+      >
         <div className="max-w-4xl mx-auto px-4 py-8">
           {/* Header */}
-          <h1 className="text-2xl font-bold text-gray-900 mb-6">
+          <h1
+            className="text-2xl font-bold mb-6"
+            style={{
+              fontFamily: "var(--font-playfair), Georgia, serif",
+              color: "var(--color-walnut)",
+            }}
+          >
             Mis Préstamos
           </h1>
 
           {/* Tabs */}
-          <div className="flex gap-2 mb-6">
-            <button
-              type="button"
-              onClick={() => handleTabChange("active")}
-              className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${
-                activeTab === "active"
-                  ? "bg-blue-600 text-white"
-                  : "border border-gray-300 text-gray-700 hover:bg-gray-100"
-              }`}
-            >
-              Activos
-            </button>
-            <button
-              type="button"
-              onClick={() => handleTabChange("returned")}
-              className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${
-                activeTab === "returned"
-                  ? "bg-blue-600 text-white"
-                  : "border border-gray-300 text-gray-700 hover:bg-gray-100"
-              }`}
-            >
-              Historial
-            </button>
-            <button
-              type="button"
-              onClick={() => handleTabChange("borrowed")}
-              className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${
-                activeTab === "borrowed"
-                  ? "bg-blue-600 text-white"
-                  : "border border-gray-300 text-gray-700 hover:bg-gray-100"
-              }`}
-            >
-              Me prestaron
-            </button>
+          <div
+            className="flex gap-1 mb-6 p-1 rounded-lg w-fit"
+            style={{ background: "var(--color-aged)" }}
+          >
+            {TABS.map((tab) => {
+              const active = activeTab === tab.id;
+              return (
+                <button
+                  key={tab.id}
+                  type="button"
+                  onClick={() => setActiveTab(tab.id)}
+                  className="px-4 py-1.5 rounded-md text-sm font-medium transition-all"
+                  style={
+                    active
+                      ? {
+                          background: "var(--color-cream)",
+                          color: "var(--color-walnut)",
+                          boxShadow: "0 1px 3px rgba(28,16,8,0.12)",
+                        }
+                      : {
+                          background: "transparent",
+                          color: "var(--color-ink-soft)",
+                        }
+                  }
+                >
+                  {tab.label}
+                </button>
+              );
+            })}
           </div>
 
           {/* Content */}
           {loading ? (
             <Skeleton variant="card" count={3} />
           ) : loans.length === 0 ? (
-            <p className="text-gray-500 text-center py-8">
-              {activeTab === "active"
-                ? "No tienes préstamos activos."
-                : activeTab === "returned"
-                ? "No tienes préstamos devueltos."
-                : "No te han prestado libros."}
-            </p>
+            <div
+              className="rounded-lg p-8 text-center"
+              style={{
+                background: "var(--color-cream)",
+                border: "1px solid var(--color-border)",
+              }}
+            >
+              <p className="text-sm" style={{ color: "var(--color-ink-faint)" }}>
+                {activeTab === "active"
+                  ? "No tienes préstamos activos."
+                  : activeTab === "returned"
+                  ? "No tienes préstamos devueltos."
+                  : "No te han prestado libros."}
+              </p>
+            </div>
           ) : (
             <div className="flex flex-col gap-4">
               {loans.map((loan) => (

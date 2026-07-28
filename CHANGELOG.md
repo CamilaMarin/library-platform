@@ -6,7 +6,27 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
-### Added
+### Added (Visual Identity — "Sala de lectura")
+- Design token system: full palette defined in `tailwind.config.ts` (walnut, mahogany, teak, brass, parchment, cream, ink, reading, leather) and mirrored as CSS custom properties in `globals.css`
+- Global base styles: parchment background, Playfair Display for headings, Inter for UI, warm focus ring (brass), custom scrollbar (teak)
+- Utility classes in `globals.css`: `.card-biblioteca`, `.btn-primary`, `.btn-brass`, `.badge-reading/read/pending/dnf`
+- Playfair Display (normal + italic) and Inter loaded via `next/font/google` in root layout
+- Custom box shadows: `spine` (book spine), `shelf`, `card`, `modal`
+- Custom border radius: `book` (book-spine shape: straight left, rounded right)
+
+### Changed (Visual Identity — migration of all pages and components)
+- Navigation (`navigation.tsx`): sidebar walnut + brass active state fully migrated (was already done); mobile bottom bar reduced to 5 items (Inicio, Biblioteca, Clubes, Reseñas, Ajustes) to prevent overflow on small screens
+- Dashboard (`dashboard/page.tsx`): emojis replaced with Lucide icons (BookMarked, Users, Shuffle, BookOpen, Star, Settings) in teak color; cards use cream/border/walnut tokens
+- Login / Register pages: parchment background, cream card, Playfair logo, walnut primary button, leather error states
+- Library, Loans, Reviews, Groups, Selection, Clubs, Club Detail, Settings, Privacy pages: all gray/blue Tailwind classes replaced with CSS variable tokens
+- Shared components fully migrated: `InputField`, `SelectField`, `ConfirmDialog`, `LoanCard`, `LoanForm`, `Skeleton`, `StarRating`, `ToastContainer`, `CopyStatusBadge`, `ProtectedRoute`
+- Root loading spinner (`page.tsx`, `protected-route.tsx`): replaced `border-t-blue-600` with `teak`/`aged` tokens
+- `star-rating.tsx`: filled stars use `brass` instead of `yellow-400`
+- `toast.tsx`: success=`reading` green, error=`leather`, info=`walnut`
+- `copy-status-badge.tsx`: available=soft reading green, on_loan=leather/teak warm tones
+- Zero gray/blue Tailwind tokens remain across all pages and components (verified with grep)
+
+### Added (Community/Clubs REST router — previous unreleased)
 - Community/Clubs REST router: GET/POST /clubs, GET /clubs/{id}, /members, /comments, /active-book, /available-books (8 endpoints)
 - GET /reviews/ endpoint (list user's own reviews)
 - GET /reviews/shared endpoint (reviews shared with user's groups/clubs)

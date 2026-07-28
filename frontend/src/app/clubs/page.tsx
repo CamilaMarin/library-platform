@@ -40,7 +40,6 @@ export default function ClubsPage() {
         ]);
         setClubs(clubsData);
         setGroups(groupsData);
-        // Auto-select if only one group
         if (groupsData.length === 1) {
           setSelectedGroupId(groupsData[0].id);
         }
@@ -72,12 +71,8 @@ export default function ClubsPage() {
 
     try {
       const body: Record<string, string> = { name: name.trim() };
-      if (description.trim()) {
-        body.description = description.trim();
-      }
-      if (selectedGroupId) {
-        body.group_id = selectedGroupId;
-      }
+      if (description.trim()) body.description = description.trim();
+      if (selectedGroupId) body.group_id = selectedGroupId;
 
       const newClub = await apiPost<Club>("/clubs", body);
       setClubs((prev) => [newClub, ...prev]);
@@ -91,7 +86,8 @@ export default function ClubsPage() {
         const detail =
           typeof err.detail === "string"
             ? err.detail
-            : (err.detail as Record<string, string>).detail || JSON.stringify(err.detail);
+            : (err.detail as Record<string, string>).detail ||
+              JSON.stringify(err.detail);
         if (detail === "user_has_no_group") {
           setNameError("Debes pertenecer a un grupo familiar para crear un club.");
         } else if (detail === "not_member_of_group") {
@@ -110,15 +106,35 @@ export default function ClubsPage() {
   return (
     <ProtectedRoute>
       <Navigation />
-      <main className="md:ml-64 pb-20 md:pb-0 min-h-screen bg-gray-50">
+      <main
+        className="md:ml-64 pb-20 md:pb-0 min-h-screen"
+        style={{ background: "var(--color-parchment)" }}
+      >
         <div className="max-w-4xl mx-auto px-4 py-8">
           {/* Header */}
           <div className="flex items-center justify-between mb-6">
-            <h1 className="text-2xl font-bold text-gray-900">Mis Clubes</h1>
+            <h1
+              className="text-2xl font-bold"
+              style={{
+                fontFamily: "var(--font-playfair), Georgia, serif",
+                color: "var(--color-walnut)",
+              }}
+            >
+              Mis Clubes
+            </h1>
             <button
               type="button"
               onClick={() => setShowForm((prev) => !prev)}
-              className="rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700 transition-colors"
+              className="rounded-full px-4 py-2 text-sm font-medium transition-colors"
+              style={{ background: "var(--color-walnut)", color: "var(--color-cream)" }}
+              onMouseEnter={(e) =>
+                ((e.currentTarget as HTMLButtonElement).style.background =
+                  "var(--color-mahogany)")
+              }
+              onMouseLeave={(e) =>
+                ((e.currentTarget as HTMLButtonElement).style.background =
+                  "var(--color-walnut)")
+              }
             >
               {showForm ? "Cancelar" : "Crear club"}
             </button>
@@ -128,9 +144,20 @@ export default function ClubsPage() {
           {showForm && (
             <form
               onSubmit={handleSubmit}
-              className="mb-6 rounded-lg border border-gray-200 bg-white p-5 shadow-sm space-y-4"
+              className="mb-6 rounded-lg p-5 space-y-4"
+              style={{
+                background: "var(--color-cream)",
+                border: "1px solid var(--color-border)",
+                boxShadow: "0 1px 3px rgba(28,16,8,0.08)",
+              }}
             >
-              <h2 className="text-lg font-semibold text-gray-900">
+              <h2
+                className="text-lg font-semibold"
+                style={{
+                  fontFamily: "var(--font-playfair), Georgia, serif",
+                  color: "var(--color-walnut)",
+                }}
+              >
                 Nuevo club
               </h2>
 
@@ -150,7 +177,8 @@ export default function ClubsPage() {
               <div className="flex flex-col gap-1">
                 <label
                   htmlFor="input-club-description"
-                  className="text-sm font-medium text-gray-700"
+                  className="text-sm font-medium"
+                  style={{ color: "var(--color-ink-soft)" }}
                 >
                   Descripción
                 </label>
@@ -161,7 +189,12 @@ export default function ClubsPage() {
                   onChange={(e) => setDescription(e.target.value)}
                   placeholder="Descripción del club (opcional)"
                   rows={3}
-                  className="rounded-md border border-gray-300 px-3 py-2 text-sm transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="rounded-md border px-3 py-2 text-sm transition-colors focus:outline-none"
+                  style={{
+                    borderColor: "var(--color-border)",
+                    background: "var(--color-cream)",
+                    color: "var(--color-ink)",
+                  }}
                 />
               </div>
 
@@ -187,14 +220,38 @@ export default function ClubsPage() {
                     setNameError("");
                     setSelectedGroupId(groups.length === 1 ? groups[0].id : "");
                   }}
-                  className="rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors"
+                  className="rounded-full px-4 py-2 text-sm font-medium transition-colors"
+                  style={{
+                    border: "1px solid var(--color-border)",
+                    color: "var(--color-ink-soft)",
+                    background: "transparent",
+                  }}
+                  onMouseEnter={(e) =>
+                    ((e.currentTarget as HTMLButtonElement).style.background =
+                      "var(--color-parchment)")
+                  }
+                  onMouseLeave={(e) =>
+                    ((e.currentTarget as HTMLButtonElement).style.background =
+                      "transparent")
+                  }
                 >
                   Cancelar
                 </button>
                 <button
                   type="submit"
                   disabled={submitting}
-                  className="rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                  className="rounded-full px-4 py-2 text-sm font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                  style={{ background: "var(--color-walnut)", color: "var(--color-cream)" }}
+                  onMouseEnter={(e) => {
+                    if (!submitting)
+                      (e.currentTarget as HTMLButtonElement).style.background =
+                        "var(--color-mahogany)";
+                  }}
+                  onMouseLeave={(e) => {
+                    if (!submitting)
+                      (e.currentTarget as HTMLButtonElement).style.background =
+                        "var(--color-walnut)";
+                  }}
                 >
                   {submitting ? "Creando..." : "Crear club"}
                 </button>
@@ -202,35 +259,67 @@ export default function ClubsPage() {
             </form>
           )}
 
-          {/* Loading State */}
           {loading && <Skeleton variant="card" count={3} />}
 
-          {/* Empty State */}
           {!loading && clubs.length === 0 && (
-            <div className="rounded-lg border border-gray-200 bg-white p-8 text-center">
-              <p className="text-lg font-medium text-gray-900 mb-2">
+            <div
+              className="rounded-lg p-8 text-center"
+              style={{
+                background: "var(--color-cream)",
+                border: "1px solid var(--color-border)",
+              }}
+            >
+              <p
+                className="text-base font-medium mb-2"
+                style={{ color: "var(--color-walnut)" }}
+              >
                 No perteneces a ningún club aún
               </p>
-              <p className="text-sm text-gray-500">
+              <p className="text-sm" style={{ color: "var(--color-ink-faint)" }}>
                 Crea uno para comenzar.
               </p>
             </div>
           )}
 
-          {/* Clubs List */}
           {!loading && clubs.length > 0 && (
             <div className="space-y-3">
               {clubs.map((club) => (
                 <Link
                   key={club.id}
                   href={`/clubs/${club.id}`}
-                  className="block rounded-lg border border-gray-200 bg-white px-5 py-4 shadow-sm hover:shadow-md transition-shadow"
+                  className="block rounded-lg px-5 py-4 transition-all"
+                  style={{
+                    background: "var(--color-cream)",
+                    border: "1px solid var(--color-border)",
+                    boxShadow: "0 1px 3px rgba(28,16,8,0.08)",
+                  }}
+                  onMouseEnter={(e) => {
+                    (e.currentTarget as HTMLAnchorElement).style.boxShadow =
+                      "0 4px 12px -2px rgba(28,16,8,0.16)";
+                    (e.currentTarget as HTMLAnchorElement).style.borderColor =
+                      "var(--color-teak)";
+                  }}
+                  onMouseLeave={(e) => {
+                    (e.currentTarget as HTMLAnchorElement).style.boxShadow =
+                      "0 1px 3px rgba(28,16,8,0.08)";
+                    (e.currentTarget as HTMLAnchorElement).style.borderColor =
+                      "var(--color-border)";
+                  }}
                 >
-                  <h2 className="text-base font-semibold text-gray-900">
+                  <h2
+                    className="text-base font-semibold"
+                    style={{
+                      fontFamily: "var(--font-playfair), Georgia, serif",
+                      color: "var(--color-walnut)",
+                    }}
+                  >
                     {club.name}
                   </h2>
                   {club.description && (
-                    <p className="text-sm text-gray-500 mt-1">
+                    <p
+                      className="text-sm mt-1"
+                      style={{ color: "var(--color-ink-faint)" }}
+                    >
                       {club.description}
                     </p>
                   )}

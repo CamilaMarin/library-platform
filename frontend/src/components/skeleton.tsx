@@ -19,7 +19,8 @@ export function Skeleton({ variant = "text", count = 1 }: SkeletonProps) {
       {items.map((i) => (
         <div
           key={i}
-          className={`animate-pulse bg-gray-200 ${variantStyles[variant]}`}
+          className={`animate-pulse ${variantStyles[variant]}`}
+          style={{ background: "var(--color-aged)" }}
         />
       ))}
       <span className="sr-only">Cargando...</span>

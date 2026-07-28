@@ -100,19 +100,53 @@ export default function RegisterPage() {
   }
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-gray-50 px-4">
-      <div className="w-full max-w-md rounded-lg bg-white p-8 shadow-md">
-        <h1 className="mb-2 text-center text-2xl font-bold text-blue-700">
-          EntreLíneas
-        </h1>
-        <h2 className="mb-6 text-center text-lg font-semibold text-gray-700">
+    <div
+      className="flex min-h-screen items-center justify-center px-4 py-8"
+      style={{ background: "var(--color-parchment)" }}
+    >
+      <div
+        className="w-full max-w-md rounded-xl p-8"
+        style={{
+          background: "var(--color-cream)",
+          border: "1px solid var(--color-border)",
+          boxShadow: "0 4px 24px -4px rgba(28, 16, 8, 0.14)",
+        }}
+      >
+        {/* Logo */}
+        <div className="mb-6 text-center">
+          <h1
+            className="text-3xl font-bold tracking-tight"
+            style={{
+              fontFamily: "var(--font-playfair), Georgia, serif",
+              color: "var(--color-walnut)",
+            }}
+          >
+            EntreLíneas
+          </h1>
+          <p
+            className="mt-1 text-[11px] tracking-widest uppercase"
+            style={{ color: "var(--color-brass)" }}
+          >
+            biblioteca familiar
+          </p>
+        </div>
+
+        <h2
+          className="mb-6 text-center text-lg font-semibold"
+          style={{ color: "var(--color-walnut)" }}
+        >
           Crear cuenta
         </h2>
 
         {formError && (
           <div
-            className="mb-4 rounded-md bg-red-50 p-3 text-sm text-red-700"
+            className="mb-4 rounded-md px-4 py-3 text-sm"
             role="alert"
+            style={{
+              background: "#FAF0E8",
+              border: "1px solid var(--color-leather)",
+              color: "var(--color-leather)",
+            }}
           >
             {formError}
           </div>
@@ -163,25 +197,48 @@ export default function RegisterPage() {
             placeholder="Repite tu contraseña"
           />
 
+          {/* Consent checkbox */}
           <div className="flex flex-col gap-1">
-            <label className="flex items-start gap-2 text-sm text-gray-700">
+            <label
+              className="flex items-start gap-2 text-sm cursor-pointer"
+              style={{ color: "var(--color-ink-soft)" }}
+            >
               <input
                 type="checkbox"
                 checked={consent}
                 onChange={(e) => setConsent(e.target.checked)}
-                className="mt-0.5 h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                className="mt-0.5 h-4 w-4 rounded"
+                style={{ accentColor: "var(--color-teak)" }}
                 aria-describedby={errors.consent ? "error-consent" : undefined}
               />
               <span>
                 Acepto la{" "}
-                <a href="/privacy" target="_blank" className="text-blue-600 hover:underline">
+                <a
+                  href="/privacy"
+                  target="_blank"
+                  className="transition-colors"
+                  style={{ color: "var(--color-teak)" }}
+                  onMouseEnter={(e) =>
+                    ((e.currentTarget as HTMLAnchorElement).style.color =
+                      "var(--color-mahogany)")
+                  }
+                  onMouseLeave={(e) =>
+                    ((e.currentTarget as HTMLAnchorElement).style.color =
+                      "var(--color-teak)")
+                  }
+                >
                   política de privacidad
                 </a>{" "}
                 y el tratamiento de mis datos personales
               </span>
             </label>
             {errors.consent && (
-              <p id="error-consent" className="text-xs text-red-600" role="alert">
+              <p
+                id="error-consent"
+                className="text-xs"
+                style={{ color: "var(--color-leather)" }}
+                role="alert"
+              >
                 {errors.consent}
               </p>
             )}
@@ -190,17 +247,43 @@ export default function RegisterPage() {
           <button
             type="submit"
             disabled={isSubmitting}
-            className="mt-2 rounded-md bg-blue-600 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+            className="mt-2 w-full rounded-full px-4 py-2.5 text-sm font-medium transition-colors focus:outline-none disabled:cursor-not-allowed disabled:opacity-60"
+            style={{
+              background: "var(--color-walnut)",
+              color: "var(--color-cream)",
+            }}
+            onMouseEnter={(e) => {
+              if (!isSubmitting)
+                (e.currentTarget as HTMLButtonElement).style.background =
+                  "var(--color-mahogany)";
+            }}
+            onMouseLeave={(e) => {
+              if (!isSubmitting)
+                (e.currentTarget as HTMLButtonElement).style.background =
+                  "var(--color-walnut)";
+            }}
           >
             {isSubmitting ? "Registrando..." : "Registrarme"}
           </button>
         </form>
 
-        <p className="mt-4 text-center text-sm text-gray-600">
+        <p
+          className="mt-4 text-center text-sm"
+          style={{ color: "var(--color-ink-faint)" }}
+        >
           ¿Ya tienes cuenta?{" "}
           <Link
             href="/login"
-            className="font-medium text-blue-600 hover:text-blue-700"
+            className="font-medium transition-colors"
+            style={{ color: "var(--color-teak)" }}
+            onMouseEnter={(e) =>
+              ((e.currentTarget as HTMLAnchorElement).style.color =
+                "var(--color-mahogany)")
+            }
+            onMouseLeave={(e) =>
+              ((e.currentTarget as HTMLAnchorElement).style.color =
+                "var(--color-teak)")
+            }
           >
             Inicia sesión
           </Link>

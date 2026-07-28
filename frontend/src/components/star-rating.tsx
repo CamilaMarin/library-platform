@@ -54,9 +54,12 @@ export function StarRating({
             onKeyDown={(e) => handleKeyDown(e, star)}
             aria-label={`${star} estrella${star > 1 ? "s" : ""}`}
             tabIndex={readonly ? -1 : star === value || (value === 0 && star === 1) ? 0 : -1}
-            className={`text-2xl transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-1 rounded ${
+            className={`text-2xl transition-colors focus:outline-none rounded ${
               readonly ? "cursor-default" : "cursor-pointer"
-            } ${isFilled ? "text-yellow-400" : "text-gray-300"}`}
+            }`}
+            style={{
+              color: isFilled ? "var(--color-brass)" : "var(--color-aged)",
+            }}
           >
             {isFilled ? "★" : "☆"}
           </button>

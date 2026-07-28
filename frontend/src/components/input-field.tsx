@@ -32,10 +32,15 @@ export function InputField({
     <div className="flex flex-col gap-1">
       <label
         htmlFor={inputId}
-        className="text-sm font-medium text-gray-700"
+        className="text-sm font-medium"
+        style={{ color: "var(--color-ink-soft)" }}
       >
         {label}
-        {required && <span className="ml-1 text-red-500">*</span>}
+        {required && (
+          <span className="ml-1" style={{ color: "var(--color-leather)" }}>
+            *
+          </span>
+        )}
       </label>
       <input
         id={inputId}
@@ -48,14 +53,29 @@ export function InputField({
         disabled={disabled}
         aria-invalid={!!error}
         aria-describedby={error ? errorId : undefined}
-        className={`rounded-md border px-3 py-2 text-sm transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:cursor-not-allowed disabled:bg-gray-100 ${
+        className="rounded-md border px-3 py-2 text-sm transition-colors focus:outline-none disabled:cursor-not-allowed"
+        style={
           error
-            ? "border-red-500 focus:ring-red-500"
-            : "border-gray-300"
-        }`}
+            ? {
+                borderColor: "var(--color-leather)",
+                background: "var(--color-cream)",
+                color: "var(--color-ink)",
+                outlineColor: "var(--color-leather)",
+              }
+            : {
+                borderColor: "var(--color-border)",
+                background: "var(--color-cream)",
+                color: "var(--color-ink)",
+              }
+        }
       />
       {error && (
-        <p id={errorId} className="text-xs text-red-600" role="alert">
+        <p
+          id={errorId}
+          className="text-xs"
+          style={{ color: "var(--color-leather)" }}
+          role="alert"
+        >
           {error}
         </p>
       )}

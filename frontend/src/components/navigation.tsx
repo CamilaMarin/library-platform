@@ -3,31 +3,43 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useAuth } from "@/context/auth-context";
+import {
+  LayoutDashboard,
+  BookMarked,
+  Users,
+  Shuffle,
+  BookOpen,
+  Star,
+  ArrowLeftRight,
+  Settings,
+  LogOut,
+} from "lucide-react";
 
 interface NavItem {
   label: string;
   href: string;
-  icon: string;
+  icon: React.ReactNode;
 }
 
 const desktopNavItems: NavItem[] = [
-  { label: "Dashboard", href: "/dashboard", icon: "🏠" },
-  { label: "Biblioteca", href: "/library", icon: "📚" },
-  { label: "Grupos", href: "/groups", icon: "👥" },
-  { label: "Selección", href: "/selection", icon: "🎲" },
-  { label: "Clubes", href: "/clubs", icon: "📖" },
-  { label: "Reseñas", href: "/reviews", icon: "⭐" },
-  { label: "Préstamos", href: "/loans", icon: "🔄" },
-  { label: "Configuración", href: "/settings", icon: "⚙️" },
+  { label: "Dashboard",  href: "/dashboard", icon: <LayoutDashboard size={18} /> },
+  { label: "Biblioteca", href: "/library",   icon: <BookMarked size={18} /> },
+  { label: "Grupos",     href: "/groups",    icon: <Users size={18} /> },
+  { label: "Selección",  href: "/selection", icon: <Shuffle size={18} /> },
+  { label: "Clubes",     href: "/clubs",     icon: <BookOpen size={18} /> },
+  { label: "Reseñas",    href: "/reviews",   icon: <Star size={18} /> },
+  { label: "Préstamos",  href: "/loans",     icon: <ArrowLeftRight size={18} /> },
+  { label: "Configuración", href: "/settings", icon: <Settings size={18} /> },
 ];
 
+// Móvil: 5 items para que quepan cómodamente en pantallas pequeñas.
+// Grupos y Selección quedan accesibles desde el sidebar desktop o desde el Dashboard.
 const mobileNavItems: NavItem[] = [
-  { label: "Inicio", href: "/dashboard", icon: "🏠" },
-  { label: "Biblioteca", href: "/library", icon: "📚" },
-  { label: "Clubes", href: "/clubs", icon: "📖" },
-  { label: "Reseñas", href: "/reviews", icon: "⭐" },
-  { label: "Préstamos", href: "/loans", icon: "🔄" },
-  { label: "Ajustes", href: "/settings", icon: "⚙️" },
+  { label: "Inicio",     href: "/dashboard", icon: <LayoutDashboard size={20} /> },
+  { label: "Biblioteca", href: "/library",   icon: <BookMarked size={20} /> },
+  { label: "Clubes",     href: "/clubs",     icon: <BookOpen size={20} /> },
+  { label: "Reseñas",    href: "/reviews",   icon: <Star size={20} /> },
+  { label: "Ajustes",    href: "/settings",  icon: <Settings size={20} /> },
 ];
 
 export function Navigation() {
@@ -35,24 +47,36 @@ export function Navigation() {
   const { user, logout } = useAuth();
 
   function isActive(href: string): boolean {
-    if (href === "/dashboard") {
-      return pathname === "/dashboard";
-    }
+    if (href === "/dashboard") return pathname === "/dashboard";
     return pathname.startsWith(href);
   }
 
   return (
     <>
-      {/* Desktop Sidebar */}
+      {/* ── Sidebar desktop ───────────────────────────────────────────── */}
       <nav
         aria-label="Navegación principal"
-        className="hidden md:flex fixed left-0 top-0 h-full w-64 flex-col border-r border-gray-200 bg-white z-40"
+        className="hidden md:flex fixed left-0 top-0 h-full w-64 flex-col z-40"
+        style={{ background: "var(--color-walnut)", borderRight: "1px solid var(--color-mahogany)" }}
       >
-        <div className="px-6 py-5 border-b border-gray-100">
-          <h1 className="text-xl font-bold text-gray-900">EntreLíneas</h1>
+        {/* Logo */}
+        <div
+          className="px-6 py-5"
+          style={{ borderBottom: "1px solid var(--color-mahogany)" }}
+        >
+          <h1
+            className="text-xl font-bold tracking-tight"
+            style={{ fontFamily: "var(--font-playfair), Georgia, serif", color: "var(--color-parchment)" }}
+          >
+            EntreLíneas
+          </h1>
+          <p className="mt-0.5 text-[11px] tracking-widest uppercase" style={{ color: "var(--color-brass)" }}>
+            biblioteca familiar
+          </p>
         </div>
 
-        <ul className="flex-1 px-3 py-4 space-y-1 overflow-y-auto">
+        {/* Items */}
+        <ul className="flex-1 px-3 py-4 space-y-0.5 overflow-y-auto">
           {desktopNavItems.map((item) => {
             const active = isActive(item.href);
             return (
@@ -60,15 +84,35 @@ export function Navigation() {
                 <Link
                   href={item.href}
                   aria-current={active ? "page" : undefined}
-                  className={`flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
+                  className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors"
+                  style={
                     active
-                      ? "bg-blue-50 text-blue-700"
-                      : "text-gray-700 hover:bg-gray-100 hover:text-gray-900"
-                  }`}
+                      ? {
+                          background: "var(--color-brass)",
+                          color: "var(--color-walnut)",
+                        }
+                      : {
+                          color: "var(--color-ink-faint)",
+                        }
+                  }
+                  onMouseEnter={(e) => {
+                    if (!active) {
+                      (e.currentTarget as HTMLAnchorElement).style.background =
+                        "var(--color-mahogany)";
+                      (e.currentTarget as HTMLAnchorElement).style.color =
+                        "var(--color-parchment)";
+                    }
+                  }}
+                  onMouseLeave={(e) => {
+                    if (!active) {
+                      (e.currentTarget as HTMLAnchorElement).style.background =
+                        "transparent";
+                      (e.currentTarget as HTMLAnchorElement).style.color =
+                        "var(--color-ink-faint)";
+                    }
+                  }}
                 >
-                  <span className="text-lg" aria-hidden="true">
-                    {item.icon}
-                  </span>
+                  <span aria-hidden="true">{item.icon}</span>
                   {item.label}
                 </Link>
               </li>
@@ -76,23 +120,44 @@ export function Navigation() {
           })}
         </ul>
 
-        <div className="px-4 py-4 border-t border-gray-200">
-          <p className="text-sm font-medium text-gray-900 truncate">
+        {/* Usuario */}
+        <div
+          className="px-4 py-4"
+          style={{ borderTop: "1px solid var(--color-mahogany)" }}
+        >
+          <p
+            className="text-sm font-medium truncate"
+            style={{ color: "var(--color-parchment)" }}
+          >
             {user?.name || "Usuario"}
           </p>
           <button
             onClick={logout}
-            className="mt-2 text-sm text-gray-500 hover:text-red-600 transition-colors"
+            className="mt-2 flex items-center gap-1.5 text-sm transition-colors"
+            style={{ color: "var(--color-ink-faint)" }}
+            onMouseEnter={(e) =>
+              ((e.currentTarget as HTMLButtonElement).style.color =
+                "var(--color-brass-lt)")
+            }
+            onMouseLeave={(e) =>
+              ((e.currentTarget as HTMLButtonElement).style.color =
+                "var(--color-ink-faint)")
+            }
           >
+            <LogOut size={14} aria-hidden />
             Cerrar sesión
           </button>
         </div>
       </nav>
 
-      {/* Mobile Bottom Bar */}
+      {/* ── Barra móvil inferior ──────────────────────────────────────── */}
       <nav
         aria-label="Navegación móvil"
-        className="md:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 z-40"
+        className="md:hidden fixed bottom-0 left-0 right-0 z-40"
+        style={{
+          background: "var(--color-walnut)",
+          borderTop: "1px solid var(--color-mahogany)",
+        }}
       >
         <ul className="flex justify-around items-center h-16">
           {mobileNavItems.map((item) => {
@@ -102,15 +167,14 @@ export function Navigation() {
                 <Link
                   href={item.href}
                   aria-current={active ? "page" : undefined}
-                  className={`flex flex-col items-center gap-0.5 px-2 py-1 text-xs transition-colors ${
-                    active
-                      ? "text-blue-600"
-                      : "text-gray-500 hover:text-gray-700"
-                  }`}
+                  className="flex flex-col items-center gap-0.5 px-2 py-1 text-[10px] font-medium transition-colors"
+                  style={{
+                    color: active
+                      ? "var(--color-brass)"
+                      : "var(--color-ink-faint)",
+                  }}
                 >
-                  <span className="text-lg" aria-hidden="true">
-                    {item.icon}
-                  </span>
+                  <span aria-hidden="true">{item.icon}</span>
                   {item.label}
                 </Link>
               </li>

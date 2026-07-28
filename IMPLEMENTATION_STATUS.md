@@ -1,6 +1,6 @@
 # Implementation Status — EntreLíneas
 
-Last updated: 2025-07-27
+Last updated: 2025-07-28
 
 ## Overall Progress
 
@@ -109,15 +109,21 @@ Last updated: 2025-07-27
   - Club Detail (`/clubs/[id]`) — active book, comments with spoiler toggle, members
   - Reviews (`/reviews`) — create/edit/delete, star rating, privacy-first visibility
   - Settings (`/settings`) — ARCO data export, account deletion with email confirmation
+  - Privacy (`/privacy`) — Ley 21.719 policy page
 - **Infrastructure:**
   - API client (Bearer token, 401 refresh/retry, error propagation, toast integration)
   - Token storage (localStorage, JWT decode)
   - Auth context (login, register, logout, session persistence)
   - Toast system (auto-dismiss, stacked, responsive)
   - ProtectedRoute (redirect preservation)
-  - Navigation (desktop sidebar + mobile bottom bar)
-  - Shared components (InputField, SelectField, StarRating, ConfirmDialog, Skeleton)
+  - Navigation (desktop sidebar + mobile bottom bar — 5 items on mobile)
+  - Shared components (InputField, SelectField, StarRating, ConfirmDialog, Skeleton, LoanCard, LoanForm, CopyStatusBadge)
   - Testing infra (Vitest, React Testing Library, MSW, fast-check)
+- **Visual identity (sala de lectura):**
+  - Design tokens: walnut/mahogany/teak/brass/parchment/cream/ink/reading/leather
+  - Typography: Playfair Display (editorial) + Inter (UI)
+  - All pages and components migrated — zero gray/blue Tailwind tokens remaining
+  - Lucide icons used throughout (no emojis in UI chrome)
 - **Open issues:** None
 - **Blocking issues:** None
 
