@@ -4,6 +4,7 @@ import {
   setTokens,
   clearTokens,
 } from "./token-storage";
+import type { BookMetadata } from "../types";
 
 // === Toast handler (injectable, registered later by ToastContext) ===
 
@@ -208,4 +209,13 @@ export async function apiPostForm<T>(
     method: "POST",
     body: formData,
   });
+}
+
+export async function searchBookMetadata(
+  query: string,
+  type: "isbn" | "text" = "text"
+): Promise<BookMetadata[]> {
+  return apiGet<BookMetadata[]>(
+    `/books/metadata/search?query=${encodeURIComponent(query)}&type=${type}`
+  );
 }

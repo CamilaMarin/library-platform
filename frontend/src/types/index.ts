@@ -40,6 +40,15 @@ export interface CreateBookRequest {
   isbn?: string;
 }
 
+export interface BookMetadata {
+  title: string;
+  author: string | null;
+  genres: string[];
+  description: string | null;
+  pages: number | null;
+  isbn: string | null;
+}
+
 export interface Copy {
   id: string;
   book_id: string;
@@ -174,6 +183,16 @@ export interface CopyWithLoanStatus {
 export interface GroupMember {
   user_id: string;
   name: string;
+}
+
+// === Book Metadata (external search) ===
+export interface BookMetadata {
+  title: string;
+  author: string | null;
+  genres: string[];
+  description: string | null;
+  pages: number | null;
+  isbn: string | null;
 }
 
 // === API Error ===

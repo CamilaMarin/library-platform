@@ -21,8 +21,9 @@ A web platform for managing personal libraries (physical and digital) and foster
 | M8 Privacy Panel | ✅ Complete |
 | M9 Release Candidate | ✅ Complete |
 | Post-MVP: Integrated Reader | ✅ Complete |
+| Post-MVP: Metadata Import | ✅ Complete |
 
-**12/12 milestones complete + post-MVP reader** · Architecture frozen · 17 ADRs · 10 specs · ~450 tests
+**12/12 milestones complete + post-MVP reader & metadata import** · Architecture frozen · 17 ADRs · 11 specs · ~470 tests
 
 ## User Flow
 
@@ -88,6 +89,7 @@ See [docs/deployment.md](docs/deployment.md) for full guide with security checkl
 - **List View:** Searchable list with mini progress bars for books in progress
 - **Unified Book Modal:** Click any book to edit, manage copies, lend, change status, track progress
 - **Reading Progress:** Track current page with visual progress bar ("Página 145 / 320")
+- **Metadata Import:** Search Open Library by ISBN or title/author for autocomplete when adding books. Prefills form fields, fully editable before saving
 
 ### Integrated Reader
 - **EPUB reader:** epub.js with paginated flow, CFI-based position tracking, chapter navigation
@@ -130,7 +132,7 @@ See [docs/deployment.md](docs/deployment.md) for full guide with security checkl
 |--------|-----------|------------|
 | **Auth** | 4 | `POST /auth/register`, `/login`, `/refresh`, `/logout` |
 | **Groups** | 5 | `GET/POST /groups`, `/invitations`, `/{id}/members`, `/accept` |
-| **Books** | 6 | `GET/POST /books`, `/{id}`, `/statuses`, `/{id}/status` |
+| **Books** | 7 | `GET/POST /books`, `/{id}`, `/statuses`, `/{id}/status`, `/metadata/search` |
 | **Copies** | 6 | `POST /copies/physical`, `/digital`, `GET /copies/{id}`, `/{id}/file`, `/{id}/progress`, `PUT /{id}/progress` |
 | **Clubs** | 8 | `GET/POST /clubs`, `/{id}`, `/members`, `/comments`, `/active-book`, `/available-books` |
 | **Reviews** | 5 | `GET/POST /reviews`, `/shared`, `PATCH/DELETE /{id}`, `GET /books/{id}/reviews` |

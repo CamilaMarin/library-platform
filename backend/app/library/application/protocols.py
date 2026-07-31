@@ -7,7 +7,21 @@ Reference: ADR-0017 (cloud agnostic — all dependencies behind abstractions)
 from typing import Protocol
 from uuid import UUID
 
-from app.library.domain.entities import Book, Copy, ReadingProgress, ReadingStatus
+from app.library.domain.entities import (
+    Book,
+    BookMetadata,
+    Copy,
+    ReadingProgress,
+    ReadingStatus,
+)
+
+
+class MetadataProviderError(Exception):
+    """Raised when an external metadata provider is unreachable or returns an error."""
+
+    def __init__(self, message: str = "External metadata service unavailable"):
+        super().__init__(message)
+        self.message = message
 
 
 class BookRepository(Protocol):
@@ -100,3 +114,39 @@ class ReadingProgressRepository(Protocol):
     def find_by_user(self, user_id: UUID) -> list[ReadingProgress]: ...
 
     def delete_by_copy(self, copy_id: UUID) -> None: ...
+
+
+class MetadataProvider(Protocol):
+    """Abstraction for external book metadata sources.
+
+    Reference: ADR-0017 (cloud agnostic — all dependencies behind abstractions)
+    """
+
+    def search_by_isbn(self, isbn: str) -> BookMetadata | None:
+        """Search for a single book by ISBN.
+
+        Args:
+            isbn: A normalized ISBN-10 or ISBN-13 (digits only, no hyphens).
+
+        Returns:
+            BookMetadata if found, None if no match exists.
+
+        Raises:
+            MetadataProviderError: On network failure or timeout.
+        """
+        ...
+
+    def search_by_text(self, query: str, limit: int = 10) -> list[BookMetadata]:
+        """Search for books by title/author free text.
+
+        Args:
+            query: Free-text search string (title, author, or combination).
+            limit: Maximum results to return (default 10, max 10).
+
+        Returns:
+            List of BookMetadata results, possibly empty.
+
+        Raises:
+            MetadataProviderError: On network failure or timeout.
+        """
+        ...

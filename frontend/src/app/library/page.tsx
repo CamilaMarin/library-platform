@@ -11,7 +11,7 @@ import { BookShelf } from "@/components/book-shelf";
 import { BookDetailModal } from "@/components/book-detail-modal";
 import { useToast } from "@/context/toast-context";
 import { useAuth } from "@/context/auth-context";
-import { apiGet, apiPost, apiDelete, apiPut, ApiError } from "@/lib/api-client";
+import { apiGet, apiPost, apiDelete, apiPut, ApiError, searchBookMetadata } from "@/lib/api-client";
 import type {
   Book,
   Copy,
@@ -21,6 +21,7 @@ import type {
   BookReadingStatus,
   ReadingStatusValue,
   StatusMap,
+  BookMetadata,
 } from "@/types";
 import { READING_STATUS_LABELS, SHELF_ORDER } from "@/types";
 
@@ -62,6 +63,14 @@ export default function LibraryPage() {
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const { showToast } = useToast();
   const { user } = useAuth();
+
+  // Metadata autocomplete state
+  const [metadataQuery, setMetadataQuery] = useState("");
+  const [metadataType, setMetadataType] = useState<"text" | "isbn">("text");
+  const [metadataResults, setMetadataResults] = useState<BookMetadata[]>([]);
+  const [metadataLoading, setMetadataLoading] = useState(false);
+  const [metadataError, setMetadataError] = useState<string | null>(null);
+  const metadataDebounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   // Loan state
   const [expandedBookId, setExpandedBookId] = useState<string | null>(null);
@@ -134,7 +143,10 @@ export default function LibraryPage() {
   };
 
   useEffect(() => {
-    return () => { if (debounceRef.current) clearTimeout(debounceRef.current); };
+    return () => {
+      if (debounceRef.current) clearTimeout(debounceRef.current);
+      if (metadataDebounceRef.current) clearTimeout(metadataDebounceRef.current);
+    };
   }, []);
 
   // ── Reading status change handler ────────────────────────────────────────
@@ -161,6 +173,102 @@ export default function LibraryPage() {
     },
     [showToast, fetchBooks, searchTerm]
   );
+
+  // ── Metadata autocomplete handlers ─────────────────────────────────────
+  const handleMetadataQueryChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    setMetadataQuery(value);
+    setMetadataError(null);
+
+    if (metadataDebounceRef.current) clearTimeout(metadataDebounceRef.current);
+
+    if (value.trim().length < 3) {
+      setMetadataResults([]);
+      setMetadataLoading(false);
+      return;
+    }
+
+    setMetadataLoading(true);
+    metadataDebounceRef.current = setTimeout(async () => {
+      try {
+        const results = await searchBookMetadata(value.trim(), metadataType);
+        setMetadataResults(results);
+        setMetadataError(null);
+      } catch (err) {
+        setMetadataResults([]);
+        if (err instanceof ApiError) {
+          if (err.status === 503) {
+            setMetadataError("Servicio de metadatos no disponible. Puedes agregar el libro manualmente.");
+          } else if (err.status === 422) {
+            setMetadataError("Formato de ISBN inválido");
+          } else {
+            setMetadataError("Error al buscar metadatos");
+          }
+        } else {
+          setMetadataError("Error al buscar metadatos");
+        }
+      } finally {
+        setMetadataLoading(false);
+      }
+    }, 300);
+  };
+
+  const handleMetadataTypeChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const newType = e.target.value as "text" | "isbn";
+    setMetadataType(newType);
+    setMetadataResults([]);
+    setMetadataError(null);
+    // Re-trigger search if query is long enough
+    if (metadataQuery.trim().length >= 3) {
+      setMetadataLoading(true);
+      if (metadataDebounceRef.current) clearTimeout(metadataDebounceRef.current);
+      metadataDebounceRef.current = setTimeout(async () => {
+        try {
+          const results = await searchBookMetadata(metadataQuery.trim(), newType);
+          setMetadataResults(results);
+        } catch (err) {
+          setMetadataResults([]);
+          if (err instanceof ApiError) {
+            if (err.status === 503) {
+              setMetadataError("Servicio de metadatos no disponible. Puedes agregar el libro manualmente.");
+            } else if (err.status === 422) {
+              setMetadataError("Formato de ISBN inválido");
+            } else {
+              setMetadataError("Error al buscar metadatos");
+            }
+          } else {
+            setMetadataError("Error al buscar metadatos");
+          }
+        } finally {
+          setMetadataLoading(false);
+        }
+      }, 300);
+    }
+  };
+
+  const handleMetadataSelect = (metadata: BookMetadata) => {
+    setAddBookForm((prev) => ({
+      ...prev,
+      title: metadata.title,
+      author: metadata.author ?? "",
+      isbn: metadata.isbn ?? "",
+      genres: metadata.genres.join(", "),
+      description: metadata.description ?? "",
+      pages: metadata.pages !== null ? String(metadata.pages) : "",
+    }));
+    setMetadataResults([]);
+    setMetadataQuery("");
+    setMetadataError(null);
+    setAddBookErrors({});
+  };
+
+  const resetMetadataState = () => {
+    setMetadataQuery("");
+    setMetadataResults([]);
+    setMetadataLoading(false);
+    setMetadataError(null);
+    if (metadataDebounceRef.current) clearTimeout(metadataDebounceRef.current);
+  };
 
   // ── Book form handlers ───────────────────────────────────────────────────
   const handleAddBookChange = (
@@ -209,6 +317,7 @@ export default function LibraryPage() {
       setAddBookForm(initialFormState);
       setShowAddForm(false);
       showToast("Libro agregado exitosamente", "success");
+      resetMetadataState();
     } catch (err) {
       if (err instanceof ApiError && typeof err.detail === "object")
         setAddBookErrors(err.detail as Record<string, string>);
@@ -367,6 +476,75 @@ export default function LibraryPage() {
               <h2 className="text-lg font-semibold" style={{ fontFamily: "var(--font-playfair), Georgia, serif", color: "var(--color-walnut)" }}>
                 Nuevo libro
               </h2>
+
+              {/* ── Metadata autocomplete search ─────────────────── */}
+              <div className="rounded-md p-4 space-y-3" style={{ background: "var(--color-parchment)", border: "1px solid var(--color-border)" }}>
+                <label className="text-sm font-medium" style={{ color: "var(--color-ink-soft)" }}>
+                  Buscar libro (autocompletar metadatos)
+                </label>
+                <div className="flex gap-2">
+                  <input
+                    type="text"
+                    value={metadataQuery}
+                    onChange={handleMetadataQueryChange}
+                    placeholder={metadataType === "isbn" ? "Ingresa un ISBN..." : "Buscar por título o autor..."}
+                    className="flex-1 rounded-md border px-3 py-2 text-sm transition-colors focus:outline-none"
+                    style={{ borderColor: "var(--color-border)", background: "var(--color-cream)", color: "var(--color-ink)" }}
+                  />
+                  <select
+                    value={metadataType}
+                    onChange={handleMetadataTypeChange}
+                    className="rounded-md border px-3 py-2 text-sm"
+                    style={{ borderColor: "var(--color-border)", background: "var(--color-cream)", color: "var(--color-ink)" }}
+                  >
+                    <option value="text">Texto</option>
+                    <option value="isbn">ISBN</option>
+                  </select>
+                </div>
+
+                {/* Loading indicator */}
+                {metadataLoading && (
+                  <p className="text-xs" style={{ color: "var(--color-ink-faint)" }}>Buscando...</p>
+                )}
+
+                {/* Error message */}
+                {metadataError && (
+                  <p className="text-xs" style={{ color: "var(--color-leather)" }} role="alert">{metadataError}</p>
+                )}
+
+                {/* Results list */}
+                {metadataResults.length > 0 && (
+                  <ul className="rounded-md border divide-y max-h-48 overflow-y-auto" style={{ borderColor: "var(--color-border)" }}>
+                    {metadataResults.map((result, idx) => (
+                      <li key={`${result.isbn ?? result.title}-${idx}`}>
+                        <button
+                          type="button"
+                          onClick={() => handleMetadataSelect(result)}
+                          className="w-full text-left px-3 py-2 text-sm transition-colors hover:bg-opacity-80"
+                          style={{ background: "var(--color-cream)", color: "var(--color-ink)" }}
+                          onMouseEnter={(e) => ((e.currentTarget as HTMLButtonElement).style.background = "var(--color-parchment)")}
+                          onMouseLeave={(e) => ((e.currentTarget as HTMLButtonElement).style.background = "var(--color-cream)")}
+                        >
+                          <span className="font-medium" style={{ color: "var(--color-walnut)" }}>{result.title}</span>
+                          {result.author && (
+                            <span style={{ color: "var(--color-ink-faint)" }}> — {result.author}</span>
+                          )}
+                          {result.isbn && (
+                            <span className="ml-2 text-xs" style={{ color: "var(--color-ink-faint)" }}>ISBN: {result.isbn}</span>
+                          )}
+                        </button>
+                      </li>
+                    ))}
+                  </ul>
+                )}
+
+                {/* Empty results message */}
+                {!metadataLoading && !metadataError && metadataQuery.trim().length >= 3 && metadataResults.length === 0 && (
+                  <p className="text-xs" style={{ color: "var(--color-ink-faint)" }}>
+                    No se encontraron resultados. Puedes agregar el libro manualmente.
+                  </p>
+                )}
+              </div>
               {addBookErrors._general && <p className="text-sm" style={{ color: "var(--color-leather)" }} role="alert">{addBookErrors._general}</p>}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <InputField label="Título" name="title" value={addBookForm.title} onChange={handleAddBookChange} error={addBookErrors.title} required placeholder="Título del libro" />
@@ -389,7 +567,7 @@ export default function LibraryPage() {
                   style={{ borderColor: "var(--color-border)", background: "var(--color-cream)", color: "var(--color-ink)" }} />
               </div>
               <div className="flex justify-end gap-3">
-                <button type="button" onClick={() => { setShowAddForm(false); setAddBookForm(initialFormState); setAddBookErrors({}); }}
+                <button type="button" onClick={() => { setShowAddForm(false); setAddBookForm(initialFormState); setAddBookErrors({}); resetMetadataState(); }}
                   className="rounded-full px-4 py-2 text-sm font-medium transition-colors"
                   style={{ border: "1px solid var(--color-border)", color: "var(--color-ink-soft)", background: "transparent" }}
                   onMouseEnter={(e) => ((e.currentTarget as HTMLButtonElement).style.background = "var(--color-parchment)")}
