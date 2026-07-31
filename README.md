@@ -20,8 +20,9 @@ A web platform for managing personal libraries (physical and digital) and foster
 | M7 Loans | ✅ Complete |
 | M8 Privacy Panel | ✅ Complete |
 | M9 Release Candidate | ✅ Complete |
+| Post-MVP: Integrated Reader | ✅ Complete |
 
-**12/12 milestones complete** · Architecture frozen · 17 ADRs · 10 specs · 379 tests
+**12/12 milestones complete + post-MVP reader** · Architecture frozen · 17 ADRs · 10 specs · ~450 tests
 
 ## User Flow
 
@@ -88,6 +89,15 @@ See [docs/deployment.md](docs/deployment.md) for full guide with security checkl
 - **Unified Book Modal:** Click any book to edit, manage copies, lend, change status, track progress
 - **Reading Progress:** Track current page with visual progress bar ("Página 145 / 320")
 
+### Integrated Reader
+- **EPUB reader:** epub.js with paginated flow, CFI-based position tracking, chapter navigation
+- **PDF reader:** PDF.js with single-page render, page navigation, keyboard shortcuts
+- **Auto-save progress:** Debounced (5s), syncs with library preview bar
+- **Position restore:** Reopening a book resumes from exact last position
+- **Upload:** Drag & drop EPUB/PDF files directly from book detail modal
+- **Mobile responsive:** Touch-friendly navigation, full-screen reading mode
+- **Security:** File served only to authenticated owner (403 for everyone else)
+
 ### Social Reading
 - **Family Groups:** Invitation-based membership with multi-group support
 - **Book Clubs:** Clubs within family groups, active book coordination, spoiler-safe comments
@@ -121,7 +131,7 @@ See [docs/deployment.md](docs/deployment.md) for full guide with security checkl
 | **Auth** | 4 | `POST /auth/register`, `/login`, `/refresh`, `/logout` |
 | **Groups** | 5 | `GET/POST /groups`, `/invitations`, `/{id}/members`, `/accept` |
 | **Books** | 6 | `GET/POST /books`, `/{id}`, `/statuses`, `/{id}/status` |
-| **Copies** | 3 | `POST /copies/physical`, `/digital`, `GET /copies?book_id=` |
+| **Copies** | 6 | `POST /copies/physical`, `/digital`, `GET /copies/{id}`, `/{id}/file`, `/{id}/progress`, `PUT /{id}/progress` |
 | **Clubs** | 8 | `GET/POST /clubs`, `/{id}`, `/members`, `/comments`, `/active-book`, `/available-books` |
 | **Reviews** | 5 | `GET/POST /reviews`, `/shared`, `PATCH/DELETE /{id}`, `GET /books/{id}/reviews` |
 | **Loans** | 4 | `POST /copies/{id}/loans`, `GET /loans`, `/borrowed`, `PATCH /{id}/return` |
@@ -182,7 +192,7 @@ Key decisions: [17 ADRs](docs/adr/) · Cloud agnostic · Ley 21.719 compliance f
 backend/           FastAPI + SQLAlchemy + Alembic
   app/
     identity/      Authentication, users, groups
-    library/       Books, copies, reading status, file storage
+    library/       Books, copies, reading status, file storage, integrated reader
     community/     Clubs, reading turns, comments
     reviews/       Book reviews with visibility control
     reading_selection/  Draw, pick-by-turn
@@ -191,10 +201,10 @@ backend/           FastAPI + SQLAlchemy + Alembic
     security/      Field encryption
 frontend/          Next.js + React + TypeScript + Tailwind
   src/
-    app/           Pages (library, loans, reviews, groups, clubs, settings…)
-    components/    Shared UI (BookSpine, BookShelf, BookDetailModal, Navigation…)
+    app/           Pages (library, loans, reviews, groups, clubs, settings, reader…)
+    components/    Shared UI (BookSpine, BookShelf, BookDetailModal, PdfReader, EpubReader, Navigation…)
     context/       Auth + Toast providers
-    lib/           API client, token storage
+    lib/           API client, token storage, useReadingProgress hook
     types/         TypeScript contracts
 docs/              Project documentation + deployment guide
 .kiro/             Specifications + steering rules

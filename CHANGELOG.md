@@ -6,7 +6,37 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
-## [1.0.0-rc.1] — 2025-07-28
+## [1.1.0] — 2026-07-31
+
+### Added (Integrated Reader — EPUB/PDF)
+- `ReadingProgress` domain entity with ownership invariant and format-appropriate positioning (CFI for EPUB, page number for PDF)
+- `FileFormat` enum (`epub`, `pdf`) in Library domain
+- `OpenReader` use case: ownership-gated file serving (always 403, never 404 for non-owners — ADR-0014)
+- `SaveReadingProgress` use case: upsert with idempotency, validates ownership + digital-only + position format
+- `GetReadingProgress` use case: owner-only retrieval with 404 for no-progress-yet
+- `ReadingProgressRepository` protocol + `SqlReadingProgressRepository` (PostgreSQL upsert)
+- `ReadingProgressModel` (SQLAlchemy) with `UNIQUE(user_id, copy_id)` constraint
+- Alembic migration 0013: `reading_progress` table
+- `GET /copies/{id}/file` — serves encrypted file to authenticated owner only
+- `GET /copies/{id}/progress` — retrieves last saved reading position
+- `PUT /copies/{id}/progress` — saves/updates position (debounced from frontend)
+- `GET /copies/{id}` — copy detail endpoint (format without file_ref exposure)
+- PDF.js reader component (`pdfjs-dist@4.9.155`): single-page render, page navigation, keyboard shortcuts, mobile-responsive
+- epub.js reader component (`epubjs@0.3.93`): paginated flow, CFI tracking, chapter display, progress bar
+- `useReadingProgress` hook: fetches progress on mount, debounced auto-save (5s max interval)
+- `/reader/[copyId]` protected route: format detection, renders appropriate reader
+- Progress sync to `ReadingStatus.current_page`: PDF (direct page number), EPUB (percentage × book.pages)
+- Digital file upload button in book detail modal (accepts .epub/.pdf, max 50MB)
+- "Leer" button on digital copies navigating to `/reader/{copyId}`
+- 59 backend tests + 8 frontend tests
+
+### Security
+- File ownership gate: `GET /copies/{id}/file` returns 403 for both non-existent and non-owned copies (no existence leakage)
+- `file_ref` never exposed in any API response (ADR-0009)
+- Progress isolation: user can only read/write progress for their own copies (Property 2)
+- Cross-user tests verify complete isolation across all reader endpoints
+
+## [1.0.0-rc.1] — 2026-07-28
 
 ### Fixed (M9 — Final Cleanup)
 - test_encryption.py: graceful skip when cryptography module unavailable

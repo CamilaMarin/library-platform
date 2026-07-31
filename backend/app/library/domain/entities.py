@@ -110,3 +110,77 @@ class ReadingStatus:
     current_page: int | None = None
     id: UUID = field(default_factory=uuid4)
     updated_at: datetime = field(default_factory=_utcnow)
+
+
+class FileFormat(str, Enum):
+    """Supported digital file formats for the integrated reader."""
+
+    EPUB = "epub"
+    PDF = "pdf"
+
+
+@dataclass
+class ReadingProgress:
+    """Tracks a user's reading position in a digital copy.
+
+    Personal data under Ley 21.719 (Chile's Data Protection Law) —
+    included in ARCO export; deleted via ON DELETE CASCADE on user_id.
+
+    Reference: .kiro/specs/reader/design.md, ADR-0014
+
+    Invariants:
+    - Ownership: progress.user_id must match the copy's user_id (Property 2).
+    - Format-appropriate positioning: EPUB uses CFI strings, PDF uses page numbers (Property 4).
+    - Percentage range: 0.0 <= percentage <= 1.0.
+    """
+
+    user_id: UUID
+    copy_id: UUID
+    position: str
+    file_format: FileFormat
+    percentage: float = 0.0
+    id: UUID = field(default_factory=uuid4)
+    last_read_at: datetime = field(default_factory=_utcnow)
+
+    def __post_init__(self):
+        self._validate_percentage()
+        self._validate_position_format()
+
+    def _validate_percentage(self) -> None:
+        if not (0.0 <= self.percentage <= 1.0):
+            raise ValueError(
+                f"Percentage must be between 0.0 and 1.0, got {self.percentage}"
+            )
+
+    def _validate_position_format(self) -> None:
+        """Enforce format-appropriate positioning (Property 4).
+
+        EPUB: must be a CFI string starting with 'epubcfi('.
+        PDF: must be a string representing a positive integer (page number).
+        """
+        if self.file_format == FileFormat.EPUB:
+            if not self.position.startswith("epubcfi("):
+                raise ValueError(
+                    "EPUB position must be a CFI string starting with 'epubcfi('"
+                )
+            if not self.position.endswith(")"):
+                raise ValueError(
+                    "EPUB position must be a valid CFI string ending with ')'"
+                )
+        elif self.file_format == FileFormat.PDF:
+            if not self.position.isdigit() or int(self.position) < 1:
+                raise ValueError(
+                    "PDF position must be a string representing a positive integer page number"
+                )
+
+    @staticmethod
+    def validate_ownership(user_id: UUID, copy_user_id: UUID) -> None:
+        """Validate ownership invariant (Property 2).
+
+        ReadingProgress can only exist where progress.user_id == copy.user_id.
+        Raises ValueError if ownership check fails.
+        """
+        if user_id != copy_user_id:
+            raise ValueError(
+                "ReadingProgress can only be created for copies owned by the user"
+            )

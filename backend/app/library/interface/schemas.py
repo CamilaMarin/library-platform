@@ -89,3 +89,20 @@ class ReadingStatusResponse(BaseModel):
     updated_at: datetime
 
     model_config = {"from_attributes": True}
+
+
+class ReadingProgressResponse(BaseModel):
+    """Response for GET /copies/{id}/progress.
+
+    Reference: .kiro/specs/reader/requirements.md Req 2.2
+    """
+
+    id: UUID
+    user_id: UUID
+    copy_id: UUID
+    position: str
+    file_format: str
+    percentage: float
+    last_read_at: str  # ISO datetime string
+
+    model_config = {"from_attributes": True}

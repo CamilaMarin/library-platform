@@ -6,7 +6,17 @@ Reference: docs/architecture/database.md
 
 import uuid
 
-from sqlalchemy import Column, DateTime, ForeignKey, Integer, String, Text, UniqueConstraint, func
+from sqlalchemy import (
+    Column,
+    DateTime,
+    Float,
+    ForeignKey,
+    Integer,
+    String,
+    Text,
+    UniqueConstraint,
+    func,
+)
 from sqlalchemy.dialects.postgresql import ARRAY, UUID
 
 from app.database import Base
@@ -82,4 +92,40 @@ class ReadingStatusModel(Base):
         nullable=False,
         server_default=func.now(),
         onupdate=func.now(),
+    )
+
+
+class ReadingProgressModel(Base):
+    """ORM model for the reading_progress table.
+
+    Unique constraint on (user_id, copy_id) enforces Property 3 (idempotent upsert).
+    ON DELETE CASCADE on both FKs handles ARCO cancellation automatically.
+    Reference: .kiro/specs/reader/design.md
+    """
+
+    __tablename__ = "reading_progress"
+    __table_args__ = (
+        UniqueConstraint("user_id", "copy_id", name="uq_reading_progress_user_copy"),
+    )
+
+    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    user_id = Column(
+        UUID(as_uuid=True),
+        ForeignKey("users.id", ondelete="CASCADE"),
+        nullable=False,
+        index=True,
+    )
+    copy_id = Column(
+        UUID(as_uuid=True),
+        ForeignKey("copies.id", ondelete="CASCADE"),
+        nullable=False,
+        index=True,
+    )
+    position = Column(String(1000), nullable=False)
+    file_format = Column(String(20), nullable=False)
+    percentage = Column(Float, nullable=False, default=0.0)
+    last_read_at = Column(
+        DateTime(timezone=True),
+        nullable=False,
+        server_default=func.now(),
     )

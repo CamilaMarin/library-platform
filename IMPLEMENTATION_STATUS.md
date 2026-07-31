@@ -1,6 +1,6 @@
 # Implementation Status — EntreLíneas
 
-Last updated: 2025-07-28 (M9 Complete — Release Candidate)
+Last updated: 2026-07-31 (Post-MVP: Integrated Reader)
 
 ## Overall Progress
 
@@ -162,6 +162,34 @@ Last updated: 2025-07-28 (M9 Complete — Release Candidate)
 - **Open issues:** None
 - **Blocking issues:** None
 
+### Integrated Reader (EPUB/PDF)
+- **Status:** Complete
+- **Milestone:** Post-MVP (v1)
+- **Spec:** `.kiro/specs/reader/`
+- **Completed tasks:** 7/7
+- **Remaining tasks:** 0
+- **Test coverage:** 59 backend tests (17 domain + 15 use case + 4 get progress + 23 integration/security) + 8 frontend tests
+- **Implemented:**
+  - `ReadingProgress` domain entity with ownership and format invariants
+  - `FileFormat` enum (EPUB, PDF)
+  - `OpenReader` use case — ownership-gated file serving (Property 1)
+  - `SaveReadingProgress` use case — upsert with idempotency (Property 3)
+  - `GetReadingProgress` use case — owner-only retrieval (Property 2)
+  - `ReadingProgressRepository` protocol + `SqlReadingProgressRepository`
+  - `ReadingProgressModel` + Alembic migration 0013
+  - `GET /copies/{id}/file` — stream file to owner only (403 for non-owners, never 404)
+  - `GET /copies/{id}/progress` — retrieve last position
+  - `PUT /copies/{id}/progress` — save/update position (CFI for EPUB, page for PDF)
+  - `GET /copies/{id}` — copy detail without file_ref exposure
+  - PDF.js reader component (pdfjs-dist 4.9.155) with page navigation
+  - epub.js reader component (epubjs 0.3.93) with CFI tracking
+  - `useReadingProgress` hook with 5-second debounced auto-save
+  - `/reader/[copyId]` protected route with format detection
+  - Progress sync: reader auto-updates `ReadingStatus.current_page` for library preview
+  - Digital file upload UI + "Leer" button in book detail modal
+- **Open issues:** None
+- **Blocking issues:** None
+
 ## Risk Log
 
 | Risk | Status | Milestone | Notes |
@@ -177,7 +205,7 @@ Last updated: 2025-07-28 (M9 Complete — Release Candidate)
 
 | Feature | Reason | Original milestone |
 |---------|--------|-------------------|
-| Integrated Reader (EPUB/PDF) | Highest technical risk | Was M4 |
+| ~~Integrated Reader (EPUB/PDF)~~ | ✅ Implemented (post-MVP) | Was M4 |
 | Bookmarks & Notes | Reader-dependent | Was M4 |
 | Metadata Import (Open Library) | Convenience, no dependency | Was M3 |
 | Advanced audit logging | Extensible later | Was M0 |
@@ -189,7 +217,7 @@ Last updated: 2025-07-28 (M9 Complete — Release Candidate)
 All 12 milestones have been completed. The project is at Release Candidate status.
 
 ### Post-MVP backlog (deferred to v1):
-- Integrated Reader (EPUB/PDF)
+- ~~Integrated Reader (EPUB/PDF)~~ ✅ Implemented
 - Bookmarks & Notes
 - Metadata Import (Open Library)
 - Minor accounts / adult-minor linking

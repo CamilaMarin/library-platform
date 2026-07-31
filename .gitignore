@@ -58,3 +58,5 @@ minio-data/
 
 # Ruff
 .ruff_cache/
+backend/storage/
+.kiro/specs/*/tasks.meta.json
