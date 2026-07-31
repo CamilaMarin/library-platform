@@ -6,7 +6,7 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
-## [1.1.0] — 2025-07-31
+## [1.1.0] — 2026-07-31
 
 ### Added (Integrated Reader — EPUB/PDF)
 - `ReadingProgress` domain entity with ownership invariant and format-appropriate positioning (CFI for EPUB, page number for PDF)
@@ -36,7 +36,7 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 - Progress isolation: user can only read/write progress for their own copies (Property 2)
 - Cross-user tests verify complete isolation across all reader endpoints
 
-## [1.0.0-rc.1] — 2025-07-28
+## [1.0.0-rc.1] — 2026-07-28
 
 ### Fixed (M9 — Final Cleanup)
 - test_encryption.py: graceful skip when cryptography module unavailable

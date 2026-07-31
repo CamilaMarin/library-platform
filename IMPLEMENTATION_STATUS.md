@@ -1,6 +1,6 @@
 # Implementation Status — EntreLíneas
 
-Last updated: 2025-07-31 (Post-MVP: Integrated Reader)
+Last updated: 2026-07-31 (Post-MVP: Integrated Reader)
 
 ## Overall Progress
 
