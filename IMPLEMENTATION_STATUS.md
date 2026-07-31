@@ -1,6 +1,6 @@
 # Implementation Status — EntreLíneas
 
-Last updated: 2026-07-31 (Post-MVP: Integrated Reader)
+Last updated: 2026-07-31 (Post-MVP: Metadata Import)
 
 ## Overall Progress
 
@@ -44,7 +44,7 @@ Last updated: 2026-07-31 (Post-MVP: Integrated Reader)
 - **Spec:** `.kiro/specs/library/`, `.kiro/specs/reading-status/`
 - **Completed tasks:** 6/7 (task 5 Import deferred to v1) + 9/9 Reading Status tasks
 - **Remaining tasks:** 0
-- **Test coverage:** 26 tests (11 domain + 15 integration)
+- **Test coverage:** 42 tests (11 domain + 15 integration + 5 property + 11 metadata integration)
 - **Reading Status additions:**
   - `ReadingStatus` entity + `ReadingStatusValue` enum in domain
   - `reading_statuses` table (migration 0011) with `UNIQUE(user_id, book_id)`, ON DELETE CASCADE
@@ -53,6 +53,16 @@ Last updated: 2026-07-31 (Post-MVP: Integrated Reader)
   - `GET /books/statuses`, `PUT /books/{id}/status`, `DELETE /books/{id}/status` endpoints
   - Books can be created without copies (auto-tagged `want_to_read`)
   - `GET /books` returns books with copies OR books with reading status (UNION query)
+- **Metadata Import additions:**
+  - `BookMetadata` frozen dataclass (transient value object in domain)
+  - `MetadataProvider` protocol + `MetadataProviderError` in application layer
+  - `SearchBookMetadata` use case with ISBN validation (text + ISBN modes)
+  - `OpenLibraryAdapter` infrastructure (5s timeout, graceful degradation, privacy-safe)
+  - `GET /books/metadata/search` endpoint (auth required, 422/503 error mapping)
+  - `BookMetadataResponse` Pydantic schema
+  - Frontend autocomplete UI in add book form (debounced search, results dropdown, form prefill)
+  - `searchBookMetadata()` API client helper
+  - 5 property-based tests (Hypothesis) + 11 integration tests
 - **Open issues:** None
 - **Blocking issues:** None
 
@@ -207,7 +217,7 @@ Last updated: 2026-07-31 (Post-MVP: Integrated Reader)
 |---------|--------|-------------------|
 | ~~Integrated Reader (EPUB/PDF)~~ | ✅ Implemented (post-MVP) | Was M4 |
 | Bookmarks & Notes | Reader-dependent | Was M4 |
-| Metadata Import (Open Library) | Convenience, no dependency | Was M3 |
+| ~~Metadata Import (Open Library)~~ | ✅ Implemented (post-MVP) | Was M3 |
 | Advanced audit logging | Extensible later | Was M0 |
 | Automated retention worker | Operational, not domain | Was M8 |
 | Application-level encryption at rest | Key management complexity; infrastructure-level encryption sufficient pre-launch; gated by legal review (ADR-0018) | Was M8 (Task 6) |
@@ -219,7 +229,7 @@ All 12 milestones have been completed. The project is at Release Candidate statu
 ### Post-MVP backlog (deferred to v1):
 - ~~Integrated Reader (EPUB/PDF)~~ ✅ Implemented
 - Bookmarks & Notes
-- Metadata Import (Open Library)
+- ~~Metadata Import (Open Library)~~ ✅ Implemented
 - Minor accounts / adult-minor linking
 - Lending to people outside the platform
 - Application-level encryption at rest

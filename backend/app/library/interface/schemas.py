@@ -106,3 +106,14 @@ class ReadingProgressResponse(BaseModel):
     last_read_at: str  # ISO datetime string
 
     model_config = {"from_attributes": True}
+
+
+class BookMetadataResponse(BaseModel):
+    """A single metadata search result."""
+
+    title: str
+    author: str | None = None
+    genres: list[str] = Field(default_factory=list)
+    description: str | None = None
+    pages: int | None = None
+    isbn: str | None = None

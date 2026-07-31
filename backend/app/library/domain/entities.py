@@ -184,3 +184,25 @@ class ReadingProgress:
             raise ValueError(
                 "ReadingProgress can only be created for copies owned by the user"
             )
+
+
+@dataclass(frozen=True)
+class BookMetadata:
+    """Transient value object for externally sourced book metadata.
+
+    All fields except title are optional — external sources may not
+    have complete information for every edition.
+
+    This is NOT an entity — it has no identity or persistence.
+    Used exclusively as an in-memory representation of search results
+    from external metadata providers.
+
+    Reference: .kiro/specs/metadata-import/design.md
+    """
+
+    title: str
+    author: str | None = None
+    genres: list[str] = field(default_factory=list)
+    description: str | None = None
+    pages: int | None = None
+    isbn: str | None = None

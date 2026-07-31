@@ -15,14 +15,22 @@ from app.library.application.create_book import CreateBookRequest as CreateBookI
 from app.library.application.delete_book import BookHasCopiesError, DeleteBook
 from app.library.application.edit_book import EditBook, EditBookRequest
 from app.library.application.get_reading_statuses import GetReadingStatuses
+from app.library.application.protocols import MetadataProviderError
+from app.library.application.search_book_metadata import (
+    InvalidIsbnError,
+    SearchBookMetadata,
+    SearchBookMetadataRequest,
+)
 from app.library.application.search_books import SearchBooks
 from app.library.application.set_reading_status import SetReadingStatus, SetReadingStatusRequest
+from app.library.infrastructure.open_library_adapter import OpenLibraryAdapter
 from app.library.infrastructure.repositories import (
     SqlBookRepository,
     SqlCopyRepository,
     SqlReadingStatusRepository,
 )
 from app.library.interface.schemas import (
+    BookMetadataResponse,
     BookResponse,
     CreateBookRequest,
     ReadingStatusResponse,
@@ -59,6 +67,48 @@ def get_reading_statuses(
             updated_at=r.updated_at,
         )
         for r in records
+    ]
+
+
+@router.get("/metadata/search", response_model=list[BookMetadataResponse])
+def search_book_metadata(
+    query: str,
+    type: str = "text",
+    user_id: UUID = Depends(get_current_user_id),
+):
+    """Search external sources for book metadata (autocomplete).
+
+    Privacy: only transmits the query string to external APIs.
+    No user identifiers are sent. No responses are persisted.
+    """
+    adapter = OpenLibraryAdapter()
+    use_case = SearchBookMetadata(metadata_provider=adapter)
+
+    try:
+        results = use_case.execute(
+            SearchBookMetadataRequest(query=query, search_type=type)
+        )
+    except InvalidIsbnError:
+        raise HTTPException(
+            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+            detail="invalid_isbn_format",
+        )
+    except MetadataProviderError:
+        raise HTTPException(
+            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+            detail="external_metadata_service_unavailable",
+        )
+
+    return [
+        BookMetadataResponse(
+            title=r.title,
+            author=r.author,
+            genres=r.genres,
+            description=r.description,
+            pages=r.pages,
+            isbn=r.isbn,
+        )
+        for r in results
     ]
 
 

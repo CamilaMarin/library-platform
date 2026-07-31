@@ -6,6 +6,24 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+### Added (Metadata Import — Open Library)
+- `BookMetadata` frozen dataclass in Library domain (transient value object, not persisted)
+- `MetadataProvider` protocol + `MetadataProviderError` in application layer (ADR-0017)
+- `SearchBookMetadata` use case: text search (max 10 results) and ISBN search with normalization/validation
+- `InvalidIsbnError` for malformed ISBN format rejection
+- `OpenLibraryAdapter` infrastructure: Open Library API client with 5s timeout, custom User-Agent, graceful degradation
+- `GET /books/metadata/search?query=&type=` endpoint: auth required, maps errors to 422/503
+- `BookMetadataResponse` Pydantic schema for API responses
+- Frontend autocomplete UI in add book form: debounced search (300ms, 3+ chars), type selector (text/ISBN), results dropdown, form prefill on selection
+- `searchBookMetadata()` helper in api-client.ts
+- `BookMetadata` TypeScript interface
+- 5 Hypothesis property-based tests (ISBN normalization, malformed rejection, result size bound, non-empty title, error propagation)
+- 11 integration tests (happy paths, auth, error mapping)
+
+### Privacy
+- Metadata search transmits only query string to Open Library — no user identifiers, tokens, or personal data (Req 6.1)
+- Search results are transient (never persisted in database)
+
 ## [1.1.0] — 2026-07-31
 
 ### Added (Integrated Reader — EPUB/PDF)
