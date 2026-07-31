@@ -314,11 +314,10 @@ class TestSaveReadingProgressIsolation:
         )
 
         # First save
-        progress1 = uc.execute(request)
-        first_last_read = progress1.last_read_at
+        uc.execute(request)
 
         # Second save with same position — idempotent
-        progress2 = uc.execute(request)
+        uc.execute(request)
 
         # Should still only have one record for this user+copy
         assert progress_repo.find_by_user_and_copy(user_id, copy.id) is not None

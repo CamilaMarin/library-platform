@@ -22,6 +22,8 @@ from app.library.domain.entities import (
     CopyType,
     FileFormat,
     ReadingProgress,
+    ReadingStatus,
+    ReadingStatusValue,
 )
 
 
@@ -289,9 +291,6 @@ class FakeReadingStatusRepository:
 
     def delete(self, user_id: UUID, book_id: UUID) -> None:
         self._store.pop((user_id, book_id), None)
-
-
-from app.library.domain.entities import ReadingStatus, ReadingStatusValue
 
 
 class TestReadingStatusSync:
