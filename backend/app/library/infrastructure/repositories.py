@@ -15,10 +15,17 @@ from app.library.domain.entities import (
     Copy,
     CopyStatus,
     CopyType,
+    FileFormat,
+    ReadingProgress,
     ReadingStatus,
     ReadingStatusValue,
 )
-from app.library.infrastructure.models import BookModel, CopyModel, ReadingStatusModel
+from app.library.infrastructure.models import (
+    BookModel,
+    CopyModel,
+    ReadingProgressModel,
+    ReadingStatusModel,
+)
 
 
 class SqlBookRepository:
@@ -302,4 +309,83 @@ class SqlReadingStatusRepository:
             status=ReadingStatusValue(model.status),
             current_page=model.current_page,
             updated_at=model.updated_at,
+        )
+
+
+class SqlReadingProgressRepository:
+    """SQLAlchemy implementation of ReadingProgressRepository.
+
+    Uses PostgreSQL INSERT ... ON CONFLICT DO UPDATE (upsert) to enforce
+    the UNIQUE(user_id, copy_id) constraint cleanly (Property 3: idempotent).
+    Reference: .kiro/specs/reader/design.md
+    """
+
+    def __init__(self, session: Session):
+        self._session = session
+
+    def upsert(self, progress: ReadingProgress) -> ReadingProgress:
+        """Insert or update progress for a (user_id, copy_id) pair."""
+        stmt = (
+            pg_insert(ReadingProgressModel)
+            .values(
+                id=progress.id,
+                user_id=progress.user_id,
+                copy_id=progress.copy_id,
+                position=progress.position,
+                file_format=progress.file_format.value,
+                percentage=progress.percentage,
+                last_read_at=progress.last_read_at,
+            )
+            .on_conflict_do_update(
+                constraint="uq_reading_progress_user_copy",
+                set_={
+                    "position": progress.position,
+                    "file_format": progress.file_format.value,
+                    "percentage": progress.percentage,
+                    "last_read_at": progress.last_read_at,
+                },
+            )
+        )
+        self._session.execute(stmt)
+        self._session.flush()
+        return progress
+
+    def find_by_user_and_copy(
+        self, user_id: UUID, copy_id: UUID
+    ) -> ReadingProgress | None:
+        model = (
+            self._session.query(ReadingProgressModel)
+            .filter(
+                ReadingProgressModel.user_id == user_id,
+                ReadingProgressModel.copy_id == copy_id,
+            )
+            .first()
+        )
+        return self._to_domain(model) if model else None
+
+    def find_by_user(self, user_id: UUID) -> list[ReadingProgress]:
+        """Return all reading progress records for a user."""
+        models = (
+            self._session.query(ReadingProgressModel)
+            .filter(ReadingProgressModel.user_id == user_id)
+            .all()
+        )
+        return [self._to_domain(m) for m in models]
+
+    def delete_by_copy(self, copy_id: UUID) -> None:
+        """Remove all progress for a copy. Used when a copy is deleted."""
+        self._session.query(ReadingProgressModel).filter(
+            ReadingProgressModel.copy_id == copy_id,
+        ).delete(synchronize_session=False)
+        self._session.flush()
+
+    def _to_domain(self, model: ReadingProgressModel) -> ReadingProgress:
+        return ReadingProgress(
+            id=model.id,
+            user_id=model.user_id,
+            copy_id=model.copy_id,
+            position=model.position,
+            file_format=FileFormat(model.file_format),
+            percentage=model.percentage,
+            last_read_at=model.last_read_at,
         )

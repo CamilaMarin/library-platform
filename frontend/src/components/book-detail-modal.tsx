@@ -1,8 +1,9 @@
 "use client";
 
 import React, { useEffect, useRef, useState } from "react";
+import { useRouter } from "next/navigation";
 import { X } from "lucide-react";
-import { apiPut, apiPatch, apiPost, apiGet } from "@/lib/api-client";
+import { apiPut, apiPatch, apiPost, apiGet, apiPostForm } from "@/lib/api-client";
 import { LoanForm } from "@/components/loan-form";
 import type { Book, CopyWithLoanStatus, ReadingStatusValue, GroupMember, FamilyGroup } from "@/types";
 
@@ -36,7 +37,9 @@ export function BookDetailModal({
   onCopyAdded,
   onLoanCreated,
 }: BookDetailModalProps) {
+  const router = useRouter();
   const dialogRef = useRef<HTMLDivElement>(null);
+  const digitalFileRef = useRef<HTMLInputElement>(null);
   const [pageInput, setPageInput] = useState<string>("");
   const [savingProgress, setSavingProgress] = useState(false);
   const [editing, setEditing] = useState(false);
@@ -53,6 +56,10 @@ export function BookDetailModal({
   // Add copy state
   const [showAddCopy, setShowAddCopy] = useState(false);
   const [addingCopy, setAddingCopy] = useState(false);
+
+  // Digital upload state
+  const [uploadingDigital, setUploadingDigital] = useState(false);
+  const [uploadError, setUploadError] = useState<string | null>(null);
 
   // Loan state
   const [lendCopyId, setLendCopyId] = useState<string | null>(null);
@@ -147,6 +154,35 @@ export function BookDetailModal({
       // silent
     } finally {
       setAddingCopy(false);
+    }
+  };
+
+  const handleDigitalUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (!book || !e.target.files || e.target.files.length === 0) return;
+    const file = e.target.files[0];
+
+    // Client-side max file size: 50MB
+    const MAX_SIZE = 50 * 1024 * 1024;
+    if (file.size > MAX_SIZE) {
+      setUploadError("El archivo excede el tamaño máximo de 50MB.");
+      // Reset file input
+      if (digitalFileRef.current) digitalFileRef.current.value = "";
+      return;
+    }
+
+    setUploadingDigital(true);
+    setUploadError(null);
+    try {
+      const formData = new FormData();
+      formData.append("book_id", book.id);
+      formData.append("file", file);
+      await apiPostForm("/copies/digital", formData);
+      if (onCopyAdded) onCopyAdded();
+    } catch {
+      setUploadError("Error al subir el archivo.");
+    } finally {
+      setUploadingDigital(false);
+      if (digitalFileRef.current) digitalFileRef.current.value = "";
     }
   };
 
@@ -441,6 +477,16 @@ export function BookDetailModal({
                   >
                     {copy.loan_status === "available" ? "Disponible" : "Prestada"}
                   </span>
+                  {copy.format === "digital" && (
+                    <button
+                      type="button"
+                      onClick={() => router.push(`/reader/${copy.id}`)}
+                      className="rounded-full px-3 py-1.5 text-xs font-medium transition-colors"
+                      style={{ background: "var(--color-reading)", color: "var(--color-cream)" }}
+                    >
+                      Leer
+                    </button>
+                  )}
                   {onLoanCreated && copy.format === "physical" && copy.loan_status === "available" && lendCopyId !== copy.id && (
                     <button
                       type="button"
@@ -490,6 +536,28 @@ export function BookDetailModal({
                   Cancelar
                 </button>
               </div>
+            )}
+            <button
+              type="button"
+              onClick={() => digitalFileRef.current?.click()}
+              disabled={uploadingDigital}
+              className="rounded-full px-3 py-1.5 text-xs font-medium transition-colors disabled:opacity-50"
+              style={{ border: "1px solid var(--color-border)", color: "var(--color-ink-soft)" }}
+            >
+              {uploadingDigital ? "Subiendo..." : "+ Subir archivo digital"}
+            </button>
+            <input
+              ref={digitalFileRef}
+              type="file"
+              accept=".epub,.pdf"
+              onChange={handleDigitalUpload}
+              className="hidden"
+              aria-hidden="true"
+            />
+            {uploadError && (
+              <p className="w-full text-xs mt-1" style={{ color: "var(--color-mahogany, #b91c1c)" }}>
+                {uploadError}
+              </p>
             )}
           </div>
         )}
