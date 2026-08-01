@@ -455,6 +455,104 @@ class TestExportEndpoint:
         assert response.status_code == 401
 
 
+class TestGetOppositionsEndpoint:
+    """GET /users/me/oppositions — integration tests.
+
+    Requirements: 2.3, 3.1, 3.4
+    """
+
+    def test_returns_empty_list_for_new_user(self):
+        """New user with no oppositions gets 200 with an empty list."""
+        _, token = _register_and_login(
+            email="oppositions_empty@test.com", name="Empty Oppositions"
+        )
+
+        response = client.get(
+            "/users/me/oppositions",
+            headers={"Authorization": f"Bearer {token}"},
+        )
+        assert response.status_code == 200
+        assert response.json() == {"opposed_purposes": []}
+
+    def test_returns_list_after_post(self):
+        """After POST /users/me/oppose, GET returns a list containing that purpose."""
+        _, token = _register_and_login(
+            email="oppositions_after_post@test.com", name="Post Oppositions"
+        )
+
+        # Register an opposition
+        post_response = client.post(
+            "/users/me/oppose",
+            json={"purpose": "Estadísticas de uso"},
+            headers={"Authorization": f"Bearer {token}"},
+        )
+        assert post_response.status_code == 200
+
+        # Retrieve oppositions
+        response = client.get(
+            "/users/me/oppositions",
+            headers={"Authorization": f"Bearer {token}"},
+        )
+        assert response.status_code == 200
+        data = response.json()
+        assert "Estadísticas de uso" in data["opposed_purposes"]
+
+    def test_no_duplicates_after_double_post(self):
+        """Registering the same purpose twice results in exactly one occurrence."""
+        _, token = _register_and_login(
+            email="oppositions_dedup@test.com", name="Dedup Oppositions"
+        )
+
+        purpose = "Personalización de contenido"
+
+        # Register the same opposition twice
+        for _ in range(2):
+            post_response = client.post(
+                "/users/me/oppose",
+                json={"purpose": purpose},
+                headers={"Authorization": f"Bearer {token}"},
+            )
+            assert post_response.status_code == 200
+
+        # Retrieve oppositions — must contain exactly one occurrence
+        response = client.get(
+            "/users/me/oppositions",
+            headers={"Authorization": f"Bearer {token}"},
+        )
+        assert response.status_code == 200
+        purposes = response.json()["opposed_purposes"]
+        assert purposes.count(purpose) == 1
+
+    def test_requires_auth(self):
+        """GET /users/me/oppositions without Authorization header returns 422."""
+        response = client.get("/users/me/oppositions")
+        assert response.status_code == 422
+
+    def test_rejects_invalid_token(self):
+        """GET /users/me/oppositions with an invalid token returns 401."""
+        response = client.get(
+            "/users/me/oppositions",
+            headers={"Authorization": "Bearer invalid_token"},
+        )
+        assert response.status_code == 401
+
+    def test_post_still_works_after_fix(self):
+        """Regression guard: POST /users/me/oppose still returns OpposeResponse with opposed=True."""
+        _, token = _register_and_login(
+            email="oppositions_regression@test.com", name="Regression Guard"
+        )
+
+        response = client.post(
+            "/users/me/oppose",
+            json={"purpose": "Recomendaciones de lectura"},
+            headers={"Authorization": f"Bearer {token}"},
+        )
+        assert response.status_code == 200
+        data = response.json()
+        assert data["opposed"] is True
+        assert data["processing_purpose"] == "Recomendaciones de lectura"
+
+
 class TestDeleteEndpoint:
     """DELETE /users/me — integration tests."""
 

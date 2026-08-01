@@ -183,3 +183,9 @@ class OpposeResponse(BaseModel):
     user_id: UUID
     processing_purpose: str
     opposed: bool
+
+
+class OppositionsResponse(BaseModel):
+    """Response body for GET /users/me/oppositions."""
+
+    opposed_purposes: list[str]
