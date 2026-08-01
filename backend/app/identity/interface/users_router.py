@@ -23,6 +23,12 @@ from app.identity.application.export_user_data import (
 from app.identity.application.export_user_data import (
     UserNotFoundError as ExportUserNotFoundError,
 )
+from app.identity.application.get_user_oppositions import (
+    GetUserOppositions,
+)
+from app.identity.application.get_user_oppositions import (
+    UserNotFoundError as GetOppositionsUserNotFoundError,
+)
 from app.identity.application.oppose_data_processing import (
     OpposeDataProcessing,
 )
@@ -56,6 +62,7 @@ from app.identity.interface.schemas import (
     ExportUserProfile,
     OpposeRequest,
     OpposeResponse,
+    OppositionsResponse,
     RectifyRequest,
     RectifyResponse,
 )
@@ -238,6 +245,37 @@ def rectify_user_data(
         name=result.name,
         email=result.email,
     )
+
+
+@router.get("/me/oppositions", response_model=OppositionsResponse)
+def get_user_oppositions(
+    current_user_id: UUID = Depends(get_current_user_id),
+    db: Session = Depends(get_db),
+):
+    """List all active data processing oppositions for the authenticated user.
+
+    ARCO opposition right — read access.
+    """
+    user_repo = SqlUserRepository(db)
+    audit_repo = SqlAuditLogRepository(db)
+    audit_service = AuditService(repository=audit_repo)
+
+    use_case = GetUserOppositions(
+        user_repository=user_repo,
+        audit_service=audit_service,
+    )
+
+    try:
+        purposes = use_case.execute(current_user_id)
+    except GetOppositionsUserNotFoundError:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="user_not_found",
+        )
+
+    db.commit()
+
+    return OppositionsResponse(opposed_purposes=purposes)
 
 
 @router.post("/me/oppose", response_model=OpposeResponse)
