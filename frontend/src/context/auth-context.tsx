@@ -35,6 +35,7 @@ interface AuthContextValue extends AuthState {
   login(email: string, password: string): Promise<void>;
   register(data: RegisterRequest): Promise<void>;
   logout(): void;
+  updateUser(fields: Partial<Pick<UserInfo, "name" | "email">>): void;
 }
 
 // === Helpers ===
@@ -188,14 +189,27 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     window.location.href = "/login";
   }, []);
 
+  const updateUser = useCallback(
+    (fields: Partial<Pick<UserInfo, "name" | "email">>) => {
+      setState((prev) => {
+        if (!prev.user) return prev;
+        const updatedUser: UserInfo = { ...prev.user, ...fields };
+        storeUserInfo(updatedUser);
+        return { ...prev, user: updatedUser };
+      });
+    },
+    []
+  );
+
   const value = useMemo<AuthContextValue>(
     () => ({
       ...state,
       login,
       register,
       logout,
+      updateUser,
     }),
-    [state, login, register, logout]
+    [state, login, register, logout, updateUser]
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
