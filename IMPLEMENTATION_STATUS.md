@@ -115,7 +115,7 @@ Last updated: 2026-08-01 (ARCO Profile Panel + view-registered-oppositions bugfi
 - **Spec:** `.kiro/specs/frontend-catchup/`
 - **Completed tasks:** 24/24
 - **Remaining tasks:** 0
-- **Test coverage:** 24 tests passing (7 toast + 9 auth context + 5 API client PBTs + 3 ProtectedRoute PBTs)
+- **Test coverage:** 84 tests passing (7 toast + 9 auth context + 5 API client PBTs + 3 ProtectedRoute PBTs + 27 settings-validation + 2 export-download + 10 settings-page + 11 settings-page-delete + 6 auth-context PBTs + 2 settings-validation PBTs + 2 export-download PBTs)
 - **Pages delivered:**
   - Login (`/login`) — email/password with error mapping
   - Register (`/register`) — consent-gated, field validation
@@ -137,6 +137,13 @@ Last updated: 2026-08-01 (ARCO Profile Panel + view-registered-oppositions bugfi
   - Navigation (desktop sidebar + mobile bottom bar — 5 items on mobile)
   - Shared components (InputField, SelectField, StarRating, ConfirmDialog, Skeleton, LoanCard, LoanForm, CopyStatusBadge)
   - Testing infra (Vitest, React Testing Library, MSW, fast-check)
+- **ARCO Profile Panel additions:**
+  - `ProfileSection`: inline edit form for name/email (PATCH /users/me) with optimistic `updateUser()`
+  - `ArcoSection`: export download + account deletion with email confirmation
+  - `OppositionForm`: chip selectors + free text + active oppositions list on mount
+  - `lib/settings-validation.ts`: validateName, validateEmail, validatePurpose helpers
+  - `lib/export-download.ts`: triggerJsonDownload, generateExportFilename utilities
+  - `updateUser()` added to AuthContext
 - **Visual identity (sala de lectura):**
   - Design tokens: walnut/mahogany/teak/brass/parchment/cream/ink/reading/leather
   - Typography: Playfair Display (editorial) + Inter (UI)
