@@ -144,6 +144,31 @@ export interface ExportData {
   }>;
 }
 
+export interface RectifyRequest {
+  name?: string;
+  email?: string;
+}
+
+export interface RectifyResponse {
+  user_id: string;
+  name: string;
+  email: string;
+}
+
+export interface OpposeRequest {
+  purpose: string;
+}
+
+export interface OpposeResponse {
+  user_id: string;
+  processing_purpose: string;
+  opposed: boolean;
+}
+
+export interface OppositionsResponse {
+  opposed_purposes: string[];
+}
+
 // === Loans ===
 export interface Loan {
   id: string;
