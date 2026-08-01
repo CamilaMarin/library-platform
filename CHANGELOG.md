@@ -16,6 +16,15 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 - Vitest unit + integration tests for settings-validation (27), export-download (2), settings page (10), settings page delete regression (11)
 - PBT tests with Hypothesis/fast-check: auth-context (6), settings-validation (2), export-download (2)
 
+### Fixed (view-registered-oppositions — ARCO opposition read)
+- `GET /users/me/oppositions` was missing — endpoint returned 404; users could register oppositions but had no way to retrieve them
+- Added `GetUserOppositions` use case: reads `privacy_settings["opposed_purposes"]`, logs `AuditAction.ARCO_REQUEST`, handles null/empty settings defensively
+- Added `OppositionsResponse` schema (`opposed_purposes: list[str]`)
+- Added `GET /users/me/oppositions` endpoint with authentication, 404 guard, and ARCO audit log entry
+- Updated `OppositionForm`: fetches active oppositions on mount, renders loading skeleton → empty-state → teak chips list; optimistic update on submit
+- Added `OppositionsResponse` TypeScript interface
+- 33 tests total: 2 exploration (bug confirmed → now fixed), 6 preservation property (POST unchanged), 5 use case unit, 20 integration (including 6 new `TestGetOppositionsEndpoint`)
+
 ### Added (Metadata Import — Open Library)
 - `BookMetadata` frozen dataclass in Library domain (transient value object, not persisted)
 - `MetadataProvider` protocol + `MetadataProviderError` in application layer (ADR-0017)
