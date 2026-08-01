@@ -104,7 +104,7 @@ vi.mock("@/lib/settings-validation", () => ({
 
 // ── Import after mocks ─────────────────────────────────────────────────────────
 
-import { apiDelete } from "@/lib/api-client";
+import { apiDelete, apiGet } from "@/lib/api-client";
 import { clearTokens } from "@/lib/token-storage";
 import SettingsPage from "./page";
 
@@ -114,6 +114,13 @@ let hrefSetter: ReturnType<typeof vi.fn>;
 
 beforeEach(() => {
   vi.clearAllMocks();
+
+  // Default: resolve GET /users/me/oppositions with empty list so the
+  // OppositionForm useEffect doesn't crash on mount.
+  vi.mocked(apiGet).mockImplementation((path: string) => {
+    if (path === "/users/me/oppositions") return Promise.resolve({ opposed_purposes: [] });
+    return Promise.resolve({});
+  });
 
   hrefSetter = vi.fn();
   Object.defineProperty(window, "location", {

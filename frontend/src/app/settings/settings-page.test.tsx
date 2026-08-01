@@ -123,6 +123,14 @@ describe("Settings Page — Integration Tests", () => {
   beforeEach(() => {
     vi.clearAllMocks();
     mockGenerateExportFilename.mockReturnValue("entrelineas-datos-2024-01-15.json");
+
+    // Default: resolve GET /users/me/oppositions with empty list so the
+    // OppositionForm useEffect doesn't crash. Any test that needs a specific
+    // response for /users/me/export should override with mockResolvedValueOnce.
+    mockApiGet.mockImplementation((path: string) => {
+      if (path === "/users/me/oppositions") return Promise.resolve({ opposed_purposes: [] });
+      return Promise.resolve({});
+    });
   });
 
   // ----------------------------------------------------------
@@ -250,7 +258,11 @@ describe("Settings Page — Integration Tests", () => {
         processing_records: [],
       };
 
-      mockApiGet.mockResolvedValueOnce(exportPayload);
+      mockApiGet.mockImplementation((path: string) => {
+        if (path === "/users/me/export") return Promise.resolve(exportPayload);
+        if (path === "/users/me/oppositions") return Promise.resolve({ opposed_purposes: [] });
+        return Promise.resolve({});
+      });
 
       renderSettingsPage();
 
@@ -274,7 +286,11 @@ describe("Settings Page — Integration Tests", () => {
     it("shows inline error with Reintentar button when export fails", async () => {
       const user = userEvent.setup();
 
-      mockApiGet.mockRejectedValueOnce(new Error("Network error"));
+      mockApiGet.mockImplementation((path: string) => {
+        if (path === "/users/me/oppositions") return Promise.resolve({ opposed_purposes: [] });
+        if (path === "/users/me/export") return Promise.reject(new Error("Network error"));
+        return Promise.resolve({});
+      });
 
       renderSettingsPage();
 
@@ -295,10 +311,17 @@ describe("Settings Page — Integration Tests", () => {
         processing_records: [],
       };
 
-      // First call fails, second succeeds
-      mockApiGet
-        .mockRejectedValueOnce(new Error("Network error"))
-        .mockResolvedValueOnce(exportPayload);
+      // First export call fails, second succeeds; oppositions always succeeds
+      let exportCallCount = 0;
+      mockApiGet.mockImplementation((path: string) => {
+        if (path === "/users/me/oppositions") return Promise.resolve({ opposed_purposes: [] });
+        if (path === "/users/me/export") {
+          exportCallCount += 1;
+          if (exportCallCount === 1) return Promise.reject(new Error("Network error"));
+          return Promise.resolve(exportPayload);
+        }
+        return Promise.resolve({});
+      });
 
       renderSettingsPage();
 
