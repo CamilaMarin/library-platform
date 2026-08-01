@@ -23,7 +23,7 @@ A web platform for managing personal libraries (physical and digital) and foster
 | Post-MVP: Integrated Reader | ✅ Complete |
 | Post-MVP: Metadata Import | ✅ Complete |
 
-**12/12 milestones complete + post-MVP reader & metadata import** · Architecture frozen · 17 ADRs · 11 specs · ~470 tests
+**12/12 milestones complete + post-MVP reader & metadata import** · Architecture frozen · 17 ADRs · 11 specs · ~524 tests
 
 ## User Flow
 
@@ -114,7 +114,7 @@ See [docs/deployment.md](docs/deployment.md) for full guide with security checkl
 - **History:** Returned books preserved in "Devueltos" shelf with reading progress
 
 ### Privacy & Security (Ley 21.719)
-- **ARCO rights:** Self-service export, rectify, delete, oppose
+- **ARCO rights:** Self-service export, rectify, delete, oppose, view registered oppositions
 - **Consent gating:** Registration requires explicit privacy consent
 - **Data isolation:** Digital files never shared between accounts (ADR-0001)
 - **Configurable retention:** Policies stored in DB, no hardcoded durations
@@ -138,7 +138,7 @@ See [docs/deployment.md](docs/deployment.md) for full guide with security checkl
 | **Reviews** | 5 | `GET/POST /reviews`, `/shared`, `PATCH/DELETE /{id}`, `GET /books/{id}/reviews` |
 | **Loans** | 4 | `POST /copies/{id}/loans`, `GET /loans`, `/borrowed`, `PATCH /{id}/return` |
 | **Selection** | 3 | `POST /groups/{id}/draws`, `GET /draws`, `/next-picker` |
-| **Privacy** | 4 | `GET /users/me/export`, `PATCH /users/me`, `DELETE /users/me`, `POST /users/me/oppose` |
+| **Privacy** | 5 | `GET /users/me/export`, `PATCH /users/me`, `DELETE /users/me`, `POST/GET /users/me/oppose` |
 | **Admin** | 1 | `POST /admin/retention/run` |
 
 Full API docs available at `http://localhost:8000/docs` (Swagger UI).
@@ -206,7 +206,7 @@ frontend/          Next.js + React + TypeScript + Tailwind
     app/           Pages (library, loans, reviews, groups, clubs, settings, reader…)
     components/    Shared UI (BookSpine, BookShelf, BookDetailModal, PdfReader, EpubReader, Navigation…)
     context/       Auth + Toast providers
-    lib/           API client, token storage, useReadingProgress hook
+    lib/           API client, token storage, useReadingProgress hook, settings-validation, export-download
     types/         TypeScript contracts
 docs/              Project documentation + deployment guide
 .kiro/             Specifications + steering rules

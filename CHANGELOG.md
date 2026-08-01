@@ -6,6 +6,16 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+### Added (ARCO Profile Panel — Settings UI)
+- `ProfileSection` component in `/settings`: inline edit form for name/email with field-level validation, optimistic update via `updateUser()`, PATCH `/users/me`
+- `ArcoSection` component: export download (GET `/users/me/export`), account deletion with email confirmation guard (DELETE `/users/me`)
+- `OppositionForm` component: predefined chip selectors + free text input for POST `/users/me/oppose`; fetches and displays active oppositions list on mount (GET `/users/me/oppositions`); optimistic update on submit
+- `updateUser(fields)` method added to `AuthContext` for optimistic profile updates after rectification
+- `lib/settings-validation.ts`: `validateName`, `validateEmail`, `validatePurpose`, `isRectificationFormValid`, `isOppositionFormValid` helpers
+- `lib/export-download.ts`: `triggerJsonDownload`, `generateExportFilename` utilities
+- Vitest unit + integration tests for settings-validation (27), export-download (2), settings page (10), settings page delete regression (11)
+- PBT tests with Hypothesis/fast-check: auth-context (6), settings-validation (2), export-download (2)
+
 ### Added (Metadata Import — Open Library)
 - `BookMetadata` frozen dataclass in Library domain (transient value object, not persisted)
 - `MetadataProvider` protocol + `MetadataProviderError` in application layer (ADR-0017)
