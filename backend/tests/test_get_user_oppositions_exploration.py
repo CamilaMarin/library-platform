@@ -9,7 +9,6 @@ Counterexample: "GET /users/me/oppositions devuelve 404 porque el endpoint no ex
 Reference: view-registered-oppositions/bugfix.md Req 1.3
 """
 
-import pytest
 from fastapi.testclient import TestClient
 
 from app.main import app

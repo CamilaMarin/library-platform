@@ -537,7 +537,7 @@ class TestGetOppositionsEndpoint:
         assert response.status_code == 401
 
     def test_post_still_works_after_fix(self):
-        """Regression guard: POST /users/me/oppose still returns OpposeResponse with opposed=True."""
+        """Regression guard: POST /users/me/oppose returns OpposeResponse with opposed=True."""
         _, token = _register_and_login(
             email="oppositions_regression@test.com", name="Regression Guard"
         )

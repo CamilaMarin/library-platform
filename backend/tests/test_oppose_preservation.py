@@ -86,7 +86,9 @@ def _register_and_login(
 
 @pytest.mark.property
 class TestProperty2aPostReturnsOpposeResponse:
-    """Property 2a: POST /users/me/oppose returns OpposeResponse(processing_purpose=p, opposed=True).
+    """Property 2a: POST /users/me/oppose returns OpposeResponse.
+
+    Returns OpposeResponse(processing_purpose=p, opposed=True).
 
     For any valid purpose p (1–200 chars), the POST endpoint SHALL return 200
     with an OpposeResponse body where processing_purpose equals p and opposed is True.
@@ -196,7 +198,9 @@ class TestProperty2bIdempotency:
     def test_double_post_same_purpose_no_duplicate_in_export(
         self, purpose: str
     ) -> None:
-        """Two POSTs with the same purpose leave exactly one entry — verified via GET /users/me/export.
+        """Two POSTs with the same purpose leave exactly one entry.
+
+        Verified via GET /users/me/export.
 
         We use GET /users/me/export (which does exist) to inspect the raw user data
         and confirm privacy_settings is not accessible there. We instead use the POST
