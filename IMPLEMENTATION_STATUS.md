@@ -1,6 +1,6 @@
 # Implementation Status — EntreLíneas
 
-Last updated: 2026-07-31 (Post-MVP: Metadata Import)
+Last updated: 2026-08-01 (ARCO Profile Panel + view-registered-oppositions bugfix)
 
 ## Overall Progress
 
@@ -158,11 +158,11 @@ Last updated: 2026-07-31 (Post-MVP: Metadata Import)
 - **Spec:** `.kiro/specs/privacy/`
 - **Completed tasks:** 10/10
 - **Remaining tasks:** 0
-- **Test coverage:** 10 domain tests (M0) + 15 ARCO tests + 10 purge tests + 11 encryption tests + 11 retention tests
+- **Test coverage:** 10 domain tests (M0) + 15 ARCO tests + 10 purge tests + 11 encryption tests + 11 retention tests + 33 view-registered-oppositions (exploration + preservation + unit + integration)
 - **Implemented:**
   - DataConsent, DataProcessingRecord, AuditLog entities + repositories (M0)
   - RetentionPolicy entity with configurable retention job (ADR-0016)
-  - ARCO rights: Export (Access), RectifyUserData (Rectification), DeleteUserAccount (Cancellation), OpposeDataProcessing (Opposition)
+  - ARCO rights: Export (Access), RectifyUserData (Rectification), DeleteUserAccount (Cancellation), OpposeDataProcessing (Opposition), GetUserOppositions (Opposition read)
   - PurgeUserData: cross-cutting data cleanup (digital files, copies, reviews, loans, audit anonymization)
   - FieldEncryptor: Fernet symmetric encryption for PII fields
   - Retention job: configurable policy enforcement via DB (POST /admin/retention/run + CLI script)
