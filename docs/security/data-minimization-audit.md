@@ -4,7 +4,7 @@
 |------------------|----------------------------------------------------|
 | Referencia       | Ley 21.719 — Principio de minimización de datos    |
 | Requisito        | `privacy/requirements.md` Req 1.4                  |
-| Fecha auditoría  | 2026-07-27                                         |
+| Fecha auditoría  | 2026-08-01                                         |
 | Responsable      | Equipo de Ingeniería — Revisión DPO                |
 
 ---
@@ -88,6 +88,17 @@ Criterio: **un campo es necesario si eliminarlo impediría entregar la funcional
 | `file_ref`       | Técnico       | Sí                        | Referencia al archivo digital; sin este campo no se puede servir el contenido. |
 | `status`         | Operacional   | Sí                        | Control de disponibilidad para préstamos.                                     |
 | `created_at`     | Operacional   | Sí                        | Auditoría y retención.                                                        |
+
+### 2.3 Entidad: ReadingProgress
+
+| Campo             | Clasificación | ¿Estrictamente necesario? | Justificación                                                                 |
+|-------------------|---------------|---------------------------|-------------------------------------------------------------------------------|
+| `id`             | Técnico       | Sí                        | Clave primaria.                                                               |
+| `user_id`        | Técnico       | Sí                        | Propietario del progreso; necesario para ownership gate y ARCO.               |
+| `copy_id`        | Técnico       | Sí                        | Ejemplar al que corresponde el progreso; relación estructural.                |
+| `position`       | Personal      | Sí                        | Última posición de lectura (CFI para EPUB, número de página para PDF); sin este campo no se puede restaurar la posición al reabrir el libro. |
+| `format`         | Operacional   | Sí                        | Distingue el formato de posicionamiento (epub/pdf); necesario para interpretar `position` correctamente. |
+| `updated_at`     | Operacional   | Sí                        | Timestamp de última actualización; necesario para sincronización y auditoría. |
 
 ---
 
@@ -179,4 +190,4 @@ Observaciones clave:
 
 ---
 
-*Próxima revisión programada: cuando se agregue un nuevo campo a cualquier entidad del sistema.*
+*Próxima revisión programada: cuando se agregue un nuevo campo a cualquier entidad del sistema. Revisión 2026-08-01: añadida entidad `ReadingProgress` (módulo Integrated Reader, post-MVP).*
